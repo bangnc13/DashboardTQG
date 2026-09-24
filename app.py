@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 1. CẤU HÌNH TRANG & ÉP LIGHT THEME
+# 1. CẤU HÌNH TRANG STREAMLIT & ÉP LIGHT MODE
 st.set_page_config(
     page_title="DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST",
     page_icon="📊",
@@ -10,14 +10,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. OVERRIDE TOÀN BỘ CSS ĐỂ ÉP MÀU SÁNG (LIGHT MODE 100%)
+# 2. OVERRIDE CSS CHO GIAO DIỆN SÁNG CHUẨN ĐÚNG MẪU
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     * { font-family: 'Inter', -apple-system, sans-serif !important; }
     
-    /* Ẩn bớt UI thừa của Streamlit */
+    /* Ẩn Sidebar & các UI mặc định thừa */
     [data-testid="stSidebar"] { display: none !important; }
     [data-testid="collapsedControl"] { display: none !important; }
     #MainMenu {visibility: hidden;}
@@ -99,7 +99,7 @@ st.markdown("""
     .chart-title { font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px; }
     .chart-sub { font-size: 10px; color: #94a3b8; margin-bottom: 4px; }
 
-    /* Ép lại màu cho các ô Input & Selectbox thành màu SÁNG */
+    /* Ô Input & Selectbox màu sáng */
     div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
         background-color: #ffffff !important;
         color: #0f172a !important;
@@ -108,7 +108,7 @@ st.markdown("""
     }
     input { color: #0f172a !important; }
     
-    /* Bảng dữ liệu viền xanh lá mạ chuẩn */
+    /* Bảng dữ liệu viền xanh lá mạ */
     .table-container-box {
         background-color: #f7fee7;
         border: 1.5px solid #bef264;
@@ -121,7 +121,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 3. NẠP DỮ LIỆU FILE EXCEL
+# 3. NẠP VÀ XỬ LÝ DỮ LIỆU FILE EXCEL
 @st.cache_data
 def load_excel_data(file):
     try:
@@ -161,7 +161,7 @@ def load_excel_data(file):
         st.error(f"Lỗi đọc file: {e}")
         return pd.DataFrame()
 
-# 4. HEADER & NÚT UPLOAD FILE
+# 4. HEADER TRÊN CÙNG & NÚT UPLOAD FILE
 h_col1, h_col2 = st.columns([3.5, 1])
 
 with h_col1:
@@ -202,13 +202,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 6. KHU VỰC 4 BIỂU ĐỒ NỀN SÁNG (LIGHT CHARTS)
+# 6. KHU VỰC 4 BIỂU ĐỒ (FIX LỖI UPDATE_LAYOUT & CHỮ SÁNG RÕ)
 chart_style = {
     'paper_bgcolor': '#ffffff',
     'plot_bgcolor': '#ffffff',
-    'font': {'color': '#334155', 'size': 11},
-    'xaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0'},
-    'yaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0'},
+    'font': {'color': '#1e293b', 'size': 11, 'family': 'Inter'},
     'margin': dict(l=10, r=10, t=10, b=10)
 }
 
@@ -225,7 +223,9 @@ with c1:
         df_chart1, x='CL LẶP', y='Số ca', color='Độ Ưu Tiên', barmode='group',
         color_discrete_map={'SOS': '#f43f5e', 'Support': '#3b82f6'}
     )
-    fig1.update_layout(**chart_style, height=190, showlegend=True, legend=dict(orientation="h", y=1.1, x=0.2))
+    fig1.update_layout(**chart_style, height=200, showlegend=True, legend=dict(orientation="h", y=1.1, x=0.2))
+    fig1.update_xaxes(title_text="CL LẶP", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig1.update_yaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
     st.plotly_chart(fig1, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -238,7 +238,9 @@ with c2:
     df_chart2 = df_raw['BLOCK'].value_counts().head(5).reset_index()
     df_chart2.columns = ['BLOCK', 'Số ca']
     fig2 = px.bar(df_chart2, y='BLOCK', x='Số ca', orientation='h', color_discrete_sequence=['#0284c7'])
-    fig2.update_layout(**chart_style, height=190, yaxis={'categoryorder':'total ascending'})
+    fig2.update_layout(**chart_style, height=200)
+    fig2.update_xaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig2.update_yaxes(title_text="BLOCK", categoryorder='total ascending', title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
     st.plotly_chart(fig2, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -253,7 +255,9 @@ with c3:
     df_chart3 = df_raw['POP'].value_counts().head(5).reset_index()
     df_chart3.columns = ['POP', 'Số ca']
     fig3 = px.bar(df_chart3, x='POP', y='Số ca', color_discrete_sequence=['#10b981'])
-    fig3.update_layout(**chart_style, height=190)
+    fig3.update_layout(**chart_style, height=200)
+    fig3.update_xaxes(title_text="POP", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig3.update_yaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
     st.plotly_chart(fig3, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
@@ -266,11 +270,13 @@ with c4:
     df_chart4 = df_raw['NHÂN SỰ'].value_counts().head(5).reset_index()
     df_chart4.columns = ['NHÂN SỰ', 'Số ca']
     fig4 = px.bar(df_chart4, x='NHÂN SỰ', y='Số ca', color_discrete_sequence=['#a855f7'])
-    fig4.update_layout(**chart_style, height=190)
+    fig4.update_layout(**chart_style, height=200)
+    fig4.update_xaxes(title_text="NHÂN SỰ", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig4.update_yaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
     st.plotly_chart(fig4, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# 7. KHU VỰC BẢNG DỮ LIỆU NỀN XANH LÁ MẠ TỰC TRỰC
+# 7. KHU VỰC BẢNG DỮ LIỆU NỀN XANH LÁ MẠ CHUẨN
 st.markdown("""
 <div class="table-container-box">
     <div class="table-header-title">📊 BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA</div>
@@ -279,7 +285,7 @@ st.markdown("""
 
 list_mgr = sorted([str(x).strip() for x in df_raw['QUẢN LÝ'].unique() if pd.notna(x) and str(x).strip() != ''])
 
-# BỘ LỌC NGANG MÀU SÁNG
+# BỘ LỌC NGANG
 f1, f2, f3, f4, f5, f6 = st.columns([2, 1.5, 1.5, 1.5, 1.5, 1.5])
 
 with f1:
@@ -324,7 +330,7 @@ if search_input:
         df_table['GHI CHÚ CSKH'].astype(str).str.lower().str.contains(s_val)
     ]
 
-# TẠO DATAFRAME CHUẨN ĐỊNH DẠNG
+# TẠO DATAFRAME TẢI LÊN BẢNG
 df_display = pd.DataFrame()
 df_display['STT'] = range(1, len(df_table) + 1)
 df_display['SỐ HĐ'] = df_table['SỐ HĐ'].astype(str).values
@@ -337,7 +343,7 @@ df_display['TỒN GIỜ'] = df_table['TỒN GIỜ'].astype(str).values
 df_display['KIỂM SOÁT'] = df_table['KIỂM SOÁT'].astype(str).values
 df_display['GHI CHÚ CSKH'] = df_table['GHI CHÚ CSKH'].astype(str).values
 
-# HIỂN THỊ BẢNG
+# BẢNG HIỂN THỊ
 st.data_editor(
     df_display,
     column_config={
