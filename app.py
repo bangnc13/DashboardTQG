@@ -9,7 +9,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Thêm CSS ẩn header/footer mặc định của Streamlit để giao diện chuẩn 100%
+# Thêm CSS ẩn header/footer mặc định của Streamlit
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -25,7 +25,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Toàn bộ nội dung HTML/CSS/JS của bạn được nhúng trực tiếp
 html_content = """
 <!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
@@ -130,7 +129,6 @@ html_content = """
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <!-- Title & Badge -->
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-paleOlive-600 to-paleOlive-400 flex items-center justify-center text-white font-bold shadow-md shadow-paleOlive-200 dark:shadow-none">
                         <i class="fa-solid fa-list-check text-xl"></i>
@@ -146,7 +144,6 @@ html_content = """
                     </div>
                 </div>
 
-                <!-- Actions & Dark mode toggle -->
                 <div class="flex items-center space-x-3">
                     <button id="syncBtn" onclick="fetchGoogleSheetData(true)" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate mr-2 text-sm"></i>
@@ -690,7 +687,6 @@ html_content = """
             const textColor = isDark ? '#94a3b8' : '#475569';
             const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(203, 213, 225, 0.4)';
 
-            // 1. Chart Repeat vs Priority
             const sosRepeat = data.filter(d => String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS') && (d["CL Lặp"] || 0) > 0).length;
             const sosNoRepeat = data.filter(d => String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS') && (d["CL Lặp"] || 0) === 0).length;
             const suppRepeat = data.filter(d => !String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS') && (d["CL Lặp"] || 0) > 0).length;
@@ -732,7 +728,6 @@ html_content = """
                 });
             }
 
-            // 2. Chart Top Block
             const blockMap = {};
             data.forEach(d => {
                 if (d["Block"]) blockMap[d["Block"]] = (blockMap[d["Block"]] || 0) + 1;
@@ -766,7 +761,6 @@ html_content = """
                 });
             }
 
-            // 3. Chart Top POP
             const popMap = {};
             data.forEach(d => {
                 if (d["POP"]) popMap[d["POP"]] = (popMap[d["POP"]] || 0) + 1;
@@ -799,7 +793,6 @@ html_content = """
                 });
             }
 
-            // 4. Chart Top Tech
             const techMap = {};
             data.forEach(d => {
                 if (d["Nhân sự"]) techMap[d["Nhân sự"]] = (techMap[d["Nhân sự"]] || 0) + 1;
@@ -893,6 +886,9 @@ html_content = """
                         if (cleanName === 'an' || cleanName === 'cột an') {
                             return cleanH === 'an' || cleanH === 'cột an' || cleanH === 'cot an';
                         }
+                        if (cleanName === 'v' || cleanName === 'cột v') {
+                            return cleanH === 'v' || cleanH === 'cột v' || cleanH === 'cot v';
+                        }
                         return cleanH.includes(cleanName);
                     });
                 });
@@ -907,7 +903,10 @@ html_content = """
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
-            const colPriorityIdx = getColIndex(['Độ Ưu Tiên', 'Độ Ưu', 'SOS'], 26);
+            
+            // Cấu hình Cột V (Index = 21 trong JavaScript mảng 0-indexed) cho Mức SOS / Độ Ưu Tiên
+            const colPriorityIdx = getColIndex(['cột v', 'v', 'mức sos', 'độ ưu tiên', 'độ ưu', 'sos'], 21);
+            
             const colPopIdx = getColIndex(['POP', 'Trạm POP'], 37);
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
             const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
@@ -935,7 +934,7 @@ html_content = """
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": String(row[colTechIdx] || '').trim(),
                     "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
-                    "Độ Ưu Tiên": String(row[colPriorityIdx] || '').trim(),
+                    "Độ Ưu Tiên": String(row[colPriorityIdx] || '').trim(), // Lấy chính xác từ cột V (index 21)
                     "POP": String(row[colPopIdx] || '').trim(),
                     "Kiểm soát": String(row[colControlIdx] || '').trim(),
                     "Cột AN": String(row[colANIdx] || '').trim(),
