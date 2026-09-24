@@ -401,7 +401,7 @@ html_content = """
                             <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Quản Lý</th>
                             <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">KH Giục Tiến Độ</th>
                             <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Tồn Giờ</th>
-                            <th class="py-3 px-3 min-w-[220px]">Ghi Chú CSKH</th>
+                            <th class="py-3 px-3 min-w-[250px]">Ghi Chú CSKH</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 dark:divide-paleOlive-800/40 bg-paleOlive-50/30 dark:bg-paleOlive-950/20">
@@ -642,7 +642,7 @@ html_content = """
                         <td class="py-2.5 px-3 font-medium text-paleOlive-900 dark:text-paleOlive-200 col-highlight">${item["Cột AN"] || '-'}</td>
                         <td class="py-2.5 px-3 font-medium text-rose-600 dark:text-rose-400">${urgentBadge}</td>
                         <td class="py-2.5 px-3 text-center ${tonGioClass}">${item["Tồn giờ"] ?? 0}h</td>
-                        <td class="py-2.5 px-3 text-slate-600 dark:text-slate-400 truncate max-w-xs" title="${item["Ghi Chú CC"] || ''}">${item["Ghi Chú CC"] || '-'}</td>
+                        <td class="py-2.5 px-3 text-slate-600 dark:text-slate-400 whitespace-normal break-words min-w-[250px] leading-relaxed">${item["Ghi Chú CC"] || '-'}</td>
                     </tr>
                 `;
             }).join('');
@@ -864,7 +864,7 @@ html_content = """
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
-            const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục'], 21); // Cột V trong Google Sheet (index 21)
+            const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục'], 21);
             const colPopIdx = getColIndex(['POP', 'Trạm POP'], 37);
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
             const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
