@@ -904,7 +904,7 @@ html_content = """
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
             
-            // Cấu hình Cột V (Index = 21 trong JavaScript mảng 0-indexed) cho Mức SOS / Độ Ưu Tiên
+            // --- ĐÃ ĐIỀU CHỈNH: Lấy Mức SOS / Độ Ưu Tiên từ Cột V (Cột thứ 22 trong Excel/Google Sheets, Index 21 trong Mảng) ---
             const colPriorityIdx = getColIndex(['cột v', 'v', 'mức sos', 'độ ưu tiên', 'độ ưu', 'sos'], 21);
             
             const colPopIdx = getColIndex(['POP', 'Trạm POP'], 37);
@@ -934,7 +934,7 @@ html_content = """
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": String(row[colTechIdx] || '').trim(),
                     "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
-                    "Độ Ưu Tiên": String(row[colPriorityIdx] || '').trim(), // Lấy chính xác từ cột V (index 21)
+                    "Độ Ưu Tiên": String(row[colPriorityIdx] || '').trim(), // Lấy từ Cột V
                     "POP": String(row[colPopIdx] || '').trim(),
                     "Kiểm soát": String(row[colControlIdx] || '').trim(),
                     "Cột AN": String(row[colANIdx] || '').trim(),
