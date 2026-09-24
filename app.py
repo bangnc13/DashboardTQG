@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 # Cấu hình trang rộng tràn màn hình (Wide mode)
 st.set_page_config(
-    page_title="Dashboard Kiểm Soát Ca Tồn & Checklist (CLL)",
+    page_title="TQG-Dashboard Kiểm Soát Ca Tồn & Checklist (CLL)",
     page_icon="📋",
     layout="wide",
     initial_sidebar_state="collapsed"
