@@ -328,7 +328,7 @@ html_content = """
                     <div>
                         <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
                             <i class="fa-solid fa-network-wired text-emerald-500 mr-2"></i>
-                            3. Tồn theo POP
+                            3. Tồn theo POP (Cột U - 7 Ký Tự)
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400">Cụm trạm kỹ thuật quản lý hạ tầng</p>
                     </div>
@@ -957,7 +957,10 @@ html_content = """
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
             const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục'], 21);
-            const colPopIdx = getColIndex(['POP', 'Trạm POP'], 37);
+            
+            // CỘT U = index 20 (A=0, B=1, ..., U=20)
+            const colPopIdx = 20; 
+
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
             const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
             const colTtclIdx = getColIndex(['TTCL', 'Trạng Thái', 'Trạng thái'], 19);
@@ -977,6 +980,10 @@ html_content = """
                 // VLOOKUP tên Quản lý từ managerMapping
                 const quanLyName = managerMapping[nhanSuKey] || String(row[colANIdx] || '').trim();
 
+                // Lấy 7 ký tự đầu tiên ở Cột U cho POP
+                const popRaw = String(row[colPopIdx] || '').trim();
+                const popValue = popRaw.substring(0, 7);
+
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
@@ -989,9 +996,9 @@ html_content = """
                     "Nhân sự": nhanSuKey,
                     "KH Giục Tiến Độ": String(row[colUrgentIdx] || '').trim(),
                     "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
-                    "POP": String(row[colPopIdx] || '').trim(),
+                    "POP": popValue, // Cột U lấy 7 ký tự đầu tiên
                     "Kiểm soát": String(row[colControlIdx] || '').trim(),
-                    "Cột AN": quanLyName, // Sử dụng kết quả VLOOKUP
+                    "Cột AN": quanLyName,
                     "Ghi Chú CC": String(row[colNoteIdx] || '').trim()
                 });
             }
