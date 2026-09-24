@@ -1,1026 +1,1133 @@
-# Generated Python code from HTML
-def generate_html():
-    """Function that returns the HTML content"""
-    from html import escape
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Kiểm Soát Ca Tồn & Checklist (CLL)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS (xlsx) for processing Excel files -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        },
+                        paleOlive: {
+                            50: '#f7f9f2',
+                            100: '#e9efdc',
+                            200: '#d4e1bd',
+                            300: '#b7ce96',
+                            400: '#94b36c',
+                            500: '#759948',
+                            600: '#5c7b35',
+                            700: '#465e28',
+                            800: '#3a4e23',
+                            900: '#30411d',
+                        },
+                        amberYellow: '#fef08a',
+                        amberBorder: '#eab308'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        
+        .col-highlight {
+            background-color: #f7f9f2 !important;
+            border-left: 1px solid #d4e1bd;
+            border-right: 1px solid #d4e1bd;
+        }
+        .dark .col-highlight {
+            background-color: rgba(117, 153, 72, 0.12) !important;
+            border-left: 1px solid rgba(117, 153, 72, 0.3);
+            border-right: 1px solid rgba(117, 153, 72, 0.3);
+        }
+        
+        .table-olive-theme {
+            background-color: #f7f9f2;
+        }
+        .dark .table-olive-theme {
+            background-color: rgba(117, 153, 72, 0.08);
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-toast {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+    </style>
+</head>
+<body class="h-full text-slate-800 dark:text-slate-100 dark:bg-slate-900 font-sans antialiased flex flex-col">
 
-    return """\
-<!DOCTYPE html>\n"
-        "<html lang=\"vi\" class=\"light\">\n"
-        "<head>\n"
-        "    <meta charset=\"UTF-8\">\n"
-        "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n"
-        "    <title>Dashboard Kiểm Soát Ca Tồn & Triển Khai (Bảo Trì & TK)</title>\n"
-        "    <!-- Tailwind CSS CDN -->\n"
-        "    <script src=\"https://cdn.tailwindcss.com\"></script>\n"
-        "    <!-- Chart.js CDN -->\n"
-        "    <script src=\"https://cdn.jsdelivr.net/npm/chart.js\"></script>\n"
-        "    <!-- SheetJS (xlsx) CDN -->\n"
-        "    <script src=\"https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js\"></script>\n"
-        "    <!-- FontAwesome CDN -->\n"
-        "    <link rel=\"stylesheet\" href=\"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css\">\n"
-        "    <!-- Google Fonts: Inter -->\n"
-        "    <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap\" rel=\"stylesheet\">\n"
-        "    \n"
-        "    <script>\n"
-        "        tailwind.config = {\n"
-        "            darkMode: \'class\',\n"
-        "            theme: {\n"
-        "                extend: {\n"
-        "                    colors: {\n"
-        "                        paleOlive: {\n"
-        "                            50: \'#f7f9f2\',\n"
-        "                            100: \'#e9efdc\',\n"
-        "                            200: \'#d4e1bd\',\n"
-        "                            300: \'#b7ce96\',\n"
-        "                            400: \'#94b36c\',\n"
-        "                            500: \'#759948\',\n"
-        "                            600: \'#5c7b35\',\n"
-        "                            700: \'#465e28\',\n"
-        "                            800: \'#3a4e23\',\n"
-        "                            900: \'#30411d\',\n"
-        "                            950: \'#1a250e\'\n"
-        "                        }\n"
-        "                    },\n"
-        "                    fontFamily: {\n"
-        "                        sans: [\'Inter\', \'sans-serif\'],\n"
-        "                    }\n"
-        "                }\n"
-        "            }\n"
-        "        }\n"
-        "    </script>\n"
-        "    <style>\n"
-        "        body { font-family: \'Inter\', sans-serif; }\n"
-        "        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }\n"
-        "        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }\n"
-        "        .custom-scrollbar::-webkit-scrollbar-thumb { background: #b7ce96; border-radius: 4px; }\n"
-        "        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #759948; }\n"
-        "        .col-highlight { background-color: #f7f9f2 !important; }\n"
-        "        .dark .col-highlight { background-color: rgba(117, 153, 72, 0.15) !important; }\n"
-        "    </style>\n"
-        "</head>\n"
-        "<body class=\"bg-gray-50 dark:bg-slate-900 text-gray-800 dark:text-gray-100 antialiased min-h-screen flex flex-col transition-colors duration-200\">\n"
-        "\n"
-        "    <!-- Toast Notification Container -->\n"
-        "    <div id=\"toastContainer\" class=\"fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none\"></div>\n"
-        "\n"
-        "    <!-- Top Navigation Bar -->\n"
-        "    <header class=\"bg-white dark:bg-slate-800 border-b border-paleOlive-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm\">\n"
-        "        <div class=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4\">\n"
-        "            <div class=\"flex items-center space-x-3\">\n"
-        "                <div class=\"w-10 h-10 rounded-xl bg-paleOlive-500 flex items-center justify-center text-white font-bold text-lg shadow-md shadow-paleOlive-200 dark:shadow-none\">\n"
-        "                    <i class=\"fa-solid fa-chart-line\"></i>\n"
-        "                </div>\n"
-        "                <div>\n"
-        "                    <h1 class=\"font-bold text-gray-900 dark:text-white text-base sm:text-lg leading-tight\">DASHBOARD KIỂM SOÁT CA TỒN & TRIỂN KHAI</h1>\n"
-        "                    <p class=\"text-xs text-paleOlive-600 dark:text-paleOlive-400 font-medium hidden sm:block\">Hệ Thống Theo Dõi Vận Hành & Kiểm Soát Chuẩn Realtime</p>\n"
-        "                </div>\n"
-        "            </div>\n"
-        "\n"
-        "            <!-- Sheet Switcher Tabs -->\n"
-        "            <div class=\"flex bg-paleOlive-100 dark:bg-slate-700 p-1 rounded-xl border border-paleOlive-200 dark:border-slate-600\">\n"
-        "                <button id=\"btnSheetTon\" onclick=\"switchSheet(\'Ton\')\" class=\"px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-paleOlive-500 text-white shadow-sm\">\n"
-        "                    <i class=\"fa-solid fa-list-check\"></i>\n"
-        "                    <span>SHEET TỒN (BẢO TRÌ)</span>\n"
-        "                </button>\n"
-        "                <button id=\"btnSheetTK\" onclick=\"switchSheet(\'TK\')\" class=\"px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-paleOlive-800 dark:text-paleOlive-200 hover:bg-paleOlive-200/60 dark:hover:bg-slate-600\">\n"
-        "                    <i class=\"fa-solid fa-truck-fast\"></i>\n"
-        "                    <span>SHEET TK (TRIỂN KHAI)</span>\n"
-        "                </button>\n"
-        "            </div>\n"
-        "\n"
-        "            <div class=\"flex items-center space-x-2\">\n"
-        "                <label for=\"excelFileInput\" class=\"cursor-pointer bg-paleOlive-500 hover:bg-paleOlive-600 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm\">\n"
-        "                    <i class=\"fa-solid fa-file-excel text-sm\"></i>\n"
-        "                    <span class=\"hidden md:inline\">Cập nhật File Excel</span>\n"
-        "                </label>\n"
-        "                <input type=\"file\" id=\"excelFileInput\" accept=\".xlsx, .xls, .csv\" class=\"hidden\" onchange=\"handleFileUpload(event)\">\n"
-        "\n"
-        "                <button onclick=\"exportDataCSV()\" class=\"bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-xs font-medium transition flex items-center gap-1.5 shadow-sm\" title=\"Xuất dữ liệu CSV/Excel\">\n"
-        "                    <i class=\"fa-solid fa-download\"></i>\n"
-        "                    <span class=\"hidden md:inline\">Export</span>\n"
-        "                </button>\n"
-        "\n"
-        "                <button onclick=\"toggleDarkMode()\" class=\"p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 transition\" title=\"Đổi giao diện Sáng / Tối\">\n"
-        "                    <i class=\"fa-solid fa-moon dark:hidden text-base\"></i>\n"
-        "                    <i class=\"fa-solid fa-sun hidden dark:inline text-base text-amber-400\"></i>\n"
-        "                </button>\n"
-        "            </div>\n"
-        "        </div>\n"
-        "    </header>\n"
-        "\n"
-        "    <!-- Main Container -->\n"
-        "    <main class=\"max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6 flex-1 w-full\">\n"
-        "\n"
-        "        <!-- Info Banner for Active Sheet -->\n"
-        "        <div id=\"infoBanner\" class=\"bg-paleOlive-50 dark:bg-paleOlive-950/40 border-l-4 border-paleOlive-500 p-4 rounded-r-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 border border-paleOlive-200 dark:border-paleOlive-800\">\n"
-        "            <div class=\"flex items-start space-x-3\">\n"
-        "                <i class=\"fa-solid fa-circle-info text-paleOlive-700 dark:text-paleOlive-300 text-lg mt-0.5\"></i>\n"
-        "                <div class=\"text-xs text-paleOlive-950 dark:text-paleOlive-100 space-y-1\">\n"
-        "                    <p class=\"font-semibold text-sm\" id=\"bannerTitle\">Các trường thông tin kiểm soát trọng yếu (Bảo Trì):</p>\n"
-        "                    <div class=\"flex flex-wrap gap-2 pt-1\" id=\"bannerBadges\">\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Số HĐ</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Khách Hàng</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Block</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Lần Hẹn</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">CL Lặp</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Nhân Sự</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Quản Lý</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Tồn Giờ</span>\n"
-        "                        <span class=\"bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium\">Kiểm Soát</span>\n"
-        "                    </div>\n"
-        "                </div>\n"
-        "            </div>\n"
-        "            <div class=\"text-right text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap self-end md:self-center\">\n"
-        "                Dữ liệu hiện tại: <span id=\"recordCountBadge\" class=\"font-bold text-gray-800 dark:text-gray-200\">0</span> ca\n"
-        "            </div>\n"
-        "        </div>\n"
-        "\n"
-        "        <!-- KPI Metrics Grid -->\n"
-        "        <div class=\"grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4\" id=\"kpiContainer\">\n"
-        "            <!-- Dynamically Rendered KPIs -->\n"
-        "        </div>\n"
-        "\n"
-        "        <!-- Filter Toolbar -->\n"
-        "        <div class=\"bg-white dark:bg-slate-800 p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm space-y-3\">\n"
-        "            <div class=\"flex flex-wrap items-center justify-between gap-3\">\n"
-        "                <div class=\"flex items-center gap-2 text-paleOlive-800 dark:text-paleOlive-300 font-semibold text-sm\">\n"
-        "                    <i class=\"fa-solid fa-filter text-paleOlive-600 dark:text-paleOlive-400\"></i>\n"
-        "                    <span>BỘ LỌC DỮ LIỆU CONTROL</span>\n"
-        "                </div>\n"
-        "                <div class=\"flex items-center gap-3\">\n"
-        "                    <button onclick=\"resetFilters()\" class=\"text-xs text-paleOlive-700 dark:text-paleOlive-300 hover:text-paleOlive-900 font-medium px-3 py-1.5 rounded-md hover:bg-paleOlive-100 dark:hover:bg-slate-700 border border-paleOlive-200 dark:border-slate-600 transition\">\n"
-        "                        <i class=\"fa-solid fa-rotate-right mr-1\"></i> Xóa Lọc\n"
-        "                    </button>\n"
-        "                </div>\n"
-        "            </div>\n"
-        "\n"
-        "            <div class=\"grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3\" id=\"filterInputsGroup\">\n"
-        "                <!-- Dynamic Filters per Sheet -->\n"
-        "            </div>\n"
-        "        </div>\n"
-        "\n"
-        "        <!-- Charts Section -->\n"
-        "        <div class=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4\" id=\"chartsGrid\">\n"
-        "            <!-- Dynamically populated chart cards -->\n"
-        "        </div>\n"
-        "\n"
-        "        <!-- Table Section -->\n"
-        "        <div class=\"bg-white dark:bg-slate-800 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm overflow-hidden\">\n"
-        "            <div class=\"p-4 border-b border-paleOlive-200 dark:border-slate-700 bg-paleOlive-50/50 dark:bg-slate-800/80 flex flex-wrap justify-between items-center gap-3\">\n"
-        "                <div>\n"
-        "                    <h2 class=\"font-bold text-gray-900 dark:text-white text-base\" id=\"tableTitle\">BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA (BẢO TRÌ)</h2>\n"
-        "                    <p class=\"text-xs text-paleOlive-700 dark:text-paleOlive-400\">Xem, tìm kiếm, lọc và cập nhật trực tiếp trạng thái Kiểm Soát</p>\n"
-        "                </div>\n"
-        "                <div class=\"text-xs font-semibold px-3 py-1.5 rounded-lg bg-paleOlive-100 dark:bg-paleOlive-900/40 text-paleOlive-800 dark:text-paleOlive-200 border border-paleOlive-200 dark:border-paleOlive-800\">\n"
-        "                    Hiển thị: <span id=\"displayedCount\" class=\"text-paleOlive-900 dark:text-white font-bold\">0</span> / <span id=\"totalCount\" class=\"text-paleOlive-900 dark:text-white font-bold\">0</span> ca\n"
-        "                </div>\n"
-        "            </div>\n"
-        "\n"
-        "            <!-- Scrollable Table -->\n"
-        "            <div class=\"overflow-x-auto custom-scrollbar\">\n"
-        "                <table class=\"w-full text-left text-xs border-collapse\">\n"
-        "                    <thead id=\"tableHeader\" class=\"bg-paleOlive-100 dark:bg-paleOlive-900/60 text-paleOlive-900 dark:text-paleOlive-200 font-bold uppercase tracking-wider border-b border-paleOlive-200 dark:border-slate-700\">\n"
-        "                        <!-- Rendered via JS -->\n"
-        "                    </thead>\n"
-        "                    <tbody id=\"tableBody\" class=\"divide-y divide-paleOlive-100 dark:divide-slate-700/60 bg-paleOlive-50/20 dark:bg-slate-900/20 text-gray-700 dark:text-gray-300\">\n"
-        "                        <!-- Rendered via JS -->\n"
-        "                    </tbody>\n"
-        "                </table>\n"
-        "            </div>\n"
-        "            \n"
-        "            <div class=\"p-3 bg-paleOlive-50 dark:bg-slate-800/60 border-t border-paleOlive-200 dark:border-slate-700 flex justify-between items-center text-xs text-paleOlive-800 dark:text-paleOlive-400\">\n"
-        "                <span class=\"italic\">Hệ Thống Kiểm Soát Vận Hành Kỹ Thuật</span>\n"
-        "                <span class=\"font-medium\">BangNC13-TQG</span>\n"
-        "            </div>\n"
-        "        </div>\n"
-        "    </main>\n"
-        "\n"
-        "    <footer class=\"bg-white dark:bg-slate-800 border-t border-paleOlive-200 dark:border-slate-700 py-4 mt-auto\">\n"
-        "        <div class=\"max-w-7xl mx-auto px-4 text-center text-xs text-gray-500 dark:text-gray-400\">\n"
-        "            Dashboard Kiểm Soát Ca Tồn & Triển Khai &bull; BangNC13-TQG\n"
-        "        </div>\n"
-        "    </footer>\n"
-        "\n"
-        "    <script>\n"
-        "        // Global Application State\n"
-        "        let activeSheet = \'Ton\'; // \'Ton\' or \'TK\'\n"
-        "        let rawDataTon = [];\n"
-        "        let rawDataTK = [];\n"
-        "        let auditStatuses = {}; // Stores dropdown evaluations key: HĐ\n"
-        "\n"
-        "        let chart1 = null;\n"
-        "        let chart2 = null;\n"
-        "        let chart3 = null;\n"
-        "        let chart4 = null;\n"
-        "\n"
-        "        // Toast Notification Display Helper\n"
-        "        function showToast(message, type = \'info\') {\n"
-        "            const container = document.getElementById(\'toastContainer\');\n"
-        "            if (!container) return;\n"
-        "\n"
-        "            const toast = document.createElement(\'div\');\n"
-        "            const bgClass = type === \'success\' ? \'bg-emerald-600\' : type === \'error\' ? \'bg-red-600\' : \'bg-blue-600\';\n"
-        "            toast.className = `${bgClass} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-2 transition-all transform duration-300 opacity-0 translate-y-2 pointer-events-auto text-xs font-medium`;\n"
-        "            toast.innerHTML = `<i class=\"fa-solid ${type === \'success\' ? \'fa-circle-check\' : type === \'error\' ? \'fa-triangle-exclamation\' : \'fa-circle-info\'}\"></i> <span>${message}</span>`;\n"
-        "            \n"
-        "            container.appendChild(toast);\n"
-        "\n"
-        "            setTimeout(() => {\n"
-        "                toast.classList.remove(\'opacity-0\', \'translate-y-2\');\n"
-        "            }, 10);\n"
-        "\n"
-        "            setTimeout(() => {\n"
-        "                toast.classList.add(\'opacity-0\', \'translate-y-2\');\n"
-        "                setTimeout(() => toast.remove(), 300);\n"
-        "            }, 3500);\n"
-        "        }\n"
-        "\n"
-        "        // Generate Default Mock Data for immediate visual presentation\n"
-        "        function initDefaultData() {\n"
-        "            rawDataTon = [\n"
-        "                { id: \'SGN102931\', customerName: \'Nguyễn Văn A\', block: \'Phuong An Tuong-001- L02\', tonGio: 38, lanHen: 2, clLap: 1, nhanSu: \'TQGTI.KHANHLQ1\', quanLy: \'ANHHV15\', pop: \'TQG01\', ttcl: \'Chờ Xử Lý\', sos: \'SOS\', ghiChu: \'Khách yêu cầu xử lý khẩn\' },\n"
-        "                { id: \'SGN102932\', customerName: \'Công Ty Kim Long\', block: \'Xa Nhu Khe-001- L02\', tonGio: 14, lanHen: 1, clLap: 0, nhanSu: \'TQGTI.ANHPH3\', quanLy: \'ANHHV15\', pop: \'TQG02\', ttcl: \'Đang Xử Lý\', sos: \'Support\', ghiChu: \'Khách hẹn chiều nay\' },\n"
-        "                { id: \'SGN102933\', customerName: \'Trần Thị C\', block: \'Phuong An Tuong-001- L02\', tonGio: 52, lanHen: 3, clLap: 2, nhanSu: \'TQGTI.BINHLV6\', quanLy: \'QUANLY_B\', pop: \'TQG01\', ttcl: \'Đang XL\', sos: \'SOS\', ghiChu: \'Mất tín hiệu lặp lại\' },\n"
-        "                { id: \'SGN102934\', customerName: \'Phạm Minh D\', block: \'Trung Tam-002\', tonGio: 8, lanHen: 1, clLap: 0, nhanSu: \'TQGTI.CAONB\', quanLy: \'QUANLY_B\', pop: \'TQG03\', ttcl: \'Hoàn Thành\', sos: \'Support\', ghiChu: \'Đã bảo trì ONT\' },\n"
-        "                { id: \'SGN102935\', customerName: \'Lê Hoàng E\', block: \'Phuong An Tuong-001- L02\', tonGio: 28, lanHen: 2, clLap: 1, nhanSu: \'TQGTI.KHANHLQ1\', quanLy: \'ANHHV15\', pop: \'TQG01\', ttcl: \'Đang XL\', sos: \'Support\', ghiChu: \'Cần hạ dây đấu nối\' }\n"
-        "            ];\n"
-        "\n"
-        "            rawDataTK = [\n"
-        "                { id: \'TQAAF1677\', customerName: \'TIN TQG\', block: \'Phuong An Tuong-001- L02\', loaiCV: \'Triển khai mới\', nhanSu: \'TQGTI.KHANHLQ1\', quanLy: \'ANHHV15\', ghiChu: \'Mới kéo cáp\' },\n"
-        "                { id: \'TQAAF1851\', customerName: \'TIN TQG\', block: \'Xa Nhu Khe-001- L02\', loaiCV: \'Triển khai mới\', nhanSu: \'TQGTI.KHANHLQ1\', quanLy: \'ANHHV15\', ghiChu: \'Khách báo mai có nhà\' },\n"
-        "                { id: \'TQAAF1902\', customerName: \'Công Ty Nam Việt\', block: \'Trung Tam-002\', loaiCV: \'Nâng cấp thiết bị\', nhanSu: \'TQGTI.ANHPH3\', quanLy: \'ANHHV15\', ghiChu: \'Chuyển đổi IP Tĩnh\' },\n"
-        "                { id: \'TQAAF2011\', customerName: \'Vũ Thị H\', block: \'Phuong An Tuong-001- L02\', loaiCV: \'Triển khai mới\', nhanSu: \'TQGTI.BINHLV6\', quanLy: \'QUANLY_B\', ghiChu: \'Lắp đợt 2\' }\n"
-        "            ];\n"
-        "        }\n"
-        "\n"
-        "        // Handle File Upload & Parse Sheets\n"
-        "        function handleFileUpload(e) {\n"
-        "            const file = e.target.files[0];\n"
-        "            if (!file) return;\n"
-        "\n"
-        "            const reader = new FileReader();\n"
-        "            reader.onload = function(evt) {\n"
-        "                try {\n"
-        "                    const data = new Uint8Array(evt.target.result);\n"
-        "                    const workbook = XLSX.read(data, { type: \'array\' });\n"
-        "\n"
-        "                    let foundTon = false;\n"
-        "                    let foundTK = false;\n"
-        "\n"
-        "                    workbook.SheetNames.forEach(sheetName => {\n"
-        "                        const rawName = sheetName;\n"
-        "                        const normalizedName = sheetName.trim().toUpperCase();\n"
-        "                        const sheet = workbook.Sheets[sheetName];\n"
-        "                        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });\n"
-        "\n"
-        "                        // Ưu tiên kiểm tra sheet Bảo Trì: bao gồm cả \" BT\"\n"
-        "                        if (rawName.includes(\'BT\') || normalizedName.includes(\'BT\') || normalizedName.includes(\'TỒN\') || normalizedName.includes(\'TON\') || normalizedName.includes(\'BẢO TRÌ\') || normalizedName.includes(\'BAO TRI\') || normalizedName === \'SHEET1\') {\n"
-        "                            rawDataTon = parseSheetTon(json);\n"
-        "                            foundTon = true;\n"
-        "                        } else if (normalizedName === \'TK\' || normalizedName.includes(\'TRIỂN KHAI\') || normalizedName.includes(\'TRIEN KHAI\')) {\n"
-        "                            rawDataTK = parseSheetTK(json);\n"
-        "                            foundTK = true;\n"
-        "                        }\n"
-        "                    });\n"
-        "\n"
-        "                    if (!foundTon && !foundTK && workbook.SheetNames.length > 0) {\n"
-        "                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { header: 1 });\n"
-        "                        rawDataTon = parseSheetTon(json);\n"
-        "                    }\n"
-        "\n"
-        "                    showToast(`Tải file thành công! Đã cập nhật dữ liệu.`, \'success\');\n"
-        "                    renderDashboard();\n"
-        "                } catch (err) {\n"
-        "                    console.error(err);\n"
-        "                    showToast(\'Lỗi khi đọc file Excel. Vui lòng kiểm tra cấu trúc sheet.\', \'error\');\n"
-        "                }\n"
-        "            };\n"
-        "            reader.readAsArrayBuffer(file);\n"
-        "        }\n"
-        "\n"
-        "        // Parse Sheet Tồn / Bảo Trì (\" BT\")\n"
-        "        function parseSheetTon(rows) {\n"
-        "            if (!rows || rows.length < 2) return [];\n"
-        "\n"
-        "            let headerIdx = -1;\n"
-        "            let colMap = {};\n"
-        "\n"
-        "            for (let i = 0; i < Math.min(rows.length, 10); i++) {\n"
-        "                const rowStr = (rows[i] || []).map(cell => String(cell || \'\').toUpperCase()).join(\' \');\n"
-        "                if (rowStr.includes(\'HĐ\') || rowStr.includes(\'HỢP ĐỒNG\') || rowStr.includes(\'NHÂN SỰ\') || rowStr.includes(\'BLOCK\')) {\n"
-        "                    headerIdx = i;\n"
-        "                    rows[i].forEach((colName, colIdx) => {\n"
-        "                        const name = String(colName || \'\').trim().toUpperCase();\n"
-        "                        if (name.includes(\'HĐ\') || name.includes(\'HỢP ĐỒNG\') || name.includes(\'SỐ HĐ\')) colMap.id = colIdx;\n"
-        "                        else if (name.includes(\'KHÁCH HÀNG\') || name.includes(\'TEN KH\') || name.includes(\'TÊN KH\')) colMap.customerName = colIdx;\n"
-        "                        else if (name.includes(\'BLOCK\')) colMap.block = colIdx;\n"
-        "                        else if (name.includes(\'TỒN GIỜ\') || name.includes(\'GIỜ TỒN\') || name.includes(\'TỒN (GIỜ)\')) colMap.tonGio = colIdx;\n"
-        "                        else if (name.includes(\'LẦN HẸN\') || name.includes(\'LAN HEN\')) colMap.lanHen = colIdx;\n"
-        "                        else if (name.includes(\'LẶP\') || name.includes(\'CL LẶP\')) colMap.clLap = colIdx;\n"
-        "                        else if (name.includes(\'NHÂN SỰ\') || name.includes(\'KTV\') || name.includes(\'NHAN SU\')) colMap.nhanSu = colIdx;\n"
-        "                        else if (name.includes(\'QUẢN LÝ\') || name.includes(\'QUAN LY\') || name.includes(\'CÁN BỘ\')) colMap.quanLy = colIdx;\n"
-        "                        else if (name.includes(\'SOS\') || name.includes(\'MỨC SOS\')) colMap.sos = colIdx;\n"
-        "                        else if (name.includes(\'POP\') || name.includes(\'TRẠM\')) colMap.pop = colIdx;\n"
-        "                        else if (name.includes(\'TRẠNG THÁI\') || name.includes(\'TTCL\')) colMap.ttcl = colIdx;\n"
-        "                        else if (name.includes(\'GHI CHÚ\') || name.includes(\'NOTE\')) colMap.ghiChu = colIdx;\n"
-        "                    });\n"
-        "                    break;\n"
-        "                }\n"
-        "            }\n"
-        "\n"
-        "            const startRow = headerIdx >= 0 ? headerIdx + 1 : 1;\n"
-        "            const result = [];\n"
-        "\n"
-        "            for (let i = startRow; i < rows.length; i++) {\n"
-        "                const r = rows[i];\n"
-        "                if (!r || r.length === 0) continue;\n"
-        "\n"
-        "                const id = colMap.id !== undefined ? String(r[colMap.id] || \'\').trim() : (r[5] ? String(r[5]).trim() : (r[2] ? String(r[2]).trim() : \'\'));\n"
-        "                if (!id) continue;\n"
-        "\n"
-        "                const customerName = colMap.customerName !== undefined ? String(r[colMap.customerName] || \'\').trim() : (r[6] ? String(r[6]).trim() : (r[3] ? String(r[3]).trim() : \'\'));\n"
-        "                const block = colMap.block !== undefined ? String(r[colMap.block] || \'\').trim() : (r[4] ? String(r[4]).trim() : (r[1] ? String(r[1]).trim() : \'\'));\n"
-        "                const tonGioRaw = parseFloat(colMap.tonGio !== undefined ? r[colMap.tonGio] : (r[8] || r[5])) || 0;\n"
-        "                const lanHen = parseInt(colMap.lanHen !== undefined ? r[colMap.lanHen] : (r[14] || r[6])) || 1;\n"
-        "                const clLap = parseInt(colMap.clLap !== undefined ? r[colMap.clLap] : (r[15] || r[7])) || 0;\n"
-        "                const nhanSu = colMap.nhanSu !== undefined ? String(r[colMap.nhanSu] || \'\').trim() : (r[18] ? String(r[18]).trim() : (r[8] ? String(r[8]).trim() : \'\'));\n"
-        "                const quanLy = colMap.quanLy !== undefined ? String(r[colMap.quanLy] || \'\').trim() : (r[39] ? String(r[39]).trim() : (r[14] ? String(r[14]).trim() : \'\'));\n"
-        "                const sosRaw = colMap.sos !== undefined ? String(r[colMap.sos] || \'\').trim() : (r[26] ? String(r[26]).trim() : (r[10] ? String(r[10]).trim() : \'\'));\n"
-        "                const pop = colMap.pop !== undefined ? String(r[colMap.pop] || \'\').trim() : (r[28] ? String(r[28]).trim() : (r[11] ? String(r[11]).trim() : \'\'));\n"
-        "                const ttcl = colMap.ttcl !== undefined ? String(r[colMap.ttcl] || \'\').trim() : (r[19] ? String(r[19]).trim() : (r[9] ? String(r[9]).trim() : \'Đang XL\'));\n"
-        "                const ghiChu = colMap.ghiChu !== undefined ? String(r[colMap.ghiChu] || \'\').trim() : (r[38] ? String(r[38]).trim() : (r[22] ? String(r[22]).trim() : \'\'));\n"
-        "\n"
-        "                result.push({\n"
-        "                    id, customerName, block,\n"
-        "                    tonGio: tonGioRaw,\n"
-        "                    lanHen, clLap, nhanSu, quanLy, pop, ttcl,\n"
-        "                    sos: sosRaw.toUpperCase().includes(\'SOS\') ? \'SOS\' : \'Support\',\n"
-        "                    ghiChu\n"
-        "                });\n"
-        "            }\n"
-        "            return result;\n"
-        "        }\n"
-        "\n"
-        "        // Parse Sheet TK\n"
-        "        function parseSheetTK(rows) {\n"
-        "            if (!rows || rows.length < 2) return [];\n"
-        "\n"
-        "            let headerIdx = -1;\n"
-        "            let colMap = {};\n"
-        "\n"
-        "            for (let i = 0; i < Math.min(rows.length, 10); i++) {\n"
-        "                const rowStr = (rows[i] || []).map(cell => String(cell || \'\').toUpperCase()).join(\' \');\n"
-        "                if (rowStr.includes(\'HĐ\') || rowStr.includes(\'HỢP ĐỒNG\') || rowStr.includes(\'NHÂN SỰ\') || rowStr.includes(\'BLOCK\')) {\n"
-        "                    headerIdx = i;\n"
-        "                    rows[i].forEach((colName, colIdx) => {\n"
-        "                        const name = String(colName || \'\').trim().toUpperCase();\n"
-        "                        if (name.includes(\'HĐ\') || name.includes(\'HỢP ĐỒNG\') || name.includes(\'SỐ HĐ\')) colMap.id = colIdx;\n"
-        "                        else if (name.includes(\'KHÁCH HÀNG\') || name.includes(\'TEN KH\') || name.includes(\'TÊN KH\')) colMap.customerName = colIdx;\n"
-        "                        else if (name.includes(\'BLOCK\')) colMap.block = colIdx;\n"
-        "                        else if (name.includes(\'LOẠI\') || name.includes(\'CÔNG VIỆC\') || name.includes(\'LOAI CV\')) colMap.loaiCV = colIdx;\n"
-        "                        else if (name.includes(\'NHÂN SỰ\') || name.includes(\'KTV\') || name.includes(\'NHAN SU\')) colMap.nhanSu = colIdx;\n"
-        "                        else if (name.includes(\'QUẢN LÝ\') || name.includes(\'QUAN LY\') || name.includes(\'CÁN BỘ\')) colMap.quanLy = colIdx;\n"
-        "                        else if (name.includes(\'GHI CHÚ\') || name.includes(\'NOTE\')) colMap.ghiChu = colIdx;\n"
-        "                    });\n"
-        "                    break;\n"
-        "                }\n"
-        "            }\n"
-        "\n"
-        "            const startRow = headerIdx >= 0 ? headerIdx + 1 : 1;\n"
-        "            const result = [];\n"
-        "\n"
-        "            for (let i = startRow; i < rows.length; i++) {\n"
-        "                const r = rows[i];\n"
-        "                if (!r || r.length === 0) continue;\n"
-        "\n"
-        "                const id = colMap.id !== undefined ? String(r[colMap.id] || \'\').trim() : String(r[3] || \'\').trim();\n"
-        "                if (!id) continue;\n"
-        "\n"
-        "                const customerName = colMap.customerName !== undefined ? String(r[colMap.customerName] || \'\').trim() : String(r[4] || \'\').trim();\n"
-        "                const block = colMap.block !== undefined ? String(r[colMap.block] || \'\').trim() : String(r[5] || \'\').trim();\n"
-        "                const loaiCV = colMap.loaiCV !== undefined ? String(r[colMap.loaiCV] || \'\').trim() : (r[12] ? String(r[12]).trim() : \'Triển khai mới\');\n"
-        "                const nhanSu = colMap.nhanSu !== undefined ? String(r[colMap.nhanSu] || \'\').trim() : String(r[17] || \'\').trim();\n"
-        "                const quanLy = colMap.quanLy !== undefined ? String(r[colMap.quanLy] || \'\').trim() : String(r[22] || \'\').trim();\n"
-        "                const ghiChu = colMap.ghiChu !== undefined ? String(r[colMap.ghiChu] || \'\').trim() : String(r[21] || \'\').trim();\n"
-        "\n"
-        "                result.push({ id, customerName, block, loaiCV, nhanSu, quanLy, ghiChu });\n"
-        "            }\n"
-        "            return result;\n"
-        "        }\n"
-        "\n"
-        "        // Switch Active Sheet\n"
-        "        function switchSheet(sheetType) {\n"
-        "            activeSheet = sheetType;\n"
-        "\n"
-        "            const btnTon = document.getElementById(\'btnSheetTon\');\n"
-        "            const btnTK = document.getElementById(\'btnSheetTK\');\n"
-        "            const bannerTitle = document.getElementById(\'bannerTitle\');\n"
-        "            const tableTitle = document.getElementById(\'tableTitle\');\n"
-        "\n"
-        "            if (sheetType === \'Ton\') {\n"
-        "                btnTon.className = \"px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-paleOlive-500 text-white shadow-sm\";\n"
-        "                btnTK.className = \"px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-paleOlive-800 dark:text-paleOlive-200 hover:bg-paleOlive-200/60 dark:hover:bg-slate-600\";\n"
-        "                \n"
-        "                bannerTitle.innerText = \"Các trường thông tin kiểm soát trọng yếu (Bảo Trì):\";\n"
-        "                tableTitle.innerText = \"BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA (BẢO TRÌ)\";\n"
-        "            } else {\n"
-        "                btnTK.className = \"px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-paleOlive-500 text-white shadow-sm\";\n"
-        "                btnTon.className = \"px-3 sm:px-5 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-paleOlive-800 dark:text-paleOlive-200 hover:bg-paleOlive-200/60 dark:hover:bg-slate-600\";\n"
-        "                \n"
-        "                bannerTitle.innerText = \"Các trường thông tin kiểm soát trọng yếu (Triển Khai):\";\n"
-        "                tableTitle.innerText = \"BẢNG KIỂM SOÁT DỮ LIỆU TRIỂN KHAI (TK)\";\n"
-        "            }\n"
-        "\n"
-        "            renderDashboard();\n"
-        "        }\n"
-        "\n"
-        "        // Render Dashboard KPI Cards\n"
-        "        function renderKPIs() {\n"
-        "            const container = document.getElementById(\'kpiContainer\');\n"
-        "            const data = activeSheet === \'Ton\' ? rawDataTon : rawDataTK;\n"
-        "\n"
-        "            document.getElementById(\'recordCountBadge\').innerText = data.length;\n"
-        "\n"
-        "            if (activeSheet === \'Ton\') {\n"
-        "                const total = data.length;\n"
-        "                const sosCount = data.filter(d => d.sos === \'SOS\').length;\n"
-        "                const lapCount = data.filter(d => d.clLap > 0).length;\n"
-        "                const henCount = data.filter(d => d.lanHen > 1).length;\n"
-        "                const tonOver24 = data.filter(d => d.tonGio >= 24).length;\n"
-        "                const checkedCount = data.filter(d => auditStatuses[d.id] && auditStatuses[d.id] !== \'\').length;\n"
-        "\n"
-        "                container.innerHTML = `\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between\">\n"
-        "                        <span class=\"text-xs text-paleOlive-700 dark:text-paleOlive-400 font-semibold uppercase\">Tổng ca tồn</span>\n"
-        "                        <div class=\"text-2xl font-bold text-gray-900 dark:text-white my-1\">${total}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Tất cả hợp đồng</span>\n"
-        "                    </div>\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between\">\n"
-        "                        <span class=\"text-xs text-red-600 dark:text-red-400 font-semibold uppercase\">Mức SOS</span>\n"
-        "                        <div class=\"text-2xl font-bold text-red-600 dark:text-red-400 my-1\">${sosCount}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Ưu tiên xử lý</span>\n"
-        "                    </div>\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between\">\n"
-        "                        <span class=\"text-xs text-amber-600 dark:text-amber-400 font-semibold uppercase\">CL Lặp > 0</span>\n"
-        "                        <div class=\"text-2xl font-bold text-amber-600 dark:text-amber-400 my-1\">${lapCount}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Bị lặp chất lượng</span>\n"
-        "                    </div>\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between\">\n"
-        "                        <span class=\"text-xs text-purple-600 dark:text-purple-400 font-semibold uppercase\">Đã hẹn > 1 lần</span>\n"
-        "                        <div class=\"text-2xl font-bold text-purple-600 dark:text-purple-400 my-1\">${henCount}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Trễ hẹn nhiều lần</span>\n"
-        "                    </div>\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between\">\n"
-        "                        <span class=\"text-xs text-rose-600 dark:text-rose-400 font-semibold uppercase\">Tồn > 24 Giờ</span>\n"
-        "                        <div class=\"text-2xl font-bold text-rose-600 dark:text-rose-400 my-1\">${tonOver24}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Vượt SLA tiêu chuẩn</span>\n"
-        "                    </div>\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between\">\n"
-        "                        <span class=\"text-xs text-emerald-600 dark:text-emerald-400 font-semibold uppercase\">Đã Kiểm Soát</span>\n"
-        "                        <div class=\"text-2xl font-bold text-emerald-600 dark:text-emerald-400 my-1\">${checkedCount}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Đã đánh giá status</span>\n"
-        "                    </div>\n"
-        "                `;\n"
-        "            } else {\n"
-        "                const total = data.length;\n"
-        "                const newTK = data.filter(d => d.loaiCV.toLowerCase().includes(\'mới\')).length;\n"
-        "                const upgradeTK = data.filter(d => d.loaiCV.toLowerCase().includes(\'nâng\') || d.loaiCV.toLowerCase().includes(\'chuyển\')).length;\n"
-        "\n"
-        "                container.innerHTML = `\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between sm:col-span-2\">\n"
-        "                        <span class=\"text-xs text-paleOlive-700 dark:text-paleOlive-400 font-semibold uppercase\">Tổng ca triển khai</span>\n"
-        "                        <div class=\"text-2xl font-bold text-gray-900 dark:text-white my-1\">${total}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Số lượng hợp đồng triển khai</span>\n"
-        "                    </div>\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between sm:col-span-2\">\n"
-        "                        <span class=\"text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase\">Ca Triển Khai Mới</span>\n"
-        "                        <div class=\"text-2xl font-bold text-blue-600 dark:text-blue-400 my-1\">${newTK}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Công việc lắp mới</span>\n"
-        "                    </div>\n"
-        "                    <div class=\"bg-white dark:bg-slate-800 p-3 sm:p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm flex flex-col justify-between sm:col-span-2\">\n"
-        "                        <span class=\"text-xs text-purple-600 dark:text-purple-400 font-semibold uppercase\">Nâng cấp / Chuyển điểm</span>\n"
-        "                        <div class=\"text-2xl font-bold text-purple-600 dark:text-purple-400 my-1\">${upgradeTK}</div>\n"
-        "                        <span class=\"text-[10px] text-gray-500 dark:text-gray-400\">Dịch vụ bổ sung</span>\n"
-        "                    </div>\n"
-        "                `;\n"
-        "            }\n"
-        "        }\n"
-        "\n"
-        "        // Render Dynamic Controls Filters\n"
-        "        function renderFilters() {\n"
-        "            const container = document.getElementById(\'filterInputsGroup\');\n"
-        "            const data = activeSheet === \'Ton\' ? rawDataTon : rawDataTK;\n"
-        "\n"
-        "            const quanLyList = [...new Set(data.map(d => d.quanLy).filter(Boolean))].sort();\n"
-        "            const blockList = [...new Set(data.map(d => d.block).filter(Boolean))].sort();\n"
-        "\n"
-        "            if (activeSheet === \'Ton\') {\n"
-        "                container.innerHTML = `\n"
-        "                    <div class=\"relative\">\n"
-        "                        <i class=\"fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs\"></i>\n"
-        "                        <input type=\"text\" id=\"filterSearch\" oninput=\"applyFiltersAndRenderTable()\" placeholder=\"Tìm Số HĐ, Tên KH, Ghi chú...\" class=\"w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 focus:border-paleOlive-500 border dark:text-white\">\n"
-        "                    </div>\n"
-        "                    \n"
-        "                    <select id=\"filterQuanLy\" onchange=\"onQuanLyChange()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border font-semibold text-paleOlive-900 dark:text-paleOlive-200\">\n"
-        "                        <option value=\"\">Tất cả Quản lý</option>\n"
-        "                        ${quanLyList.map(q => `<option value=\"${q}\">${q}</option>`).join(\'\')}\n"
-        "                    </select>\n"
-        "\n"
-        "                    <select id=\"filterNhanSu\" onchange=\"applyFiltersAndRenderTable()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                        <option value=\"\">Tất cả Nhân sự</option>\n"
-        "                    </select>\n"
-        "\n"
-        "                    <select id=\"filterSOS\" onchange=\"applyFiltersAndRenderTable()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                        <option value=\"\">Tất cả Mức SOS</option>\n"
-        "                        <option value=\"SOS\">Chỉ lấy: SOS</option>\n"
-        "                        <option value=\"Support\">Chỉ lấy: Support</option>\n"
-        "                    </select>\n"
-        "\n"
-        "                    <select id=\"filterRepeat\" onchange=\"applyFiltersAndRenderTable()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                        <option value=\"\">Tất cả CL Lặp</option>\n"
-        "                        <option value=\"NON_ZERO\">Chỉ khác 0 (Lặp > 0)</option>\n"
-        "                        <option value=\"0\">Bằng 0 (= 0)</option>\n"
-        "                        <option value=\"1\">Lặp 1 lần</option>\n"
-        "                        <option value=\"2\">Lặp 2 lần</option>\n"
-        "                        <option value=\"3\">Lặp ≥ 3 lần</option>\n"
-        "                    </select>\n"
-        "\n"
-        "                    <select id=\"filterBlock\" onchange=\"applyFiltersAndRenderTable()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                        <option value=\"\">Tất cả Block</option>\n"
-        "                        ${blockList.map(b => `<option value=\"${b}\">${b}</option>`).join(\'\')}\n"
-        "                    </select>\n"
-        "                `;\n"
-        "            } else {\n"
-        "                const loaiCVList = [...new Set(data.map(d => d.loaiCV).filter(Boolean))].sort();\n"
-        "\n"
-        "                container.innerHTML = `\n"
-        "                    <div class=\"relative sm:col-span-2\">\n"
-        "                        <i class=\"fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-gray-400 text-xs\"></i>\n"
-        "                        <input type=\"text\" id=\"filterSearch\" oninput=\"applyFiltersAndRenderTable()\" placeholder=\"Tìm Số HĐ, Tên KH, Ghi chú...\" class=\"w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                    </div>\n"
-        "\n"
-        "                    <select id=\"filterLoaiCV\" onchange=\"applyFiltersAndRenderTable()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                        <option value=\"\">Tất cả Loại CV</option>\n"
-        "                        ${loaiCVList.map(l => `<option value=\"${l}\">${l}</option>`).join(\'\')}\n"
-        "                    </select>\n"
-        "\n"
-        "                    <select id=\"filterQuanLy\" onchange=\"onQuanLyChange()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border font-semibold text-paleOlive-900 dark:text-paleOlive-200\">\n"
-        "                        <option value=\"\">Tất cả Quản lý</option>\n"
-        "                        ${quanLyList.map(q => `<option value=\"${q}\">${q}</option>`).join(\'\')}\n"
-        "                    </select>\n"
-        "\n"
-        "                    <select id=\"filterNhanSu\" onchange=\"applyFiltersAndRenderTable()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                        <option value=\"\">Tất cả Nhân sự</option>\n"
-        "                    </select>\n"
-        "\n"
-        "                    <select id=\"filterBlock\" onchange=\"applyFiltersAndRenderTable()\" class=\"w-full py-1.5 px-3 text-xs rounded-lg border-paleOlive-200 dark:border-slate-600 dark:bg-slate-900 focus:ring-paleOlive-500 border dark:text-white\">\n"
-        "                        <option value=\"\">Tất cả Block</option>\n"
-        "                        ${blockList.map(b => `<option value=\"${b}\">${b}</option>`).join(\'\')}\n"
-        "                    </select>\n"
-        "                `;\n"
-        "            }\n"
-        "\n"
-        "            // Tự động cập nhật danh sách Nhân sự theo Quản lý đã chọn\n"
-        "            updateNhanSuDropdown();\n"
-        "        }\n"
-        "\n"
-        "        // Event handler when Manager dropdown changes\n"
-        "        function onQuanLyChange() {\n"
-        "            updateNhanSuDropdown();\n"
-        "            applyFiltersAndRenderTable();\n"
-        "        }\n"
-        "\n"
-        "        // Dynamically update Staff dropdown based on current selected Manager\n"
-        "        function updateNhanSuDropdown() {\n"
-        "            const data = activeSheet === \'Ton\' ? rawDataTon : rawDataTK;\n"
-        "            const quanLyVal = document.getElementById(\'filterQuanLy\')?.value || \'\';\n"
-        "            const selectNhanSu = document.getElementById(\'filterNhanSu\');\n"
-        "            if (!selectNhanSu) return;\n"
-        "\n"
-        "            const currentSelectedNhanSu = selectNhanSu.value;\n"
-        "\n"
-        "            // Filter relevant data by manager if selected\n"
-        "            const relevantData = quanLyVal ? data.filter(d => d.quanLy === quanLyVal) : data;\n"
-        "            const nhanSuList = [...new Set(relevantData.map(d => d.nhanSu).filter(Boolean))].sort();\n"
-        "\n"
-        "            selectNhanSu.innerHTML = `<option value=\"\">Tất cả Nhân sự</option>` + \n"
-        "                nhanSuList.map(s => `<option value=\"${s}\">${s}</option>`).join(\'\');\n"
-        "\n"
-        "            // Keep existing selection if still available in new filtered list\n"
-        "            if (nhanSuList.includes(currentSelectedNhanSu)) {\n"
-        "                selectNhanSu.value = currentSelectedNhanSu;\n"
-        "            } else {\n"
-        "                selectNhanSu.value = \'\';\n"
-        "            }\n"
-        "        }\n"
-        "\n"
-        "        // Filter Data & Render Both Table and Charts\n"
-        "        function applyFiltersAndRenderTable() {\n"
-        "            const data = activeSheet === \'Ton\' ? rawDataTon : rawDataTK;\n"
-        "            const searchVal = document.getElementById(\'filterSearch\')?.value.toLowerCase() || \'\';\n"
-        "            const quanLyVal = document.getElementById(\'filterQuanLy\')?.value || \'\';\n"
-        "            const nhanSuVal = document.getElementById(\'filterNhanSu\')?.value || \'\';\n"
-        "            const blockVal = document.getElementById(\'filterBlock\')?.value || \'\';\n"
-        "\n"
-        "            let filtered = data.filter(item => {\n"
-        "                const matchSearch = !searchVal || \n"
-        "                    (item.id && item.id.toLowerCase().includes(searchVal)) ||\n"
-        "                    (item.customerName && item.customerName.toLowerCase().includes(searchVal)) ||\n"
-        "                    (item.ghiChu && item.ghiChu.toLowerCase().includes(searchVal));\n"
-        "\n"
-        "                const matchQuanLy = !quanLyVal || item.quanLy === quanLyVal;\n"
-        "                const matchNhanSu = !nhanSuVal || item.nhanSu === nhanSuVal;\n"
-        "                const matchBlock = !blockVal || item.block === blockVal;\n"
-        "\n"
-        "                if (activeSheet === \'Ton\') {\n"
-        "                    const sosVal = document.getElementById(\'filterSOS\')?.value || \'\';\n"
-        "                    const repeatVal = document.getElementById(\'filterRepeat\')?.value || \'\';\n"
-        "\n"
-        "                    const matchSOS = !sosVal || item.sos === sosVal;\n"
-        "                    let matchRepeat = true;\n"
-        "\n"
-        "                    if (repeatVal === \'NON_ZERO\') matchRepeat = item.clLap > 0;\n"
-        "                    else if (repeatVal === \'0\') matchRepeat = item.clLap === 0;\n"
-        "                    else if (repeatVal === \'1\') matchRepeat = item.clLap === 1;\n"
-        "                    else if (repeatVal === \'2\') matchRepeat = item.clLap === 2;\n"
-        "                    else if (repeatVal === \'3\') matchRepeat = item.clLap >= 3;\n"
-        "\n"
-        "                    return matchSearch && matchQuanLy && matchNhanSu && matchBlock && matchSOS && matchRepeat;\n"
-        "                } else {\n"
-        "                    const loaiCVVal = document.getElementById(\'filterLoaiCV\')?.value || \'\';\n"
-        "                    const matchLoaiCV = !loaiCVVal || item.loaiCV === loaiCVVal;\n"
-        "\n"
-        "                    return matchSearch && matchQuanLy && matchNhanSu && matchBlock && matchLoaiCV;\n"
-        "                }\n"
-        "            });\n"
-        "\n"
-        "            document.getElementById(\'displayedCount\').innerText = filtered.length;\n"
-        "            document.getElementById(\'totalCount\').innerText = data.length;\n"
-        "\n"
-        "            renderTableHead();\n"
-        "            renderTableBody(filtered);\n"
-        "            renderCharts(filtered);\n"
-        "        }\n"
-        "\n"
-        "        // Clear All Filter Inputs\n"
-        "        function resetFilters() {\n"
-        "            renderFilters();\n"
-        "            applyFiltersAndRenderTable();\n"
-        "        }\n"
-        "\n"
-        "        // Render Table Header Columns\n"
-        "        function renderTableHead() {\n"
-        "            const head = document.getElementById(\'tableHeader\');\n"
-        "            if (activeSheet === \'Ton\') {\n"
-        "                head.innerHTML = `\n"
-        "                    <tr>\n"
-        "                        <th class=\"py-3 px-3 w-12 text-center\">STT</th>\n"
-        "                        <th class=\"py-3 px-3\">SỐ HĐ</th>\n"
-        "                        <th class=\"py-3 px-3\">KHÁCH HÀNG</th>\n"
-        "                        <th class=\"py-3 px-3\">BLOCK</th>\n"
-        "                        <th class=\"py-3 px-3 text-center\">MỨC SOS</th>\n"
-        "                        <th class=\"py-3 px-3 text-center\">TỒN GIỜ</th>\n"
-        "                        <th class=\"py-3 px-3 text-center\">LẦN HẸN</th>\n"
-        "                        <th class=\"py-3 px-3 text-center\">CL LẶP</th>\n"
-        "                        <th class=\"py-3 px-3\">NHÂN SỰ</th>\n"
-        "                        <th class=\"py-3 px-3\">QUẢN LÝ</th>\n"
-        "                        <th class=\"py-3 px-3 min-w-[140px]\">KIỂM SOÁT</th>\n"
-        "                        <th class=\"py-3 px-3\">GHI CHÚ CHI TIẾT</th>\n"
-        "                    </tr>\n"
-        "                `;\n"
-        "            } else {\n"
-        "                head.innerHTML = `\n"
-        "                    <tr>\n"
-        "                        <th class=\"py-3 px-3 w-12 text-center\">STT</th>\n"
-        "                        <th class=\"py-3 px-3\">SỐ HĐ</th>\n"
-        "                        <th class=\"py-3 px-3\">KHÁCH HÀNG</th>\n"
-        "                        <th class=\"py-3 px-3\">BLOCK</th>\n"
-        "                        <th class=\"py-3 px-3\">LOẠI HÌNH / CV</th>\n"
-        "                        <th class=\"py-3 px-3\">NHÂN SỰ</th>\n"
-        "                        <th class=\"py-3 px-3\">QUẢN LÝ</th>\n"
-        "                        <th class=\"py-3 px-3\">GHI CHÚ CHI TIẾT</th>\n"
-        "                    </tr>\n"
-        "                `;\n"
-        "            }\n"
-        "        }\n"
-        "\n"
-        "        // Render Rows in Data Table\n"
-        "        function renderTableBody(data) {\n"
-        "            const body = document.getElementById(\'tableBody\');\n"
-        "            if (!data || data.length === 0) {\n"
-        "                body.innerHTML = `\n"
-        "                    <tr>\n"
-        "                        <td colspan=\"12\" class=\"py-8 text-center text-gray-400 italic\">\n"
-        "                            Không tìm thấy dữ liệu phù hợp với bộ lọc hiện tại.\n"
-        "                        </td>\n"
-        "                    </tr>\n"
-        "                `;\n"
-        "                return;\n"
-        "            }\n"
-        "\n"
-        "            let html = \'\';\n"
-        "            data.forEach((item, index) => {\n"
-        "                if (activeSheet === \'Ton\') {\n"
-        "                    const currentStatus = auditStatuses[item.id] || \'\';\n"
-        "                    const sosBadge = item.sos === \'SOS\' \n"
-        "                        ? `<span class=\"bg-red-100 text-red-800 dark:bg-red-900/60 dark:text-red-300 font-bold px-2 py-0.5 rounded text-[10px]\">SOS</span>` \n"
-        "                        : `<span class=\"bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-gray-300 px-2 py-0.5 rounded text-[10px]\">Support</span>`;\n"
-        "                    \n"
-        "                    const lapBadge = item.clLap > 0 \n"
-        "                        ? `<span class=\"text-amber-600 dark:text-amber-400 font-bold\">${item.clLap}</span>` \n"
-        "                        : `<span class=\"text-gray-400\">0</span>`;\n"
-        "\n"
-        "                    const tonGioBadge = item.tonGio >= 24 \n"
-        "                        ? `<span class=\"text-rose-600 dark:text-rose-400 font-bold\">${item.tonGio}h</span>`\n"
-        "                        : `<span>${item.tonGio}h</span>`;\n"
-        "\n"
-        "                    html += `\n"
-        "                        <tr class=\"hover:bg-paleOlive-100/50 dark:hover:bg-slate-800 transition\">\n"
-        "                            <td class=\"py-2.5 px-3 text-center font-medium text-gray-500\">${index + 1}</td>\n"
-        "                            <td class=\"py-2.5 px-3 font-bold text-paleOlive-900 dark:text-paleOlive-200\">${item.id}</td>\n"
-        "                            <td class=\"py-2.5 px-3 font-medium\">${item.customerName || \'N/A\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3 text-gray-600 dark:text-gray-400 text-[11px]\">${item.block || \'-\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3 text-center\">${sosBadge}</td>\n"
-        "                            <td class=\"py-2.5 px-3 text-center\">${tonGioBadge}</td>\n"
-        "                            <td class=\"py-2.5 px-3 text-center font-semibold\">${item.lanHen}</td>\n"
-        "                            <td class=\"py-2.5 px-3 text-center\">${lapBadge}</td>\n"
-        "                            <td class=\"py-2.5 px-3 font-medium text-paleOlive-800 dark:text-paleOlive-300\">${item.nhanSu || \'-\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3 font-semibold text-gray-800 dark:text-gray-200\">${item.quanLy || \'-\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3 col-highlight\">\n"
-        "                                <select onchange=\"updateAuditStatus(\'${item.id}\', this.value)\" class=\"w-full text-xs py-1 px-2 rounded border-paleOlive-300 dark:border-slate-600 bg-white dark:bg-slate-800 focus:ring-1 focus:ring-paleOlive-500\">\n"
-        "                                    <option value=\"\" ${currentStatus === \'\' ? \'selected\' : \'\'}>-- Chọn --</option>\n"
-        "                                    <option value=\"Đã duyệt\" ${currentStatus === \'Đã duyệt\' ? \'selected\' : \'\'}>Đã duyệt</option>\n"
-        "                                    <option value=\"Chờ đôn đốc\" ${currentStatus === \'Chờ đôn đốc\' ? \'selected\' : \'\'}>Chờ đôn đốc</option>\n"
-        "                                    <option value=\"Cần điều phối lại\" ${currentStatus === \'Cần điều phối lại\' ? \'selected\' : \'\'}>Cần điều phối lại</option>\n"
-        "                                    <option value=\"Cần KTV giải trình\" ${currentStatus === \'Cần KTV giải trình\' ? \'selected\' : \'\'}>Cần KTV giải trình</option>\n"
-        "                                </select>\n"
-        "                            </td>\n"
-        "                            <td class=\"py-2.5 px-3 text-gray-600 dark:text-gray-400 max-w-xs truncate\" title=\"${item.ghiChu || \'\'}\">${item.ghiChu || \'-\'}</td>\n"
-        "                        </tr>\n"
-        "                    `;\n"
-        "                } else {\n"
-        "                    html += `\n"
-        "                        <tr class=\"hover:bg-paleOlive-100/50 dark:hover:bg-slate-800 transition\">\n"
-        "                            <td class=\"py-2.5 px-3 text-center font-medium text-gray-500\">${index + 1}</td>\n"
-        "                            <td class=\"py-2.5 px-3 font-bold text-paleOlive-900 dark:text-paleOlive-200\">${item.id}</td>\n"
-        "                            <td class=\"py-2.5 px-3 font-medium\">${item.customerName || \'N/A\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3 text-gray-600 dark:text-gray-400 text-[11px]\">${item.block || \'-\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3\"><span class=\"bg-paleOlive-100 dark:bg-paleOlive-900/50 text-paleOlive-800 dark:text-paleOlive-300 px-2 py-0.5 rounded font-medium\">${item.loaiCV || \'Triển khai\'}</span></td>\n"
-        "                            <td class=\"py-2.5 px-3 font-medium text-paleOlive-800 dark:text-paleOlive-300\">${item.nhanSu || \'-\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3 font-semibold text-gray-800 dark:text-gray-200\">${item.quanLy || \'-\'}</td>\n"
-        "                            <td class=\"py-2.5 px-3 text-gray-600 dark:text-gray-400 max-w-xs truncate\" title=\"${item.ghiChu || \'\'}\">${item.ghiChu || \'-\'}</td>\n"
-        "                        </tr>\n"
-        "                    `;\n"
-        "                }\n"
-        "            });\n"
-        "\n"
-        "            body.innerHTML = html;\n"
-        "        }\n"
-        "\n"
-        "        // Save status modification\n"
-        "        function updateAuditStatus(id, val) {\n"
-        "            auditStatuses[id] = val;\n"
-        "            renderKPIs();\n"
-        "            showToast(`Cập nhật trạng thái kiểm soát HĐ ${id}: ${val || \'Xóa chọn\'}`, \'info\');\n"
-        "        }\n"
-        "\n"
-        "        // Render Interactive Analytics Charts using Chart.js\n"
-        "        function renderCharts(filteredData) {\n"
-        "            const container = document.getElementById(\'chartsGrid\');\n"
-        "            container.innerHTML = `\n"
-        "                <div class=\"bg-white dark:bg-slate-800 p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm\">\n"
-        "                    <h3 class=\"text-xs font-bold text-gray-700 dark:text-gray-200 mb-3 uppercase flex items-center gap-1.5\">\n"
-        "                        <i class=\"fa-solid fa-chart-bar text-paleOlive-600\"></i> Top 10 Nhân Sự Lớn Nhất\n"
-        "                    </h3>\n"
-        "                    <div class=\"h-48\">\n"
-        "                        <canvas id=\"chartNhanSu\"></canvas>\n"
-        "                    </div>\n"
-        "                </div>\n"
-        "\n"
-        "                <div class=\"bg-white dark:bg-slate-800 p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm\">\n"
-        "                    <h3 class=\"text-xs font-bold text-gray-700 dark:text-gray-200 mb-3 uppercase flex items-center gap-1.5\">\n"
-        "                        <i class=\"fa-solid fa-user-tie text-paleOlive-600\"></i> Phân Bổ Theo Quản Lý\n"
-        "                    </h3>\n"
-        "                    <div class=\"h-48\">\n"
-        "                        <canvas id=\"chartQuanLy\"></canvas>\n"
-        "                    </div>\n"
-        "                </div>\n"
-        "\n"
-        "                <div class=\"bg-white dark:bg-slate-800 p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm\">\n"
-        "                    <h3 class=\"text-xs font-bold text-gray-700 dark:text-gray-200 mb-3 uppercase flex items-center gap-1.5\">\n"
-        "                        <i class=\"fa-solid fa-cubes text-paleOlive-600\"></i> Phân Bổ Theo Block\n"
-        "                    </h3>\n"
-        "                    <div class=\"h-48\">\n"
-        "                        <canvas id=\"chartBlock\"></canvas>\n"
-        "                    </div>\n"
-        "                </div>\n"
-        "\n"
-        "                <div class=\"bg-white dark:bg-slate-800 p-4 rounded-xl border border-paleOlive-200 dark:border-slate-700 shadow-sm\">\n"
-        "                    <h3 class=\"text-xs font-bold text-gray-700 dark:text-gray-200 mb-3 uppercase flex items-center gap-1.5\">\n"
-        "                        <i class=\"fa-solid fa-chart-pie text-paleOlive-600\"></i> ${activeSheet === \'Ton\' ? \'Tỷ Lệ Mức SOS\' : \'Phân Loại Công Việc\'}\n"
-        "                    </h3>\n"
-        "                    <div class=\"h-48\">\n"
-        "                        <canvas id=\"chartPie\"></canvas>\n"
-        "                    </div>\n"
-        "                </div>\n"
-        "            `;\n"
-        "\n"
-        "            // Destroy existing instances if any\n"
-        "            if (chart1) chart1.destroy();\n"
-        "            if (chart2) chart2.destroy();\n"
-        "            if (chart3) chart3.destroy();\n"
-        "            if (chart4) chart4.destroy();\n"
-        "\n"
-        "            const isDark = document.documentElement.classList.contains(\'dark\');\n"
-        "            const textColor = isDark ? \'#cbd5e1\' : \'#475569\';\n"
-        "\n"
-        "            // Chart 1: Top Staff\n"
-        "            const nsCounts = {};\n"
-        "            filteredData.forEach(d => { if (d.nhanSu) nsCounts[d.nhanSu] = (nsCounts[d.nhanSu] || 0) + 1; });\n"
-        "            const topNS = Object.entries(nsCounts).sort((a,b) => b[1] - a[1]).slice(0, 10);\n"
-        "\n"
-        "            chart1 = new Chart(document.getElementById(\'chartNhanSu\'), {\n"
-        "                type: \'bar\',\n"
-        "                data: {\n"
-        "                    labels: topNS.map(x => x[0]),\n"
-        "                    datasets: [{\n"
-        "                        data: topNS.map(x => x[1]),\n"
-        "                        backgroundColor: \'#94b36c\',\n"
-        "                        borderRadius: 4\n"
-        "                    }]\n"
-        "                },\n"
-        "                options: {\n"
-        "                    responsive: true,\n"
-        "                    maintainAspectRatio: false,\n"
-        "                    plugins: { legend: { display: false } },\n"
-        "                    scales: {\n"
-        "                        x: { ticks: { color: textColor, font: { size: 9 } } },\n"
-        "                        y: { ticks: { color: textColor, stepSize: 1 } }\n"
-        "                    }\n"
-        "                }\n"
-        "            });\n"
-        "\n"
-        "            // Chart 2: Quản Lý\n"
-        "            const qlCounts = {};\n"
-        "            filteredData.forEach(d => { if (d.quanLy) qlCounts[d.quanLy] = (qlCounts[d.quanLy] || 0) + 1; });\n"
-        "            const topQL = Object.entries(qlCounts).sort((a,b) => b[1] - a[1]);\n"
-        "\n"
-        "            chart2 = new Chart(document.getElementById(\'chartQuanLy\'), {\n"
-        "                type: \'bar\',\n"
-        "                data: {\n"
-        "                    labels: topQL.map(x => x[0]),\n"
-        "                    datasets: [{\n"
-        "                        data: topQL.map(x => x[1]),\n"
-        "                        backgroundColor: \'#759948\',\n"
-        "                        borderRadius: 4\n"
-        "                    }]\n"
-        "                },\n"
-        "                options: {\n"
-        "                    responsive: true,\n"
-        "                    maintainAspectRatio: false,\n"
-        "                    plugins: { legend: { display: false } },\n"
-        "                    scales: {\n"
-        "                        x: { ticks: { color: textColor, font: { size: 9 } } },\n"
-        "                        y: { ticks: { color: textColor, stepSize: 1 } }\n"
-        "                    }\n"
-        "                }\n"
-        "            });\n"
-        "\n"
-        "            // Chart 3: Block\n"
-        "            const blkCounts = {};\n"
-        "            filteredData.forEach(d => { if (d.block) blkCounts[d.block] = (blkCounts[d.block] || 0) + 1; });\n"
-        "            const topBLK = Object.entries(blkCounts).sort((a,b) => b[1] - a[1]).slice(0, 5);\n"
-        "\n"
-        "            chart3 = new Chart(document.getElementById(\'chartBlock\'), {\n"
-        "                type: \'bar\',\n"
-        "                data: {\n"
-        "                    labels: topBLK.map(x => x[0]),\n"
-        "                    datasets: [{\n"
-        "                        data: topBLK.map(x => x[1]),\n"
-        "                        backgroundColor: \'#5c7b35\',\n"
-        "                        borderRadius: 4\n"
-        "                    }]\n"
-        "                },\n"
-        "                options: {\n"
-        "                    responsive: true,\n"
-        "                    maintainAspectRatio: false,\n"
-        "                    plugins: { legend: { display: false } },\n"
-        "                    scales: {\n"
-        "                        x: { ticks: { color: textColor, font: { size: 8 } } },\n"
-        "                        y: { ticks: { color: textColor, stepSize: 1 } }\n"
-        "                    }\n"
-        "                }\n"
-        "            });\n"
-        "\n"
-        "            // Chart 4: Pie Chart (SOS or LoaiCV)\n"
-        "            if (activeSheet === \'Ton\') {\n"
-        "                const sosCounts = { \'SOS\': 0, \'Support\': 0 };\n"
-        "                filteredData.forEach(d => { sosCounts[d.sos] = (sosCounts[d.sos] || 0) + 1; });\n"
-        "\n"
-        "                chart4 = new Chart(document.getElementById(\'chartPie\'), {\n"
-        "                    type: \'doughnut\',\n"
-        "                    data: {\n"
-        "                        labels: [\'SOS\', \'Support\'],\n"
-        "                        datasets: [{\n"
-        "                            data: [sosCounts[\'SOS\'], sosCounts[\'Support\']],\n"
-        "                            backgroundColor: [\'#ef4444\', \'#94b36c\']\n"
-        "                        }]\n"
-        "                    },\n"
-        "                    options: {\n"
-        "                        responsive: true,\n"
-        "                        maintainAspectRatio: false,\n"
-        "                        plugins: { legend: { labels: { color: textColor, font: { size: 10 } } } }\n"
-        "                    }\n"
-        "                });\n"
-        "            } else {\n"
-        "                const cvCounts = {};\n"
-        "                filteredData.forEach(d => { cvCounts[d.loaiCV] = (cvCounts[d.loaiCV] || 0) + 1; });\n"
-        "\n"
-        "                chart4 = new Chart(document.getElementById(\'chartPie\'), {\n"
-        "                    type: \'doughnut\',\n"
-        "                    data: {\n"
-        "                        labels: Object.keys(cvCounts),\n"
-        "                        datasets: [{\n"
-        "                            data: Object.values(cvCounts),\n"
-        "                            backgroundColor: [\'#3b82f6\', \'#8b5cf6\', \'#ec4899\', \'#10b981\']\n"
-        "                        }]\n"
-        "                    },\n"
-        "                    options: {\n"
-        "                        responsive: true,\n"
-        "                        maintainAspectRatio: false,\n"
-        "                        plugins: { legend: { labels: { color: textColor, font: { size: 10 } } } }\n"
-        "                    }\n"
-        "                });\n"
-        "            }\n"
-        "        }\n"
-        "\n"
-        "        // Export Filtered Data to CSV\n"
-        "        function exportDataCSV() {\n"
-        "            const data = activeSheet === \'Ton\' ? rawDataTon : rawDataTK;\n"
-        "            if (!data || data.length === 0) {\n"
-        "                showToast(\'Không có dữ liệu để xuất!\', \'error\');\n"
-        "                return;\n"
-        "            }\n"
-        "\n"
-        "            let csvContent = \"data:text/csv;charset=utf-8,\\uFEFF\";\n"
-        "            \n"
-        "            if (activeSheet === \'Ton\') {\n"
-        "                csvContent += \"STT,Số HĐ,Khách Hàng,Block,Tồn Giờ,Lần Hẹn,CL Lặp,Nhân Sự,Quản Lý,SOS,Kiểm Soát,Ghi Chú\\n\";\n"
-        "                data.forEach((d, i) => {\n"
-        "                    const status = auditStatuses[d.id] || \'\';\n"
-        "                    csvContent += `\"${i+1}\",\"${d.id}\",\"${d.customerName}\",\"${d.block}\",\"${d.tonGio}\",\"${d.lanHen}\",\"${d.clLap}\",\"${d.nhanSu}\",\"${d.quanLy}\",\"${d.sos}\",\"${status}\",\"${d.ghiChu}\"\\n`;\n"
-        "                });\n"
-        "            } else {\n"
-        "                csvContent += \"STT,Số HĐ,Khách Hàng,Block,Loại CV,Nhân Sự,Quản Lý,Ghi Chú\\n\";\n"
-        "                data.forEach((d, i) => {\n"
-        "                    csvContent += `\"${i+1}\",\"${d.id}\",\"${d.customerName}\",\"${d.block}\",\"${d.loaiCV}\",\"${d.nhanSu}\",\"${d.quanLy}\",\"${d.ghiChu}\"\\n`;\n"
-        "                });\n"
-        "            }\n"
-        "\n"
-        "            const encodedUri = encodeURI(csvContent);\n"
-        "            const link = document.createElement(\"a\");\n"
-        "            link.setAttribute(\"href\", encodedUri);\n"
-        "            link.setAttribute(\"download\", `Export_Dashboard_${activeSheet}_${new Date().toISOString().slice(0,10)}.csv`);\n"
-        "            document.body.appendChild(link);\n"
-        "            link.click();\n"
-        "            document.body.removeChild(link);\n"
-        "\n"
-        "            showToast(\'Đã xuất file CSV thành công!\', \'success\');\n"
-        "        }\n"
-        "\n"
-        "        // Dark Mode Toggle Switcher\n"
-        "        function toggleDarkMode() {\n"
-        "            const html = document.documentElement;\n"
-        "            if (html.classList.contains(\'dark\')) {\n"
-        "                html.classList.remove(\'dark\');\n"
-        "                html.classList.add(\'light\');\n"
-        "            } else {\n"
-        "                html.classList.remove(\'light\');\n"
-        "                html.classList.add(\'dark\');\n"
-        "            }\n"
-        "            if (rawDataTon.length > 0 || rawDataTK.length > 0) {\n"
-        "                applyFiltersAndRenderTable();\n"
-        "            }\n"
-        "        }\n"
-        "\n"
-        "        // Initialize Dashboard on Page Load\n"
-        "        window.onload = function() {\n"
-        "            initDefaultData();\n"
-        "            renderDashboard();\n"
-        "        };\n"
-        "\n"
-        "        function renderDashboard() {\n"
-        "            renderKPIs();\n"
-        "            renderFilters();\n"
-        "            applyFiltersAndRenderTable();\n"
-        "        }\n"
-        "    </script>\n"
-        "</body>\n"
-        "</html>"""
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
-if __name__ == "__main__":
-    html = generate_html()
-    print(html)
-    # You can also write to a file:
-    # with open("output.html", "w") as f:
-    #     f.write(html)
+    <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Title & Badge -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-paleOlive-600 to-paleOlive-400 flex items-center justify-center text-white font-bold shadow-md shadow-paleOlive-200 dark:shadow-none">
+                        <i class="fa-solid fa-list-check text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center space-x-2">
+                            <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</h1>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-paleOlive-100 text-paleOlive-900 border border-paleOlive-300 dark:bg-paleOlive-900/40 dark:text-paleOlive-200">
+                                Báo Cáo Kiểm Soát
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Khớp chính xác: Số HĐ, Khách Hàng, Block, Lần Hẹn, CL Lặp, Nhân Sự, Quản Lý, Tồn Giờ, Kiểm Soát</p>
+                    </div>
+                </div>
+
+                <!-- Actions & Dark mode toggle -->
+                <div class="flex items-center space-x-3">
+                    <label class="cursor-pointer inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm">
+                        <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
+                        <span>Cập nhật File Excel</span>
+                        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileUpload(event)">
+                    </label>
+
+                    <button onclick="exportDataCSV()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm">
+                        <i class="fa-solid fa-download mr-1.5"></i> Export Excel
+                    </button>
+
+                    <button onclick="toggleDarkMode()" class="p-2 rounded-lg text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-700 transition" title="Đổi giao diện">
+                        <i class="fa-solid fa-moon dark:hidden text-lg"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline text-lg text-amber-400"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Banner Info for Olive Highlighted Columns -->
+        <div class="bg-paleOlive-50 dark:bg-paleOlive-900/30 border-l-4 border-paleOlive-500 p-4 rounded-r-xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="flex items-start space-x-3">
+                <i class="fa-solid fa-circle-info text-paleOlive-700 dark:text-paleOlive-300 text-lg mt-0.5"></i>
+                <div class="text-xs text-paleOlive-900 dark:text-paleOlive-200 space-y-1">
+                    <p class="font-semibold text-sm">Các trường thông tin kiểm soát trọng yếu:</p>
+                    <div class="flex flex-wrap gap-2 pt-1">
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Số HĐ</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Khách Hàng</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Block</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Số Lần Hẹn</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">CL Lặp</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Nhân Sự</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Quản Lý</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Tồn Giờ</span>
+                        <span class="bg-paleOlive-200/80 dark:bg-paleOlive-800/60 px-2 py-0.5 rounded text-paleOlive-900 dark:text-paleOlive-100 font-medium">Kiểm Soát</span>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap self-end md:self-center">
+                Dữ liệu hiện tại: <span id="recordCountBadge" class="font-bold text-slate-800 dark:text-slate-200">0</span> ca tồn
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            <!-- KPI 1: Tổng Ca Tồn -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Ca Tồn</div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpiTotal" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
+                    <span class="text-xs text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-0.5 rounded-full">Tất cả</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng hợp hợp đồng tồn</div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
+            </div>
+
+            <!-- KPI 2: Mức SOS -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="text-xs font-medium text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center justify-between">
+                    <span>Mức SOS</span>
+                    <i class="fa-solid fa-triangle-exclamation animate-pulse"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpiSos" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</span>
+                    <span id="kpiSosPct" class="text-xs text-rose-700 bg-rose-50 dark:bg-rose-900/30 dark:text-rose-300 px-2 py-0.5 rounded-full">0%</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Số ca báo SOS</div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
+            </div>
+
+            <!-- KPI 3: CLL Đang Tồn -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center justify-between">
+                    <span>CLL Đang Tồn</span>
+                    <i class="fa-solid fa-rotate-right"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpiRepeat" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</span>
+                    <span id="kpiRepeatCases" class="text-xs text-amber-700 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 px-2 py-0.5 rounded-full">0 ca</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tổng lượt lặp (Lặp > 0)</div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
+            </div>
+
+            <!-- KPI 4: Tồn Giờ > 24H -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
+                    <span>Tồn Giờ ≥ 24H</span>
+                    <i class="fa-solid fa-clock"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpiOverdue" class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</span>
+                    <span id="kpiOverduePct" class="text-xs text-purple-700 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-0.5 rounded-full">0%</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca quá hạn 1 ngày</div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
+            </div>
+
+            <!-- KPI 5: Đang Xử Lý -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center justify-between">
+                    <span>Đang Xử Lý</span>
+                    <i class="fa-solid fa-gears"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpiProcessing" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">0</span>
+                    <span id="kpiProcessingPct" class="text-xs text-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-300 px-2 py-0.5 rounded-full">0%</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Trạng thái Đang XL</div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500"></div>
+            </div>
+
+            <!-- KPI 6: Cần Đánh Giá -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="text-xs font-medium text-emerald-600 dark:text-emerald-400 uppercase tracking-wider flex items-center justify-between">
+                    <span>Cần Đánh Giá</span>
+                    <i class="fa-solid fa-clipboard-check"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpiUnchecked" class="text-2xl font-bold text-emerald-600 dark:text-emerald-400">0</span>
+                    <span class="text-xs text-emerald-700 bg-emerald-50 dark:bg-emerald-900/30 dark:text-emerald-300 px-2 py-0.5 rounded-full">Chưa ĐG</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Chưa ghi nhận đánh giá</div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-emerald-500"></div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            
+            <!-- Chart 1: CL Lặp vs Độ Ưu Tiên -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-chart-column text-amber-500 mr-2"></i>
+                            1. Tỉ trọng Checklist Lặp Theo Mức Độ SOS
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Thống kê ca SOS vs Support lặp lại nhiều lần</p>
+                    </div>
+                </div>
+                <div class="relative flex-1 min-h-[260px]">
+                    <canvas id="chartRepeatPriority"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 2: Top Block -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-chart-bar text-blue-500 mr-2"></i>
+                            2. Top Block Tồn Ca Nhiều Nhất
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Đơn vị địa bàn phát sinh sự cố</p>
+                    </div>
+                </div>
+                <div class="relative flex-1 min-h-[260px]">
+                    <canvas id="chartTopBlock"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 3: Top POP Station -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-network-wired text-emerald-500 mr-2"></i>
+                            3. Tồn theo POP
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Cụm trạm kỹ thuật quản lý hạ tầng</p>
+                    </div>
+                </div>
+                <div class="relative flex-1 min-h-[260px]">
+                    <canvas id="chartTopPop"></canvas>
+                </div>
+            </div>
+
+            <!-- Chart 4: Top 10 KTV / Nhân sự phụ trách -->
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
+                            <i class="fa-solid fa-user-gear text-purple-500 mr-2"></i>
+                            4. Top KTV Tồn Ca nhiều nhất
+                        </h2>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Xếp hạng nhân sự có số tồn case vụ cao nhất</p>
+                    </div>
+                </div>
+                <div class="relative flex-1 min-h-[260px]">
+                    <canvas id="chartTopTech"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-paleOlive-300 dark:border-paleOlive-700 shadow-sm overflow-hidden">
+            
+            <!-- Table Header Toolbar & Filters -->
+            <div class="p-5 border-b border-paleOlive-200 dark:border-paleOlive-800 space-y-4 bg-paleOlive-50/60 dark:bg-paleOlive-950/20">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-base font-bold text-paleOlive-950 dark:text-paleOlive-100 flex items-center">
+                            <i class="fa-solid fa-table-cells text-paleOlive-600 mr-2"></i>
+                            BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA
+                        </h2>
+                        <p class="text-xs text-paleOlive-800/80 dark:text-paleOlive-300/80">Xem, tìm kiếm, lọc và cập nhật trực tiếp trạng thái Kiểm Soát</p>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <label class="inline-flex items-center space-x-2 text-xs font-semibold text-paleOlive-900 dark:text-paleOlive-200 bg-paleOlive-100 dark:bg-paleOlive-900/50 px-3 py-1.5 rounded-lg cursor-pointer border border-paleOlive-300 dark:border-paleOlive-700 hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800/60 transition shadow-sm">
+                            <input type="checkbox" id="chkNonZero" onchange="applyFilters()" class="w-4 h-4 text-paleOlive-600 rounded border-paleOlive-300 focus:ring-paleOlive-500 dark:bg-slate-800">
+                            <span><i class="fa-solid fa-filter mr-1 text-paleOlive-700 dark:text-paleOlive-300"></i> Chỉ lấy CL Lặp khác 0</span>
+                        </label>
+
+                        <button onclick="resetFilters()" class="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition">
+                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Xóa Lọc
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 pt-2">
+                    <div class="relative sm:col-span-2 lg:col-span-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, Tên KH, Ghi chú..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
+                    </div>
+
+                    <!-- Filter Quản lý -->
+                    <div>
+                        <select id="filterColAN" onchange="onColANChange()" class="w-full py-1.5 px-3 text-xs font-semibold bg-paleOlive-100/90 dark:bg-paleOlive-950/40 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-900 dark:text-paleOlive-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500">
+                            <option value="">Tất cả Quản lý</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="filterTech" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
+                            <option value="">Tất cả Nhân sự</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="filterPriority" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
+                            <option value="">Tất cả Mức SOS</option>
+                            <option value="SOS">Chỉ lấy: SOS</option>
+                            <option value="Support">Chỉ lấy: Support</option>
+                            <option value="EMPTY">Giá trị trống</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="filterRepeat" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
+                            <option value="">Tất cả CL Lặp</option>
+                            <option value="NON_ZERO">Chỉ khác 0 (Lặp > 0)</option>
+                            <option value="0">Bằng 0 (= 0)</option>
+                            <option value="1">Lặp 1 lần</option>
+                            <option value="2">Lặp 2 lần</option>
+                            <option value="3">Lặp ≥ 3 lần</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="filterBlock" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
+                            <option value="">Tất cả Block</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table with Pale Olive Theme & Clean Column Names -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-paleOlive-100 dark:bg-paleOlive-900/60 text-paleOlive-900 dark:text-paleOlive-200 font-bold border-b border-paleOlive-300 dark:border-paleOlive-700 uppercase tracking-wider">
+                            <th class="py-3 px-3 w-12 text-center border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">STT</th>
+                            
+                            <!-- Header: Số HĐ -->
+                            <th class="py-3 px-3 w-32 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">
+                                <span>Số HĐ</span>
+                            </th>
+                            
+                            <!-- Header: Block -->
+                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">
+                                <span>Block</span>
+                            </th>
+                            
+                            <!-- Header: Lần Hẹn -->
+                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">
+                                <span>Lần Hẹn</span>
+                            </th>
+                            
+                            <!-- Header: CL Lặp -->
+                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">
+                                <span>CL Lặp</span>
+                            </th>
+                            
+                            <!-- Header: Nhân Sự -->
+                            <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">
+                                <span>Nhân Sự</span>
+                            </th>
+
+                            <!-- Header: Quản Lý -->
+                            <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">
+                                <span>Quản Lý</span>
+                            </th>
+                            
+                            <!-- Header: Tồn Giờ -->
+                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">
+                                <span>Tồn Giờ</span>
+                            </th>
+                            
+                            <!-- Header: Kiểm Soát -->
+                            <th class="py-3 px-3 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 min-w-[160px]">
+                                <div class="flex items-center space-x-1">
+                                    <span>Kiểm Soát</span>
+                                    <i class="fa-solid fa-pen-to-square text-paleOlive-700 dark:text-paleOlive-300 ml-1"></i>
+                                </div>
+                            </th>
+                            
+                            <!-- Header: Ghi Chú CSKH -->
+                            <th class="py-3 px-3 min-w-[220px]">Ghi Chú CSKH</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 dark:divide-paleOlive-800/40 bg-paleOlive-50/30 dark:bg-paleOlive-950/20">
+                        <!-- Dynamic table rows -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="px-5 py-3 bg-paleOlive-100/50 dark:bg-paleOlive-950/40 border-t border-paleOlive-200 dark:border-paleOlive-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-paleOlive-900/80 dark:text-paleOlive-300">
+                <div>
+                    Hiển thị <span id="displayedCount" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> / <span id="totalCount" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> ca tồn
+                </div>
+                <div class="italic">
+                    BangNC13-TQG.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-8 py-4">
+        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
+            Dashboard Kiểm Soát Ca Tồn & Checklist &bull; BangNC13-TQG
+        </div>
+    </footer>
+
+    <script>
+        // Sample dataset populated from real contracts shown in Excel mapped to Column AN (Quản lý)
+        const sampleExcelData = [
+            { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP005", "Kiểm soát": "", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP001", "Kiểm soát": "", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP002", "Kiểm soát": "", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": -29, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP038", "Kiểm soát": "", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 10, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE0730", "Tên đầy đủ": "LÝ THỊ LỰC", "Thời gian tạo": "2026-09-24 10:19:43", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DUNGNT26", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE0730 - 034654", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 11, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC9017", "Tên đầy đủ": "Vũ Đình Khải", "Thời gian tạo": "2026-09-17 08:56:48", "Tồn giờ": 137, "Số lần hẹn": 2, "CL Lặp": 2, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP030", "Kiểm soát": "", "Ghi Chú CC": "TQGP030.0094/HO-2", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 12, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE0435", "Tên đầy đủ": "Lý Văn Đô", "Thời gian tạo": "2026-09-18 12:24:07", "Tồn giờ": -2, "Số lần hẹn": 9, "CL Lặp": 2, "Nhân sự": "TQGTI.HUNGCV4", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP037", "Kiểm soát": "", "Ghi Chú CC": "KH báo mất mạng", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 13, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD22905", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-21 00:12:59", "Tồn giờ": -2, "Số lần hẹn": 3, "CL Lặp": 2, "Nhân sự": "TQGTI.LUCMDC", "TTCL": "Đã XL-Đang TD", "Độ Ưu Tiên": "Support", "POP": "TQGP024", "Kiểm soát": "", "Ghi Chú CC": "TQFD2290 >> TQGTI.LUCMDC", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 14, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE8568", "Tên đầy đủ": "ĐỖ DUY H", "Thời gian tạo": "2026-09-19 11:57:53", "Tồn giờ": -7, "Số lần hẹn": 7, "CL Lặp": 1, "Nhân sự": "TQGTI.QUYETNT1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP031", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 15, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE0407", "Tên đầy đủ": "TRƯƠNG", "Thời gian tạo": "2026-09-23 17:09:04", "Tồn giờ": -2, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV41", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP014", "Kiểm soát": "", "Ghi Chú CC": "0388061208 báo mkn", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 16, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD01751", "Tên đầy đủ": "Cao Hong", "Thời gian tạo": "2026-09-24 08:57:55", "Tồn giờ": -2, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV8", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP004", "Kiểm soát": "", "Ghi Chú CC": "TQFD01751 - 097876", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 17, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAB7146", "Tên đầy đủ": "LƯU ĐÌNH", "Thời gian tạo": "2026-09-23 16:53:44", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV8", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "097971496 >> TQGTI.THANHNV8", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 18, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAF1512", "Tên đầy đủ": "Triệu Thị", "Thời gian tạo": "2026-09-23 07:56:09", "Tồn giờ": -2, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "Checklist >> TQGTI.TUANQD", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 19, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD12722", "Tên đầy đủ": "Nguyễn V", "Thời gian tạo": "2026-09-24 08:04:07", "Tồn giờ": 2, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "KH mkn nhờ KT xử lý", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 20, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD21035", "Tên đầy đủ": "ĐÌNH VĂN", "Thời gian tạo": "2026-09-23 18:01:15", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "0852269868 kh báo r", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 21, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD22274", "Tên đầy đủ": "PHẠM XUÂ", "Thời gian tạo": "2026-09-16 09:30:16", "Tồn giờ": 193, "Số lần hẹn": 4, "CL Lặp": 1, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "085659332 >> TQGTI.TUNGDT4", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 22, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAC4072", "Tên đầy đủ": "ĐẶNG THỊ", "Thời gian tạo": "2026-09-23 13:30:17", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "0379639154 mất kết", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 23, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE4800", "Tên đầy đủ": "Hoàng Văn", "Thời gian tạo": "2026-09-23 11:10:12", "Tồn giờ": 23, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAEC48C >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 24, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE5855", "Tên đầy đủ": "Trần Thị H", "Thời gian tạo": "2026-09-23 11:42:15", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAE5855 - 098768", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 25, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB1811", "Tên đầy đủ": "LÝ VĂN DŨ", "Thời gian tạo": "2026-09-23 15:23:30", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1811 - 037519 FTTH", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 26, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE7704", "Tên đầy đủ": "NGA VĂN", "Thời gian tạo": "2026-09-23 13:27:32", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAE7704 - 097767", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 27, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAA6787", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-23 18:06:26", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đang XL", "Độ Ưu Tiên": "SOS", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "TQAAA6787 - 038570", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 28, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC5689", "Tên đầy đủ": "HOÀNG V", "Thời gian tạo": "2026-09-24 09:21:16", "Tồn giờ": -26, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.CHIENMM", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP033", "Kiểm soát": "", "Ghi Chú CC": "TQAAC5689 - 039248", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 29, "Block": "Xa Dong Tho-001", "Số HĐ": "TQFD22609", "Tên đầy đủ": "TRẦN THỊ", "Thời gian tạo": "2026-09-23 17:18:55", "Tồn giờ": -5, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP021", "Kiểm soát": "", "Ghi Chú CC": "TQFD22609 - 0989711", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 30, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC6077", "Tên đầy đủ": "RIÊU VĂN", "Thời gian tạo": "2026-09-23 18:50:25", "Tồn giờ": -7, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP018", "Kiểm soát": "", "Ghi Chú CC": "TQAAC6077 - 098649", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 31, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE4058", "Tên đầy đủ": "TRẦN THỊ", "Thời gian tạo": "2026-09-24 06:38:46", "Tồn giờ": -7, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.HUNGDT5", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP035", "Kiểm soát": "", "Ghi Chú CC": "TQAAE4058 - 097806", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 32, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAE1876", "Tên đầy đủ": "NINH VĂN", "Thời gian tạo": "2026-09-23 20:05:45", "Tồn giờ": 14, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.NGHIANV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP032", "Kiểm soát": "", "Ghi Chú CC": "TQAAE1876 - 034763", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 33, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAB0488", "Tên đầy đủ": "LÊ TRUNG", "Thời gian tạo": "2026-09-24 08:38:51", "Tồn giờ": -26, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.NGHIANV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP030", "Kiểm soát": "", "Ghi Chú CC": "TQGP030.0172/HO-1", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 34, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAF1555", "Tên đầy đủ": "Trần Lệ Tri", "Thời gian tạo": "2026-09-23 08:55:18", "Tồn giờ": -2, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.QUANHV1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAF1555 - 091719", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 35, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB1352", "Tên đầy đủ": "CHU VĂN", "Thời gian tạo": "2026-09-23 21:18:41", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.QUANHV1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1352 - 097454", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 36, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE6009", "Tên đầy đủ": "ĐẰNG VĂN", "Thời gian tạo": "2026-09-23 10:54:23", "Tồn giờ": -24, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.QUANHV1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE6009 - 083219", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 37, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6047", "Tên đầy đủ": "NGUYỄN V", "Thời gian tạo": "2026-09-23 20:35:51", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.QUYETNT1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP031", "Kiểm soát": "", "Ghi Chú CC": "TQAAB6047 - 097711", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 38, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE7703", "Tên đầy đủ": "Lò Thị Ngăn", "Thời gian tạo": "2026-09-20 21:27:28", "Tồn giờ": 85, "Số lần hẹn": 4, "CL Lặp": 0, "Nhân sự": "TQGTI.THANHNV41", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP014", "Kiểm soát": "", "Ghi Chú CC": "TQAAE7703 - 039252", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 39, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD13770", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-21 15:31:48", "Tồn giờ": 24, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.THANHNV41", "TTCL": "Đang XL", "Độ Ưu Tiên": "SOS", "POP": "TQGP014", "Kiểm soát": "", "Ghi Chú CC": "TQFD13770 - 039537", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 40, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAC8160", "Tên đầy đủ": "CHU VĂN", "Thời gian tạo": "2026-09-23 13:50:45", "Tồn giờ": 21, "Số lần hẹn": 3, "CL Lặp": 0, "Nhân sự": "TQGTI.TIENVT3", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP033", "Kiểm soát": "", "Ghi Chú CC": "TQAAC8160 - 034971", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 41, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAC7840", "Tên đầy đủ": "PHẠM ĐÌN", "Thời gian tạo": "2026-09-23 07:30:30", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đang XL", "Độ Ưu Tiên": "SOS", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "TQAAC7840 - 096321", "Cột AN": "Lê Hoàng Long (QL-03)" }
+        ];
+
+        let currentDataset = [];
+        let chartRepeatPriority = null;
+        let chartTopBlock = null;
+        let chartTopPop = null;
+        let chartTopTech = null;
+
+        // Custom notification helper replacing native alert
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const bgClass = type === 'success' ? 'bg-emerald-600' : (type === 'error' ? 'bg-rose-600' : 'bg-slate-800 dark:bg-slate-700');
+            const iconClass = type === 'success' ? 'fa-circle-check' : (type === 'error' ? 'fa-circle-xmark' : 'fa-circle-info');
+
+            toast.className = `pointer-events-auto flex items-center space-x-2 px-4 py-3 rounded-lg text-white shadow-lg text-xs ${bgClass} animate-toast`;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-sm"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Helper to safely parse numbers
+        function parseTonGio(val) {
+            if (val === undefined || val === null || val === '') return 0;
+            if (typeof val === 'number') return Math.round(val * 10) / 10;
+            const parsed = parseFloat(String(val).replace(',', '.').trim());
+            return isNaN(parsed) ? 0 : Math.round(parsed * 10) / 10;
+        }
+
+        function getTonGioRealtime(row) {
+            if (row['Thời gian tạo']) {
+                let createdDate = null;
+                const rawDate = row['Thời gian tạo'];
+
+                if (typeof rawDate === 'number') {
+                    createdDate = new Date(Math.round((rawDate - 25569) * 86400 * 1000));
+                } else if (typeof rawDate === 'string' && rawDate.trim()) {
+                    const parts = rawDate.trim().split(/[\s/:-]+/);
+                    if (parts.length >= 3) {
+                        if (parts[0].length === 4) { // YYYY-MM-DD
+                            createdDate = new Date(parts[0], parts[1] - 1, parts[2], parts[3] || 0, parts[4] || 0, parts[5] || 0);
+                        } else { // DD/MM/YYYY
+                            createdDate = new Date(parts[2], parts[1] - 1, parts[0], parts[3] || 0, parts[4] || 0, parts[5] || 0);
+                        }
+                    }
+                }
+
+                if (createdDate && !isNaN(createdDate.getTime())) {
+                    const diffMs = new Date() - createdDate;
+                    if (diffMs > 0) {
+                        return Math.floor(diffMs / (1000 * 60 * 60));
+                    }
+                }
+            }
+            return parseTonGio(row['Tồn giờ']);
+        }
+
+        function updateKPICards(data) {
+            const total = data.length;
+            
+            // Column AA: Exact count of values equal or containing "SOS"
+            const sosCount = data.filter(d => {
+                const priorityVal = String(d['Độ Ưu Tiên'] || '').trim().toUpperCase();
+                return priorityVal === 'SOS' || priorityVal.includes('SOS');
+            }).length;
+
+            // Column P > 0: Calculate total repeat sum and repeat case count
+            const repeatCases = data.filter(d => (parseInt(d['CL Lặp'], 10) || 0) > 0);
+            const repeatCountSum = repeatCases.reduce((sum, d) => sum + (parseInt(d['CL Lặp'], 10) || 0), 0);
+            const repeatCasesCount = repeatCases.length;
+
+            const overdueCount = data.filter(d => getTonGioRealtime(d) >= 24).length;
+            const processingCount = data.filter(d => String(d['TTCL'] || '').includes('Đang XL')).length;
+            const uncheckedCount = data.filter(d => !String(d['Kiểm soát'] || '').trim()).length;
+
+            document.getElementById('kpiTotal').innerText = total;
+            document.getElementById('recordCountBadge').innerText = total;
+
+            document.getElementById('kpiSos').innerText = sosCount;
+            document.getElementById('kpiSosPct').innerText = total ? ((sosCount / total) * 100).toFixed(1) + '%' : '0%';
+
+            // Column P > 0: Sum of Column P values (27) and case count (22)
+            document.getElementById('kpiRepeat').innerText = repeatCountSum;
+            document.getElementById('kpiRepeatCases').innerText = `${repeatCasesCount} ca tồn`;
+
+            document.getElementById('kpiOverdue').innerText = overdueCount;
+            document.getElementById('kpiOverduePct').innerText = total ? ((overdueCount / total) * 100).toFixed(1) + '%' : '0%';
+
+            document.getElementById('kpiProcessing').innerText = processingCount;
+            document.getElementById('kpiProcessingPct').innerText = total ? ((processingCount / total) * 100).toFixed(1) + '%' : '0%';
+
+            document.getElementById('kpiUnchecked').innerText = uncheckedCount;
+        }
+
+        function populateFilterOptions() {
+            const blockSelect = document.getElementById('filterBlock');
+            const techSelect = document.getElementById('filterTech');
+            const colANSelect = document.getElementById('filterColAN');
+
+            const blocks = [...new Set(currentDataset.map(d => d['Block']).filter(Boolean))].sort();
+            const colANs = [...new Set(currentDataset.map(d => d['Cột AN']).filter(Boolean))].sort();
+
+            // Populate Quản lý Dropdown
+            const selectedAN = colANSelect ? colANSelect.value : '';
+            colANSelect.innerHTML = '<option value="">Tất cả Quản lý</option>';
+            colANs.forEach(an => {
+                colANSelect.innerHTML += `<option value="${an}" ${an === selectedAN ? 'selected' : ''}>${an}</option>`;
+            });
+
+            // Populate Tech Filter
+            updateTechDropdownOptions(selectedAN);
+
+            blockSelect.innerHTML = '<option value="">Tất cả Block</option>';
+            blocks.forEach(b => {
+                blockSelect.innerHTML += `<option value="${b}">${b}</option>`;
+            });
+        }
+
+        function updateTechDropdownOptions(selectedAN) {
+            const techSelect = document.getElementById('filterTech');
+            const currentTechVal = techSelect.value;
+
+            let filteredTechData = currentDataset;
+            if (selectedAN) {
+                filteredTechData = currentDataset.filter(d => d['Cột AN'] === selectedAN);
+            }
+
+            const techs = [...new Set(filteredTechData.map(d => d['Nhân sự']).filter(Boolean))].sort();
+
+            techSelect.innerHTML = '<option value="">Tất cả Nhân sự</option>';
+            techs.forEach(t => {
+                techSelect.innerHTML += `<option value="${t}" ${t === currentTechVal ? 'selected' : ''}>${t}</option>`;
+            });
+        }
+
+        function onColANChange() {
+            const selectedAN = document.getElementById('filterColAN').value;
+            updateTechDropdownOptions(selectedAN);
+            applyFilters();
+
+            if (selectedAN) {
+                const mappedTechs = [...new Set(currentDataset.filter(d => d['Cột AN'] === selectedAN).map(d => d['Nhân sự']))];
+                showToast(`Đã lọc Quản lý: ${selectedAN} (${mappedTechs.length} Nhân sự)`, 'info');
+            }
+        }
+
+        function applyFilters() {
+            const filtered = getFilteredData();
+            renderTable(filtered);
+            renderCharts(filtered);
+        }
+
+        function getFilteredData() {
+            const searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+            const priorityVal = document.getElementById('filterPriority').value;
+            const repeatVal = document.getElementById('filterRepeat').value;
+            const blockVal = document.getElementById('filterBlock').value;
+            const techVal = document.getElementById('filterTech').value;
+            const colANVal = document.getElementById('filterColAN') ? document.getElementById('filterColAN').value : '';
+            const onlyNonZero = document.getElementById('chkNonZero')?.checked;
+
+            return currentDataset.filter(d => {
+                const repeatNum = parseInt(d['CL Lặp'], 10) || 0;
+
+                // Checkbox "Chỉ lấy CL Lặp khác 0" (Cột P > 0)
+                if (onlyNonZero && repeatNum === 0) {
+                    return false;
+                }
+
+                // Filter Cột AN (Quản lý / Leader)
+                if (colANVal && d['Cột AN'] !== colANVal) return false;
+
+                // Search query matching contract code, customer name, notes, block, technician, leader
+                if (searchVal) {
+                    const matchText = `${d['Số HĐ']} ${d['Tên đầy đủ']} ${d['Ghi Chú CC']} ${d['Block']} ${d['Nhân sự']} ${d['Cột AN'] || ''}`.toLowerCase();
+                    if (!matchText.includes(searchVal)) return false;
+                }
+
+                // Column AA (SOS priority filter)
+                const priorityStr = String(d['Độ Ưu Tiên'] || '').trim().toUpperCase();
+                if (priorityVal === 'SOS' && !priorityStr.includes('SOS')) return false;
+                if (priorityVal === 'Support' && priorityStr.includes('SOS')) return false;
+                if (priorityVal === 'EMPTY' && priorityStr !== '') return false;
+
+                // Column P (CL Lặp filter)
+                if (repeatVal === 'NON_ZERO' && repeatNum === 0) return false;
+                if (repeatVal === '0' && repeatNum !== 0) return false;
+                if (repeatVal === '1' && repeatNum !== 1) return false;
+                if (repeatVal === '2' && repeatNum !== 2) return false;
+                if (repeatVal === '3' && repeatNum < 3) return false;
+
+                // Column E (Block filter)
+                if (blockVal && d['Block'] !== blockVal) return false;
+
+                // Column S (Technician filter)
+                if (techVal && d['Nhân sự'] !== techVal) return false;
+
+                return true;
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('filterPriority').value = '';
+            document.getElementById('filterRepeat').value = '';
+            document.getElementById('filterBlock').value = '';
+            document.getElementById('filterTech').value = '';
+            if (document.getElementById('filterColAN')) document.getElementById('filterColAN').value = '';
+            
+            const chk = document.getElementById('chkNonZero');
+            if (chk) chk.checked = false;
+
+            populateFilterOptions();
+            const filtered = getFilteredData();
+            renderTable(filtered);
+            renderCharts(filtered);
+        }
+
+        function renderTable(data) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+
+            document.getElementById('displayedCount').innerText = data.length;
+            document.getElementById('totalCount').innerText = currentDataset.length;
+
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="py-8 text-center text-paleOlive-600/70 dark:text-paleOlive-400/70">
+                            <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
+                            <p>Không tìm thấy ca tồn nào khớp với bộ lọc</p>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-paleOlive-100/70 dark:hover:bg-paleOlive-900/50 transition border-b border-paleOlive-200/60 dark:border-paleOlive-800/40 bg-paleOlive-50/40 dark:bg-paleOlive-950/20";
+
+                // Column P Badge (CL Lặp)
+                const repeatVal = parseInt(row['CL Lặp'], 10) || 0;
+                let repeatBadge = `<span class="text-paleOlive-700/60 dark:text-paleOlive-400/60 font-mono">0</span>`;
+                if (repeatVal === 1) {
+                    repeatBadge = `<span class="px-2 py-0.5 rounded font-bold bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300 border border-amber-300">1</span>`;
+                } else if (repeatVal === 2) {
+                    repeatBadge = `<span class="px-2 py-0.5 rounded font-bold bg-orange-100 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300 border border-orange-400">2</span>`;
+                } else if (repeatVal >= 3) {
+                    repeatBadge = `<span class="px-2 py-0.5 rounded font-bold bg-rose-200 text-rose-900 dark:bg-rose-900 dark:text-rose-100 border border-rose-400">${repeatVal}</span>`;
+                }
+
+                // Column O Badge (Số Lần Hẹn)
+                const henVal = parseInt(row['Số lần hẹn'], 10) || 0;
+                const henBadge = `<span class="px-2 py-0.5 rounded font-mono font-semibold bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-paleOlive-300 dark:border-paleOlive-700">${henVal}</span>`;
+
+                // Realtime Tồn Giờ
+                const tonGio = getTonGioRealtime(row);
+                let tonGioBadge = `<span class="font-semibold ${tonGio >= 24 ? 'text-purple-600 dark:text-purple-400 font-bold' : 'text-slate-700 dark:text-slate-300'}">${tonGio}h</span>`;
+
+                const currentControl = String(row['Kiểm soát'] || '').trim();
+                
+                tr.innerHTML = `
+                    <td class="py-3 px-3 text-center text-paleOlive-700 dark:text-paleOlive-300 font-mono border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">${index + 1}</td>
+                    
+                    <!-- Clean Column: Số HĐ -->
+                    <td class="py-3 px-3 font-bold text-paleOlive-950 dark:text-paleOlive-100 font-mono border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">
+                        ${row['Số HĐ'] || ''}
+                    </td>
+
+                    <!-- Clean Column: Block -->
+                    <td class="py-3 px-3 font-medium text-slate-800 dark:text-paleOlive-100 border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">
+                        ${row['Block'] || ''}
+                    </td>
+
+                    <!-- Clean Column: Số Lần Hẹn -->
+                    <td class="py-3 px-3 text-center border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">
+                        ${henBadge}
+                    </td>
+
+                    <!-- Clean Column: CL Lặp -->
+                    <td class="py-3 px-3 text-center border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">
+                        ${repeatBadge}
+                    </td>
+
+                    <!-- Clean Column: Nhân sự -->
+                    <td class="py-3 px-3 font-mono font-medium text-paleOlive-900 dark:text-paleOlive-200 border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">
+                        <i class="fa-solid fa-user-circle mr-1 text-paleOlive-600"></i> ${row['Nhân sự'] || ''}
+                    </td>
+
+                    <!-- Clean Column: Quản lý -->
+                    <td class="py-3 px-3 font-medium text-paleOlive-900 dark:text-paleOlive-200 border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">
+                        <i class="fa-solid fa-user-shield mr-1 text-paleOlive-600"></i> ${row['Cột AN'] || ''}
+                    </td>
+
+                    <!-- Clean Column: Tồn Giờ -->
+                    <td class="py-3 px-3 text-center border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">${tonGioBadge}</td>
+
+                    <!-- Clean Column: Kiểm Soát -->
+                    <td class="py-3 px-3 border-r border-paleOlive-200/50 dark:border-paleOlive-800/40">
+                        <select onchange="updateControlStatus(${row['STT']}, this.value)" class="w-full py-1 px-2 text-xs border border-paleOlive-300 dark:border-paleOlive-600 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-white font-medium focus:ring-2 focus:ring-paleOlive-500 shadow-sm">
+                            <option value="" ${currentControl === '' ? 'selected' : ''}>-- Chưa Đánh Giá --</option>
+                            <option value="Đạt" ${currentControl === 'Đạt' ? 'selected' : ''}>✅ Đã tiếp nhận</option>
+                            <option value="Cần Hỗ Trợ" ${currentControl === 'Cần Hỗ Trợ' ? 'selected' : ''}>⚠️ Cần hỗ trợ</option>
+                            <option value="Cảnh Báo" ${currentControl === 'Cảnh Báo' ? 'selected' : ''}>🚨 Cảnh báo trễ</option>
+                            <option value="Vi Phạm" ${currentControl === 'Vi Phạm' ? 'selected' : ''}>❌ Khách giục</option>
+                            <option value="Đã Xử Lý" ${currentControl === 'Đã Xử Lý' ? 'selected' : ''}>🎉 Đã giải quyết</option>
+                        </select>
+                    </td>
+
+                    <!-- Clean Column: Ghi Chú CSKH -->
+                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300" title="${row['Ghi Chú CC'] || ''}">
+                        ${row['Ghi Chú CC'] || ''}
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        function updateControlStatus(stt, statusVal) {
+            const item = currentDataset.find(d => d.STT === stt);
+            if (item) {
+                item['Kiểm soát'] = statusVal;
+                updateKPICards(currentDataset);
+                showToast(`Đã cập nhật kiểm soát ca #${stt} thành: ${statusVal || 'Chưa đánh giá'}`, 'success');
+            }
+        }
+
+        function renderCharts(data) {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+
+            // 1. Chart Repeat vs Priority
+            const repeatCounts = { '0': { SOS: 0, Support: 0 }, '1': { SOS: 0, Support: 0 }, '2': { SOS: 0, Support: 0 }, '3+': { SOS: 0, Support: 0 } };
+            
+            data.forEach(d => {
+                const r = parseInt(d['CL Lặp'], 10) || 0;
+                const rKey = r >= 3 ? '3+' : String(r);
+                const p = String(d['Độ Ưu Tiên'] || '').trim().toUpperCase().includes('SOS') ? 'SOS' : 'Support';
+                if (repeatCounts[rKey]) {
+                    repeatCounts[rKey][p]++;
+                }
+            });
+
+            const ctx1 = document.getElementById('chartRepeatPriority').getContext('2d');
+            if (chartRepeatPriority) chartRepeatPriority.destroy();
+            chartRepeatPriority = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Không Lặp (0)', 'Lặp 1 lần', 'Lặp 2 lần', 'Lặp ≥ 3 lần'],
+                    datasets: [
+                        {
+                            label: 'SOS (Cấp Thiết)',
+                            data: [repeatCounts['0'].SOS, repeatCounts['1'].SOS, repeatCounts['2'].SOS, repeatCounts['3+'].SOS],
+                            backgroundColor: '#f43f5e',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Support (Hỗ Trợ)',
+                            data: [repeatCounts['0'].Support, repeatCounts['1'].Support, repeatCounts['2'].Support, repeatCounts['3+'].Support],
+                            backgroundColor: '#3b82f6',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: textColor, font: { family: 'Inter', size: 11 } } } },
+                    scales: {
+                        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                    }
+                }
+            });
+
+            // 2. Chart Top Block (Column E)
+            const blockMap = {};
+            data.forEach(d => {
+                const b = d['Block'] || 'Chưa gán';
+                blockMap[b] = (blockMap[b] || 0) + 1;
+            });
+            const topBlocks = Object.entries(blockMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+            const ctx2 = document.getElementById('chartTopBlock').getContext('2d');
+            if (chartTopBlock) chartTopBlock.destroy();
+            chartTopBlock = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: topBlocks.map(b => b[0]),
+                    datasets: [{
+                        label: 'Số ca tồn',
+                        data: topBlocks.map(b => b[1]),
+                        backgroundColor: '#0284c7',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                    }
+                }
+            });
+
+            // 3. Chart Top POP (Column AL)
+            const popMap = {};
+            data.forEach(d => {
+                const p = d['POP'] || 'Chưa gán';
+                popMap[p] = (popMap[p] || 0) + 1;
+            });
+            const topPops = Object.entries(popMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
+
+            const ctx3 = document.getElementById('chartTopPop').getContext('2d');
+            if (chartTopPop) chartTopPop.destroy();
+            chartTopPop = new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: topPops.map(p => p[0]),
+                    datasets: [{
+                        label: 'Số ca tồn tại POP',
+                        data: topPops.map(p => p[1]),
+                        backgroundColor: '#10b981',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                    }
+                }
+            });
+
+            // 4. Chart Top 10 Tech Personnel (Column S)
+            const techMap = {};
+            data.forEach(d => {
+                const t = d['Nhân sự'] || 'Chưa phân công';
+                techMap[t] = (techMap[t] || 0) + 1;
+            });
+            // TOP 10 KTV có số tồn ca nhiều nhất
+            const topTechs = Object.entries(techMap).sort((a, b) => b[1] - a[1]).slice(0, 10);
+
+            const ctx4 = document.getElementById('chartTopTech').getContext('2d');
+            if (chartTopTech) chartTopTech.destroy();
+            chartTopTech = new Chart(ctx4, {
+                type: 'bar',
+                data: {
+                    labels: topTechs.map(t => t[0]),
+                    datasets: [{
+                        label: 'Số ca tồn gánh',
+                        data: topTechs.map(t => t[1]),
+                        backgroundColor: '#a855f7',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                        y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                    if (!rowsMatrix || rowsMatrix.length <= 1) {
+                        showToast('File Excel không có dữ liệu!', 'error');
+                        return;
+                    }
+
+                    // Locate header row containing key fields
+                    let headerRowIdx = 0;
+                    for (let r = 0; r < Math.min(10, rowsMatrix.length); r++) {
+                        const rowStr = rowsMatrix[r].map(c => String(c).toUpperCase()).join(' ');
+                        if (rowStr.includes('SỐ HĐ') || rowStr.includes('TỒN GIỜ') || rowStr.includes('BLOCK')) {
+                            headerRowIdx = r;
+                            break;
+                        }
+                    }
+
+                    const headers = rowsMatrix[headerRowIdx].map(h => String(h).trim());
+
+                    function getColIndex(candidateNames, fallbackIndex) {
+                        const idx = headers.findIndex(h => {
+                            const cleanH = String(h).trim().toLowerCase();
+                            return candidateNames.some(name => {
+                                const cleanName = name.toLowerCase().trim();
+                                if (cleanName === 'an' || cleanName === 'cột an') {
+                                    return cleanH === 'an' || cleanH === 'cột an' || cleanH === 'cot an';
+                                }
+                                return cleanH.includes(cleanName);
+                            });
+                        });
+                        return idx !== -1 ? idx : fallbackIndex;
+                    }
+
+                    // Excel exact positional indices: 
+                    // Block=E(4), Số HĐ=F(5), Tên KH=G(6), CreatedTime=H(7), Tồn giờ=I(8), Số lần hẹn=O(14), CL Lặp=P(15), Nhân sự=S(18), SOS=AA(26), POP=AL(37), Kiểm soát=AM(38), Cột AN=AN(39)
+                    const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
+                    const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
+                    const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
+                    const colTimeIdx = getColIndex(['Thời gian tạo', 'Thoi gian tao', 'Ngày tạo'], 7);
+                    const colTonGioIdx = getColIndex(['Tồn giờ', 'Ton gio'], 8);
+                    const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
+                    const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
+                    const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
+                    const colPriorityIdx = getColIndex(['Độ Ưu Tiên', 'Độ Ưu', 'SOS'], 26);
+                    const colPopIdx = getColIndex(['POP', 'Trạm POP'], 37);
+                    const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
+                    const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
+                    const colTtclIdx = getColIndex(['TTCL', 'Trạng Thái', 'Trạng thái'], 19);
+                    const colNoteIdx = getColIndex(['Ghi Chú CC', 'Ghi Chú', 'Ghi chú'], 20);
+
+                    const parsedRecords = [];
+                    for (let r = headerRowIdx + 1; r < rowsMatrix.length; r++) {
+                        const row = rowsMatrix[r];
+                        if (!row || row.length === 0) continue;
+
+                        const soHD = String(row[colSoHDIdx] || '').trim();
+                        const block = String(row[colBlockIdx] || '').trim();
+                        
+                        if (!soHD && !block) continue;
+
+                        parsedRecords.push({
+                            "STT": parsedRecords.length + 1,
+                            "Block": block,
+                            "Số HĐ": soHD,
+                            "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
+                            "Thời gian tạo": row[colTimeIdx] || '',
+                            "Tồn giờ": parseTonGio(row[colTonGioIdx]),
+                            "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
+                            "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
+                            "Nhân sự": String(row[colTechIdx] || '').trim(),
+                            "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
+                            "Độ Ưu Tiên": String(row[colPriorityIdx] || '').trim(),
+                            "POP": String(row[colPopIdx] || '').trim(),
+                            "Kiểm soát": String(row[colControlIdx] || '').trim(),
+                            "Cột AN": String(row[colANIdx] || '').trim(),
+                            "Ghi Chú CC": String(row[colNoteIdx] || '').trim()
+                        });
+                    }
+
+                    if (parsedRecords.length > 0) {
+                        currentDataset = parsedRecords;
+                        populateFilterOptions();
+                        renderDashboard();
+                        showToast(`Nạp thành công ${currentDataset.length} ca tồn từ Excel!`, 'success');
+                    } else {
+                        showToast('Không đọc được bản ghi hợp lệ nào từ file!', 'error');
+                    }
+                } catch (err) {
+                    showToast('Lỗi khi xử lý file Excel: ' + err.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportDataCSV() {
+            const dataToExport = getFilteredData();
+            if (!dataToExport.length) {
+                showToast('Không có dữ liệu để xuất!', 'error');
+                return;
+            }
+
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Kiểm Soát Ca Tồn");
+            XLSX.writeFile(wb, "Bao_Cao_Kiem_Soat_Ca_Ton.xlsx");
+            showToast('Đã xuất file Excel báo cáo!', 'success');
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const filtered = getFilteredData();
+            renderCharts(filtered);
+        }
+
+        function renderDashboard() {
+            const filtered = getFilteredData();
+            updateKPICards(currentDataset);
+            renderTable(filtered);
+            renderCharts(filtered);
+        }
+
+        window.onload = function() {
+            currentDataset = [...sampleExcelData];
+            populateFilterOptions();
+            renderDashboard();
+        };
+    </script>
+</body>
+</html>
