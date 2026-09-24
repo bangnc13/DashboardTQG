@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 1. CẤU HÌNH TRANG STREAMLIT
+# 1. CẤU HÌNH TRANG & ÉP LIGHT THEME
 st.set_page_config(
     page_title="DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST",
     page_icon="📊",
@@ -10,50 +10,52 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. CSS TINH CHỈNH GIAO DIỆN CHUẨN MẪU 100%
+# 2. OVERRIDE TOÀN BỘ CSS ĐỂ ÉP MÀU SÁNG (LIGHT MODE 100%)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    * { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; }
+    * { font-family: 'Inter', -apple-system, sans-serif !important; }
     
-    /* Ẩn bớt các element dư thừa của Streamlit */
+    /* Ẩn bớt UI thừa của Streamlit */
     [data-testid="stSidebar"] { display: none !important; }
     [data-testid="collapsedControl"] { display: none !important; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     
     .main .block-container {
-        max-width: 96% !important;
+        max-width: 98% !important;
         padding: 0.8rem 1rem !important;
     }
 
-    /* Nền trang xám rất nhạt */
-    .stApp { background-color: #f8fafc; color: #1e293b; }
+    /* Ép nền ứng dụng màu sáng nhạt chuẩn */
+    .stApp, [data-testid="stAppViewContainer"] {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
+    }
     
     /* Header chính */
     .main-header {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         background-color: #ffffff;
-        padding: 8px 16px;
+        padding: 10px 18px;
         border-radius: 12px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         margin-bottom: 12px;
     }
-    .header-left { display: flex; align-items: center; gap: 10px; }
     .header-icon {
         background-color: #65a30d;
         color: white;
         border-radius: 50%;
-        width: 32px;
-        height: 32px;
+        width: 34px;
+        height: 34px;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 16px;
+        font-size: 18px;
+        margin-right: 12px;
     }
     .header-title { font-size: 17px; font-weight: 800; color: #0f172a; }
     .badge-sub {
@@ -65,18 +67,17 @@ st.markdown("""
         border-radius: 12px;
         border: 1px solid #bef264;
     }
-    .header-desc { font-size: 11px; color: #64748b; margin-top: 1px; }
+    .header-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
 
-    /* Top KPI Cards */
+    /* Top 6 KPI Cards */
     .kpi-container { display: flex; gap: 8px; margin-bottom: 12px; }
     .kpi-card {
         flex: 1;
         background-color: #ffffff;
         border-radius: 8px;
-        padding: 8px 6px;
+        padding: 10px 6px;
         text-align: center;
         box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        background-clip: padding-box;
     }
     .kpi-blue { border-top: 3.5px solid #3b82f6; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
     .kpi-pink { border-top: 3.5px solid #f43f5e; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
@@ -84,12 +85,11 @@ st.markdown("""
     .kpi-purple { border-top: 3.5px solid #a855f7; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
     .kpi-cyan { border-top: 3.5px solid #06b6d4; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
     .kpi-green { border-top: 3.5px solid #10b981; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
-
-    .kpi-label { font-size: 10.5px; font-weight: 600; color: #475569; white-space: nowrap; }
+    .kpi-label { font-size: 11px; font-weight: 600; color: #475569; white-space: nowrap; }
     
-    /* Biểu đồ Cards */
+    /* Biểu đồ Card nền trắng */
     .chart-card {
-        background-color: #ffffff;
+        background-color: #ffffff !important;
         border: 1px solid #e2e8f0;
         border-radius: 10px;
         padding: 12px 14px;
@@ -99,35 +99,29 @@ st.markdown("""
     .chart-title { font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px; }
     .chart-sub { font-size: 10px; color: #94a3b8; margin-bottom: 4px; }
 
-    /* Bảng dữ liệu Khung xanh lá nhạt */
-    .table-wrapper {
+    /* Ép lại màu cho các ô Input & Selectbox thành màu SÁNG */
+    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        border-radius: 6px !important;
+        border: 1px solid #cbd5e1 !important;
+    }
+    input { color: #0f172a !important; }
+    
+    /* Bảng dữ liệu viền xanh lá mạ chuẩn */
+    .table-container-box {
         background-color: #f7fee7;
         border: 1.5px solid #bef264;
         border-radius: 12px;
-        padding: 12px 16px;
+        padding: 14px 16px;
         margin-top: 10px;
     }
-    .table-header-title {
-        font-size: 14px;
-        font-weight: 800;
-        color: #1e293b;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
+    .table-header-title { font-size: 14px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 6px; }
     .table-header-sub { font-size: 11px; color: #65a30d; margin-bottom: 8px; }
-
-    /* Custom CSS Styling cho Streamlit Inputs */
-    div[data-baseweb="select"] > div {
-        background-color: #ffffff !important;
-        border-radius: 6px !important;
-        border: 1px solid #cbd5e1 !important;
-        font-size: 12px !important;
-    }
     </style>
 """, unsafe_allow_html=True)
 
-# 3. HÀM NẠP VÀ DỌN DẸP DỮ LIỆU
+# 3. NẠP DỮ LIỆU FILE EXCEL
 @st.cache_data
 def load_excel_data(file):
     try:
@@ -135,7 +129,6 @@ def load_excel_data(file):
         sheet_name = 'BT' if 'BT' in xls.sheet_names else xls.sheet_names[0]
         df = pd.read_excel(xls, sheet_name=sheet_name)
 
-        # Cột Quản lý từ Cột AN (Index 39)
         if 'Trưởng bầy' in df.columns:
             df['QUẢN LÝ'] = df['Trưởng bầy']
         elif len(df.columns) >= 40:
@@ -143,23 +136,14 @@ def load_excel_data(file):
         else:
             df['QUẢN LÝ'] = 'Chưa phân loại'
 
-        # Đổi tên cột chuẩn
         rename_map = {
-            'Số HĐ': 'SỐ HĐ',
-            'Block': 'BLOCK',
-            'Số lần hẹn': 'LẦN HẸN',
-            'CL Lặp': 'CL LẶP',
-            'Nhân sự': 'NHÂN SỰ',
-            'Tồn giờ': 'TỒN GIỜ',
-            'Kiểm soát': 'KIỂM SOÁT',
-            'Ghi Chú CC': 'GHI CHÚ CSKH'
+            'Số HĐ': 'SỐ HĐ', 'Block': 'BLOCK', 'Số lần hẹn': 'LẦN HẸN',
+            'CL Lặp': 'CL LẶP', 'Nhân sự': 'NHÂN SỰ', 'Tồn giờ': 'TỒN GIỜ',
+            'Kiểm soát': 'KIỂM SOÁT', 'Ghi Chú CC': 'GHI CHÚ CSKH'
         }
         df = df.rename(columns=rename_map)
-
-        # Bỏ trùng tên cột
         df = df.loc[:, ~df.columns.duplicated()]
 
-        # Mặc định dữ liệu trống
         defaults = {
             'SỐ HĐ': '', 'BLOCK': 'Khác', 'LẦN HẸN': 0, 'CL LẶP': 0,
             'NHÂN SỰ': 'Chưa gán', 'QUẢN LÝ': 'Chưa gán', 'TỒN GIỜ': '0h',
@@ -174,24 +158,22 @@ def load_excel_data(file):
 
         return df
     except Exception as e:
-        st.error(f"Lỗi đọc file Excel: {e}")
+        st.error(f"Lỗi đọc file: {e}")
         return pd.DataFrame()
 
-# 4. HEADER TRÊN CÙNG
+# 4. HEADER & NÚT UPLOAD FILE
 h_col1, h_col2 = st.columns([3.5, 1])
 
 with h_col1:
     st.markdown("""
     <div class="main-header">
-        <div class="header-left">
-            <div class="header-icon">📑</div>
-            <div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span class="header-title">DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</span>
-                    <span class="badge-sub">Báo Cáo Kiểm Soát</span>
-                </div>
-                <div class="header-desc">Khớp chính xác: Số HĐ, Khách Hàng, Block, Lần Hẹn, CL Lặp, Nhân Sự, Quản Lý, Tồn Giờ, Kiểm Soát</div>
+        <div class="header-icon">📑</div>
+        <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="header-title">DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</span>
+                <span class="badge-sub">Báo Cáo Kiểm Soát</span>
             </div>
+            <div class="header-desc">Khớp chính xác: Số HĐ, Khách Hàng, Block, Lần Hẹn, CL Lặp, Nhân Sự, Quản Lý, Tồn Giờ, Kiểm Soát</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -205,15 +187,11 @@ else:
     try:
         df_raw = load_excel_data('CLL2.xlsx')
     except:
-        st.info("👆 Hãy bấm Import File Excel để xem dữ liệu.")
+        st.info("👆 Vui lòng bấm nạp file Excel ở góc trên bên phải.")
         st.stop()
 
-# 5. KHU VỰC TOP KPI
-total_cases = len(df_raw)
-sos_cases = len(df_raw[df_raw['Độ Ưu Tiên'].astype(str).str.contains('SOS', na=False)])
-repeat_cases = len(df_raw[pd.to_numeric(df_raw['CL LẶP'], errors='coerce').fillna(0) > 0])
-
-st.markdown(f"""
+# 5. KHU VỰC TOP KPI CARDS
+st.markdown("""
 <div class="kpi-container">
     <div class="kpi-card kpi-blue"><div class="kpi-label">Tổng hợp hợp đồng tồn</div></div>
     <div class="kpi-card kpi-pink"><div class="kpi-label">Số ca báo SOS</div></div>
@@ -224,11 +202,13 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 6. KHU VỰC 4 BIỂU ĐỒ (CHARTS MẦU CHUẨN MẪU)
+# 6. KHU VỰC 4 BIỂU ĐỒ NỀN SÁNG (LIGHT CHARTS)
 chart_style = {
-    'paper_bgcolor': 'rgba(0,0,0,0)',
-    'plot_bgcolor': 'rgba(0,0,0,0)',
-    'font': {'color': '#475569', 'size': 10},
+    'paper_bgcolor': '#ffffff',
+    'plot_bgcolor': '#ffffff',
+    'font': {'color': '#334155', 'size': 11},
+    'xaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0'},
+    'yaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0'},
     'margin': dict(l=10, r=10, t=10, b=10)
 }
 
@@ -290,20 +270,20 @@ with c4:
     st.plotly_chart(fig4, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# 7. KHU VỰC BẢNG DỮ LIỆU TỒN CA (VIỀN XANH LÁ MẠ CỰC CHUẨN)
+# 7. KHU VỰC BẢNG DỮ LIỆU NỀN XANH LÁ MẠ TỰC TRỰC
 st.markdown("""
-<div style="background-color: #f7fee7; border: 1.5px solid #bef264; border-radius: 12px; padding: 14px 16px;">
+<div class="table-container-box">
     <div class="table-header-title">📊 BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA</div>
     <div class="table-header-sub">Xem, tìm kiếm, lọc và cập nhật trực tiếp trạng thái Kiểm Soát</div>
 """, unsafe_allow_html=True)
 
 list_mgr = sorted([str(x).strip() for x in df_raw['QUẢN LÝ'].unique() if pd.notna(x) and str(x).strip() != ''])
 
-# BỘ LỌC TẬP TRUNG DÒNG NGANG
+# BỘ LỌC NGANG MÀU SÁNG
 f1, f2, f3, f4, f5, f6 = st.columns([2, 1.5, 1.5, 1.5, 1.5, 1.5])
 
 with f1:
-    search_input = st.text_input("Search", placeholder="🔍 Tìm Số HĐ, Tên KH, Ghi...", label_visibility="collapsed")
+    search_input = st.text_input("Search", placeholder="🔍 Tìm Số HĐ, Block...", label_visibility="collapsed")
 with f2:
     selected_mgr = st.selectbox("Mgr", options=["Tất cả Quản lý"] + list_mgr, label_visibility="collapsed")
 
@@ -324,7 +304,7 @@ with f6:
     list_block = sorted([str(x).strip() for x in df_sub['BLOCK'].unique() if pd.notna(x)])
     selected_block = st.selectbox("Block", options=["Tất cả Block"] + list_block, label_visibility="collapsed")
 
-# LỌC DỮ LIỆU
+# LỌC DỮ LIỆU BẢNG
 df_table = df_sub.copy()
 if selected_tech != "Tất cả Nhân sự":
     df_table = df_table[df_table['NHÂN SỰ'].astype(str) == selected_tech]
@@ -344,7 +324,7 @@ if search_input:
         df_table['GHI CHÚ CSKH'].astype(str).str.lower().str.contains(s_val)
     ]
 
-# TẠO DATAFRAME RÕ RÀNG
+# TẠO DATAFRAME CHUẨN ĐỊNH DẠNG
 df_display = pd.DataFrame()
 df_display['STT'] = range(1, len(df_table) + 1)
 df_display['SỐ HĐ'] = df_table['SỐ HĐ'].astype(str).values
@@ -357,7 +337,7 @@ df_display['TỒN GIỜ'] = df_table['TỒN GIỜ'].astype(str).values
 df_display['KIỂM SOÁT'] = df_table['KIỂM SOÁT'].astype(str).values
 df_display['GHI CHÚ CSKH'] = df_table['GHI CHÚ CSKH'].astype(str).values
 
-# DATA EDITOR VỚI COLUMN CONFIG TẠO ĐÚNG ĐỊNH DẠNG MẮT NHÌN
+# HIỂN THỊ BẢNG
 st.data_editor(
     df_display,
     column_config={
