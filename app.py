@@ -1,263 +1,271 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 
-# 1. Cấu hình trang Streamlit
+# 1. CẤU HÌNH TRANG STREAMLIT
 st.set_page_config(
     page_title="Dashboard Kiểm Soát Ca Tồn & Checklist",
-    page_icon="📋",
+    page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Style CSS tùy chỉnh
+# Custom CSS để giả lập giao diện Dark Theme Modern giống ảnh mẫu
 st.markdown("""
-<style>
-    .main-header { font-size: 24px; font-weight: bold; color: #30411d; }
-    .sub-header { font-size: 13px; color: #5c7b35; }
-</style>
-""", unsafe_allow_html=True)
+    <style>
+    /* Background màu tối cho App */
+    .stApp {
+        background-color: #090a10;
+        color: #f1f5f9;
+    }
+    /* Style Sidebar */
+    section[data-testid="stSidebar"] {
+        background-color: #13141f;
+        border-right: 1px solid #232538;
+    }
+    /* Custom KPI Cards */
+    .kpi-card {
+        background-color: #181926;
+        border: 1px solid #232538;
+        border-radius: 8px;
+        padding: 16px;
+        text-align: left;
+    }
+    .kpi-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: #8f93a8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .kpi-value {
+        font-size: 28px;
+        font-weight: 800;
+        color: #ffffff;
+        margin-top: 4px;
+    }
+    .kpi-badge {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 10px;
+        font-weight: 700;
+        color: #34d399;
+        background-color: rgba(52, 211, 153, 0.1);
+        border: 1px solid rgba(52, 211, 153, 0.3);
+        border-radius: 12px;
+        margin-top: 6px;
+    }
+    /* Style bảng dữ liệu */
+    .stDataFrame {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    </style>
+""", unsafe_allow_allow_html=True)
 
-# 2. Dữ liệu mẫu khởi tạo
+# 2. KHỞI TẠO DỮ LIỆU MẪU (Sử dụng khi chưa upload file)
 @st.cache_data
-def load_sample_data():
+def get_sample_data():
     return pd.DataFrame([
-        { "STT": 1, "Số HĐ": "TQAAE4800", "Block": "Phuong My Lam-001", "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "Quản lý": "HUONGTT33", "Tồn giờ": 26, "Kiểm soát": "Chưa Đánh Giá", "Ghi Chú CSKH": "TQAAE4800 - 0326192565 - Báo hỏng dịch vụ", "Độ Ưu Tiên": "Support", "POP": "Phuong My Lam-001" },
-        { "STT": 2, "Số HĐ": "TQAAE5855", "Block": "Phuong My Lam-001", "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "Quản lý": "HUONGTT33", "Tồn giờ": 26, "Kiểm soát": "Chưa Đánh Giá", "Ghi Chú CSKH": "TQAAE5855 - 0987682243 - Báo hỏng dịch vụ", "Độ Ưu Tiên": "Support", "POP": "Phuong My Lam-001" },
-        { "STT": 3, "Số HĐ": "TQAAE4058", "Block": "Xa Chiem Hoa-001", "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.HUNGDQ5", "Quản lý": "HUONGTT33", "Tồn giờ": 7, "Kiểm soát": "Chưa Đánh Giá", "Ghi Chú CSKH": "TQAAE4058 - 0978063651 - Báo hỏng dịch vụ", "Độ Ưu Tiên": "Support", "POP": "Xa Chiem Hoa-001" },
-        { "STT": 4, "Số HĐ": "TQFD13450", "Block": "Phuong An Tuong-001", "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "Quản lý": "HUONGTT33", "Tồn giờ": 23, "Kiểm soát": "Chưa Đánh Giá", "Ghi Chú CSKH": "Hỏng điều khiển", "Độ Ưu Tiên": "Support", "POP": "Phuong An Tuong-001" },
-        { "STT": 5, "Số HĐ": "TQFD20613", "Block": "Phuong My Lam-001", "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.QUANDM2", "Quản lý": "HUONGTT33", "Tồn giờ": 18, "Kiểm soát": "Chưa Đánh Giá", "Ghi Chú CSKH": "TQFD20613 - 0385365241 - Mất kết nối", "Độ Ưu Tiên": "Support", "POP": "Phuong My Lam-001" },
-        { "STT": 6, "Số HĐ": "TQAAE7704", "Block": "Phuong My Lam-001", "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "Quản lý": "HUONGTT33", "Tồn giờ": 24, "Kiểm soát": "Chưa Đánh Giá", "Ghi Chú CSKH": "TQAAE7704 - Báo hỏng dịch vụ", "Độ Ưu Tiên": "SOS", "POP": "Phuong My Lam-001" },
-        { "STT": 7, "Số HĐ": "TQAAE9218", "Block": "Phuong An Tuong-001", "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "Quản lý": "HUONGTT33", "Tồn giờ": 5, "Kiểm soát": "Chưa Đánh Giá", "Ghi Chú CSKH": "TQAAE9218 - Lắp đường truyền quốc tế", "Độ Ưu Tiên": "Support", "POP": "Phuong An Tuong-001" }
+        {"STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "Trần Văn Nam (QL-01)"},
+        {"STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)"},
+        {"STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)"},
+        {"STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)"},
+        {"STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP005", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": "Trần Văn Nam (QL-01)"},
+        {"STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP001", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": "Lê Hoàng Long (QL-03)"},
+        {"STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP002", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": "Lê Hoàng Long (QL-03)"},
+        {"STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": -29, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP038", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": "Phạm Quốc Hùng (QL-02)"},
+        {"STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP006", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": "Trần Văn Nam (QL-01)"},
+        {"STT": 10, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC9017", "Tên đầy đủ": "Vũ Đình Khải", "Thời gian tạo": "2026-09-17 08:56:48", "Tồn giờ": 137, "Số lần hẹn": 2, "CL Lặp": 2, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP030", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQGP030.0094/HO-2", "Cột AN": "Lê Hoàng Long (QL-03)"},
+        {"STT": 11, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE4800", "Tên đầy đủ": "Hoàng Văn", "Thời gian tạo": "2026-09-23 11:10:12", "Tồn giờ": 23, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQAEC48C >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)"},
+        {"STT": 12, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE5855", "Tên đầy đủ": "Trần Thị H", "Thời gian tạo": "2026-09-23 11:42:15", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQAAE5855 - 098768", "Cột AN": "Trần Văn Nam (QL-01)"}
     ])
 
-# Hàm chuẩn hóa dữ liệu upload để tránh lỗi KeyError
-def normalize_dataframe(df):
-    # Loại bỏ khoảng trắng ở tên cột
-    df.columns = [str(col).strip() for col in df.columns]
-    
-    # Bảng ánh xạ các tên cột hay gặp về cột chuẩn
-    column_mapping = {
-        'Cột AN': 'Quản lý', 'Quan ly': 'Quản lý', 'QUẢN LÝ': 'Quản lý', 'QuanLy': 'Quản lý',
-        'So HD': 'Số HĐ', 'SỐ HĐ': 'Số HĐ', 'Contract': 'Số HĐ',
-        'Nhan su': 'Nhân sự', 'NHÂN SỰ': 'Nhân sự', 'KTV': 'Nhân sự',
-        'So lan hen': 'Số lần hẹn', 'Số Lần Hẹn': 'Số lần hẹn', 'LẦN HẸN': 'Số lần hẹn',
-        'CL Lap': 'CL Lặp', 'CL LẶP': 'CL Lặp', 'Checklist Lap': 'CL Lặp',
-        'Ton gio': 'Tồn giờ', 'TỒN GIỜ': 'Tồn giờ',
-        'Kiem soat': 'Kiểm soát', 'KIỂM SOÁT': 'Kiểm soát',
-        'Ghi chu': 'Ghi Chú CSKH', 'Ghi chú': 'Ghi Chú CSKH', 'GHI CHÚ CSKH': 'Ghi Chú CSKH',
-        'Do uu tien': 'Độ Ưu Tiên', 'ĐỘ ƯU TIÊN': 'Độ Ưu Tiên'
-    }
-    df = df.rename(columns=column_mapping)
-    
-    # Danh sách các cột bắt buộc phải có
-    required_defaults = {
-        "STT": range(1, len(df) + 1),
-        "Số HĐ": "",
-        "Block": "Khác",
-        "Số lần hẹn": 1,
-        "CL Lặp": 0,
-        "Nhân sự": "Chưa phân công",
-        "Quản lý": "Chưa phân công",
-        "Tồn giờ": 0,
-        "Kiểm soát": "Chưa Đánh Giá",
-        "Ghi Chú CSKH": "",
-        "Độ Ưu Tiên": "Support",
-        "POP": "Chưa xác định"
-    }
-    
-    for col, default_val in required_defaults.items():
-        if col not in df.columns:
-            df[col] = default_val
-            
-    # Ép kiểu dữ liệu an toàn
-    df['CL Lặp'] = pd.to_numeric(df['CL Lặp'], errors='coerce').fillna(0).astype(int)
-    df['Số lần hẹn'] = pd.to_numeric(df['Số lần hẹn'], errors='coerce').fillna(1).astype(int)
-    df['Tồn giờ'] = pd.to_numeric(df['Tồn giờ'], errors='coerce').fillna(0).astype(int)
-    df['Quản lý'] = df['Quản lý'].fillna('Chưa phân công').astype(str)
-    df['Nhân sự'] = df['Nhân sự'].fillna('Chưa phân công').astype(str)
-    
-    return df
+# 3. SIDEBAR - BỘ LỌC DỮ LIỆU
+st.sidebar.markdown("### ⚙️ Cấu Hình & Bộ Lọc")
 
-# Khởi tạo session state
-if "df" not in st.session_state:
-    st.session_state.df = load_sample_data()
+uploaded_file = st.sidebar.file_uploader("📂 Upload File Excel mới", type=["xlsx", "xls", "csv"])
 
-# 3. Sidebar: Upload & Lọc
-st.sidebar.title("⚙️ Cấu Hình & Bộ Lọc")
-
-uploaded_file = st.sidebar.file_uploader("📥 Tải lên File Excel mới", type=["xlsx", "xls", "csv"])
-if uploaded_file:
+if uploaded_file is not None:
     try:
         if uploaded_file.name.endswith('.csv'):
-            uploaded_df = pd.read_csv(uploaded_file)
+            df_raw = pd.read_csv(uploaded_file)
         else:
-            uploaded_df = pd.read_excel(uploaded_file)
-        
-        st.session_state.df = normalize_dataframe(uploaded_df)
+            df_raw = pd.read_excel(uploaded_file)
         st.sidebar.success("Đã nạp file Excel thành công!")
     except Exception as e:
-        st.sidebar.error(f"Lỗi đọc file: {e}")
+        st.sidebar.error("Lỗi đọc file Excel!")
+        df_raw = get_sample_data()
+else:
+    df_raw = get_sample_data()
 
-df_raw = st.session_state.df
+# Các Bộ Lọc Nâng Cao
+mgr_options = ["Tất cả Quản lý"] + list(df_raw['Cột AN'].dropna().unique())
+selected_mgr = st.sidebar.selectbox("👨‍💼 Chọn Quản Lý Trực Tiếp", mgr_options)
 
-# Lọc Quản lý
-list_quan_ly = ["Tất cả"] + sorted([x for x in df_raw["Quản lý"].unique() if x])
-sel_quan_ly = st.sidebar.selectbox("👨‍💼 Chọn Quản Lý Trực Tiếp", list_quan_ly, index=0)
+# Lọc nhân sự theo quản lý
+if selected_mgr != "Tất cả Quản lý":
+    filtered_tech_df = df_raw[df_raw['Cột AN'] == selected_mgr]
+else:
+    filtered_tech_df = df_raw
 
-# Lọc Nhân sự
-list_nhan_su = ["Tất cả"] + sorted([x for x in df_raw["Nhân sự"].unique() if x])
-sel_nhan_su = st.sidebar.selectbox("👷 Chọn Nhân Sự", list_nhan_su, index=0)
+tech_options = ["Tất cả"] + list(filtered_tech_df['Nhân sự'].dropna().unique())
+selected_tech = st.sidebar.selectbox("👷 Chọn Nhân Sự", tech_options)
 
-# Lọc Mức Ưu Tiên
-list_uu_tien = ["Tất cả", "SOS", "Support"]
-sel_uu_tien = st.sidebar.selectbox("🚨 Độ Ưu Tiên / SOS", list_uu_tien, index=0)
+selected_priority = st.sidebar.selectbox("🔥 Độ Ưu Tiên / SOS", ["Tất cả", "Chỉ lấy: SOS", "Chỉ lấy: Support"])
 
-# Lọc CL Lặp
-list_lap = ["Tất cả", "Chỉ lấy Lặp > 0", "Bằng 0 (= 0)"]
-sel_lap = st.sidebar.selectbox("🔄 Checklist Lặp", list_lap, index=0)
+repeat_options = ["Tất cả", "Lặp > 0", "Bằng 0", "Lặp 1 lần", "Lặp 2 lần", "Lặp ≥ 3 lần"]
+selected_repeat = st.sidebar.selectbox("🔄 Checklist Lặp", repeat_options)
 
-# Lọc Block
-list_block = ["Tất cả"] + sorted([x for x in df_raw["Block"].astype(str).unique() if x])
-sel_block = st.sidebar.selectbox("🏘️ Chọn Block", list_block, index=0)
+block_options = ["Tất cả"] + list(df_raw['Block'].dropna().unique())
+selected_block = st.sidebar.selectbox("📦 Chọn Block", block_options)
 
-# Tìm kiếm
 search_term = st.sidebar.text_input("🔍 Tìm kiếm (Số HĐ, Ghi chú...)", "")
 
-# Xử lý lọc dữ liệu
-df_filtered = df_raw.copy()
+# 4. XỬ LÝ LỌC DỮ LIỆU
+df = df_raw.copy()
 
-if sel_quan_ly != "Tất cả":
-    df_filtered = df_filtered[df_filtered["Quản lý"] == sel_quan_ly]
+if selected_mgr != "Tất cả Quản lý":
+    df = df[df['Cột AN'] == selected_mgr]
 
-if sel_nhan_su != "Tất cả":
-    df_filtered = df_filtered[df_filtered["Nhân sự"] == sel_nhan_su]
+if selected_tech != "Tất cả":
+    df = df[df['Nhân sự'] == selected_tech]
 
-if sel_uu_tien != "Tất cả":
-    df_filtered = df_filtered[df_filtered["Độ Ưu Tiên"].astype(str).str.contains(sel_uu_tien, case=False, na=False)]
+if selected_priority == "Chỉ lấy: SOS":
+    df = df[df['Độ Ưu Tiên'].astype(str).str.contains("SOS", case=False, na=False)]
+elif selected_priority == "Chỉ lấy: Support":
+    df = df[~df['Độ Ưu Tiên'].astype(str).str.contains("SOS", case=False, na=False)]
 
-if sel_lap == "Chỉ lấy Lặp > 0":
-    df_filtered = df_filtered[df_filtered["CL Lặp"] > 0]
-elif sel_lap == "Bằng 0 (= 0)":
-    df_filtered = df_filtered[df_filtered["CL Lặp"] == 0]
+if selected_repeat == "Lặp > 0":
+    df = df[df['CL Lặp'] > 0]
+elif selected_repeat == "Bằng 0":
+    df = df[df['CL Lặp'] == 0]
+elif selected_repeat == "Lặp 1 lần":
+    df = df[df['CL Lặp'] == 1]
+elif selected_repeat == "Lặp 2 lần":
+    df = df[df['CL Lặp'] == 2]
+elif selected_repeat == "Lặp ≥ 3 lần":
+    df = df[df['CL Lặp'] >= 3]
 
-if sel_block != "Tất cả":
-    df_filtered = df_filtered[df_filtered["Block"] == sel_block]
+if selected_block != "Tất cả":
+    df = df[df['Block'] == selected_block]
 
 if search_term:
-    search_mask = (
-        df_filtered["Số HĐ"].astype(str).str.contains(search_term, case=False, na=False) |
-        df_filtered["Ghi Chú CSKH"].astype(str).str.contains(search_term, case=False, na=False)
+    search_lower = search_term.lower()
+    df = df[
+        df['Số HĐ'].astype(str).str.lower().str.contains(search_lower) |
+        df['Ghi Chú CC'].astype(str).str.lower().str.contains(search_lower) |
+        df['Block'].astype(str).str.lower().str.contains(search_lower)
+    ]
+
+# 5. HEADER TIÊU ĐỀ
+st.markdown("<h2 style='color: #a3e635; font-weight: 800; margin-bottom: 0px;'>DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</h2>", unsafe_allow_html=True)
+st.markdown("<p style='color: #65a30d; font-size: 13px;'>Báo Cáo Kiểm Soát | Bảng dữ liệu chuẩn kiểm soát ca tồn</p>", unsafe_allow_html=True)
+st.markdown("---")
+
+# 6. HIỂN THỊ KPI CARDS (6 CARD THEO ẢNH MAU)
+total_cases = len(df)
+sos_cases = len(df[df['Độ Ưu Tiên'].astype(str).str.contains("SOS", na=False)])
+sos_pct = round((sos_cases / total_cases * 100), 1) if total_cases > 0 else 0
+
+repeat_cases = len(df[df['CL Lặp'] > 0])
+overdue_cases = len(df[df['Tồn giờ'] >= 24])
+overdue_pct = round((overdue_cases / total_cases * 100), 1) if total_cases > 0 else 0
+
+kpi_col1, kpi_col2, kpi_col3, kpi_col4, kpi_col5, kpi_col6 = st.columns(6)
+
+with kpi_col1:
+    st.markdown(f"""<div class="kpi-card"><div class="kpi-title">TỔNG CA TỒN</div><div class="kpi-value">{total_cases}</div></div>""", unsafe_allow_html=True)
+
+with kpi_col2:
+    st.markdown(f"""<div class="kpi-card"><div class="kpi-title">MỨC SOS</div><div class="kpi-value">{sos_cases}</div><div class="kpi-badge">↑ {sos_pct}%</div></div>""", unsafe_allow_html=True)
+
+with kpi_col3:
+    st.markdown(f"""<div class="kpi-card"><div class="kpi-title">CLL ĐANG TỒN</div><div class="kpi-value">{repeat_cases}</div><div class="kpi-badge">↑ {repeat_cases} ca</div></div>""", unsafe_allow_html=True)
+
+with kpi_col4:
+    st.markdown(f"""<div class="kpi-card"><div class="kpi-title">TỒN GIỜ ≥ 24H</div><div class="kpi-value">{overdue_cases}</div><div class="kpi-badge">↑ {overdue_pct}%</div></div>""", unsafe_allow_html=True)
+
+with kpi_col5:
+    st.markdown(f"""<div class="kpi-card"><div class="kpi-title">ĐANG XỬ LÝ</div><div class="kpi-value">{total_cases}</div></div>""", unsafe_allow_html=True)
+
+with kpi_col6:
+    st.markdown(f"""<div class="kpi-card"><div class="kpi-title">CẦN ĐÁNH GIÁ</div><div class="kpi-value">0</div></div>""", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# 7. VẼ 4 BIỂU ĐỒ CHARTS VỚI PLOTLY (MATCH DARK THEME)
+chart_theme = {
+    'paper_bgcolor': 'rgba(0,0,0,0)',
+    'plot_bgcolor': 'rgba(0,0,0,0)',
+    'font': {'color': '#8f93a8', 'size': 11},
+    'margin': dict(l=20, r=20, t=30, b=20)
+}
+
+c1, c2 = st.columns(2)
+
+with c1:
+    st.markdown("##### 1. Tỉ trọng Checklist Lặp Theo Mức Độ SOS")
+    # Chart 1 Data
+    repeat_sos = df.groupby(['CL Lặp', 'Độ Ưu Tiên']).size().reset_index(name='Số ca')
+    fig1 = px.bar(
+        repeat_sos, x='CL Lặp', y='Số ca', color='Độ Ưu Tiên', barmode='group',
+        color_discrete_map={'SOS': '#f43f5e', 'Support': '#3b82f6'}
     )
-    df_filtered = df_filtered[search_mask]
+    fig1.update_layout(**chart_theme, height=260)
+    st.plotly_chart(fig1, use_container_width=True)
 
-# 4. Header
-st.markdown('<div class="main-header">DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</div>', unsafe_allow_html=True)
-st.markdown('<div class="sub-header">Báo Cáo Kiểm Soát | Bảng dữ liệu chuẩn 8 cột kiểm soát ca tồn</div><br>', unsafe_allow_html=True)
+with c2:
+    st.markdown("##### 2. Top Block Tồn Ca Nhiều Nhất")
+    block_counts = df['Block'].value_counts().head(7).reset_index()
+    block_counts.columns = ['Block', 'Số ca']
+    fig2 = px.bar(block_counts, y='Block', x='Số ca', orientation='h', color_discrete_sequence=['#38bdf8'])
+    fig2.update_layout(**chart_theme, height=260, yaxis={'categoryorder':'total ascending'})
+    st.plotly_chart(fig2, use_container_width=True)
 
-# 5. Cards KPI
-kpi1, kpi2, kpi3, kpi4, kpi5, kpi6 = st.columns(6)
+c3, c4 = st.columns(2)
 
-total_cases = len(df_filtered)
-sos_cases = len(df_filtered[df_filtered["Độ Ưu Tiên"].astype(str).str.contains("SOS", case=False, na=False)])
-repeat_sum = df_filtered["CL Lặp"].sum()
-overdue_cases = len(df_filtered[df_filtered["Tồn giờ"] >= 24])
-unchecked_cases = len(df_filtered[df_filtered["Kiểm soát"].isin(["Chưa Đánh Giá", "", None])])
+with c3:
+    st.markdown("##### 3. Tồn Theo POP")
+    pop_counts = df['POP'].value_counts().head(6).reset_index()
+    pop_counts.columns = ['POP', 'Số ca']
+    fig3 = px.bar(pop_counts, x='POP', y='Số ca', color_discrete_sequence=['#34d399'])
+    fig3.update_layout(**chart_theme, height=260)
+    st.plotly_chart(fig3, use_container_width=True)
 
-kpi1.metric("TỔNG CA TỒN", total_cases)
-kpi2.metric("MỨC SOS", sos_cases, f"{(sos_cases/total_cases*100):.1f}%" if total_cases else "0%")
-kpi3.metric("CLL ĐANG TỒN", repeat_sum, f"{len(df_filtered[df_filtered['CL Lặp'] > 0])} ca")
-kpi4.metric("TỒN GIỜ ≥ 24H", overdue_cases, f"{(overdue_cases/total_cases*100):.1f}%" if total_cases else "0%")
-kpi5.metric("ĐANG XỬ LÝ", total_cases - unchecked_cases)
-kpi6.metric("CẦN ĐÁNH GIÁ", unchecked_cases)
+with c4:
+    st.markdown("##### 4. Top KTV Tồn Ca Nhiều Nhất")
+    tech_counts = df['Nhân sự'].value_counts().head(6).reset_index()
+    tech_counts.columns = ['Nhân sự', 'Số ca']
+    fig4 = px.bar(tech_counts, x='Nhân sự', y='Số ca', color_discrete_sequence=['#a855f7'])
+    fig4.update_layout(**chart_theme, height=260)
+    st.plotly_chart(fig4, use_container_width=True)
 
-st.markdown("---")
+# 8. BẢNG DỮ LIỆU BÁO CÁO (INTERACTIVE TABLE)
+st.markdown("### 📋 BẢNG DỮ LIỆU KIỂM SOÁT CA TỒN")
+st.markdown(f"Hiển thị **{len(df)}** / **{len(df_raw)}** ca")
 
-# 6. Biểu đồ Plotly
-col_c1, col_c2 = st.columns(2)
-
-with col_c1:
-    st.subheader("1. Tỉ trọng Checklist Lặp Theo Mức Độ SOS")
-    if not df_filtered.empty:
-        df_chart1 = df_filtered.groupby(['CL Lặp', 'Độ Ưu Tiên']).size().reset_index(name='Số lượng')
-        fig1 = px.bar(df_chart1, x="CL Lặp", y="Số lượng", color="Độ Ưu Tiên", barmode="group",
-                     color_discrete_map={"SOS": "#f43f5e", "Support": "#3b82f6"})
-        fig1.update_layout(height=280, margin=dict(l=20, r=20, t=20, b=20))
-        st.plotly_chart(fig1, use_container_width=True)
-
-with col_c2:
-    st.subheader("2. Top Block Tồn Ca Nhiều Nhất")
-    if not df_filtered.empty:
-        df_chart2 = df_filtered['Block'].value_counts().reset_index()
-        df_chart2.columns = ['Block', 'Số ca']
-        fig2 = px.bar(df_chart2.head(10), y="Block", x="Số ca", orientation='h', color_discrete_sequence=['#0284c7'])
-        fig2.update_layout(height=280, margin=dict(l=20, r=20, t=20, b=20), yaxis={'categoryorder':'total ascending'})
-        st.plotly_chart(fig2, use_container_width=True)
-
-col_c3, col_c4 = st.columns(2)
-
-with col_c3:
-    st.subheader("3. Tồn Theo POP")
-    if not df_filtered.empty:
-        df_chart3 = df_filtered['POP'].value_counts().reset_index()
-        df_chart3.columns = ['POP', 'Số ca']
-        fig3 = px.bar(df_chart3.head(10), x="POP", y="Số ca", color_discrete_sequence=['#10b981'])
-        fig3.update_layout(height=280, margin=dict(l=20, r=20, t=20, b=20))
-        st.plotly_chart(fig3, use_container_width=True)
-
-with col_c4:
-    st.subheader("4. Top KTV Tồn Ca Nhiều Nhất")
-    if not df_filtered.empty:
-        df_chart4 = df_filtered['Nhân sự'].value_counts().reset_index()
-        df_chart4.columns = ['Nhân sự', 'Số ca']
-        fig4 = px.bar(df_chart4.head(10), x="Nhân sự", y="Số ca", color_discrete_sequence=['#a855f7'])
-        fig4.update_layout(height=280, margin=dict(l=20, r=20, t=20, b=20))
-        st.plotly_chart(fig4, use_container_width=True)
-
-st.markdown("---")
-
-# 7. Bảng Dữ Liệu Chỉnh Sửa Dạng Table
-st.subheader("📋 BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA")
-
-display_columns = ["STT", "Số HĐ", "Block", "Số lần hẹn", "CL Lặp", "Nhân sự", "Quản lý", "Tồn giờ", "Kiểm soát", "Ghi Chú CSKH"]
-df_display = df_filtered[[c for c in display_columns if c in df_filtered.columns]]
-
+# Hiển thị bảng tương tác cho phép chỉnh sửa trực tiếp cột "Kiểm soát"
 edited_df = st.data_editor(
-    df_display,
+    df,
     column_config={
-        "STT": st.column_config.NumberColumn("STT", width="small"),
-        "Số HĐ": st.column_config.TextColumn("SỐ HĐ", width="medium"),
-        "Block": st.column_config.TextColumn("BLOCK", width="medium"),
-        "Số lần hẹn": st.column_config.NumberColumn("LẦN HẸN", width="small"),
-        "CL Lặp": st.column_config.NumberColumn("CL LẶP", width="small"),
-        "Nhân sự": st.column_config.TextColumn("NHÂN SỰ", width="medium"),
-        "Quản lý": st.column_config.TextColumn("QUẢN LÝ", width="medium"),
-        "Tồn giờ": st.column_config.NumberColumn("TỒN GIỜ", width="small"),
         "Kiểm soát": st.column_config.SelectboxColumn(
-            "KIỂM SOÁT",
-            options=["Chưa Đánh Giá", "✅ Đã tiếp nhận", "⚠️ Cần hỗ trợ"],
+            "Kiểm Soát",
+            options=["Chưa duyệt", "✅ Đã xử lý", "🚨 Cảnh báo"],
             required=True,
-            width="medium"
         ),
-        "Ghi Chú CSKH": st.column_config.TextColumn("GHI CHÚ CSKH", width="large"),
+        "Số HĐ": st.column_config.TextColumn("Số HĐ", disabled=True),
+        "Tồn giờ": st.column_config.NumberColumn("Tồn giờ (h)", format="%d h"),
     },
-    disabled=["STT", "Số HĐ", "Block", "Số lần hẹn", "CL Lặp", "Nhân sự", "Quản lý", "Tồn giờ", "Ghi Chú CSKH"],
     hide_index=True,
     use_container_width=True
 )
 
-# Export Excel
-@st.cache_data
-def convert_df_to_excel(df):
-    from io import BytesIO
-    output = BytesIO()
-    with pd.ExcelWriter(output, engine='openpyxl') as writer:
-        df.to_excel(writer, index=False, sheet_name='KiemSoatCaTon')
-    return output.getvalue()
-
+# Nút Export Excel
 st.download_button(
-    label="📥 Export Bảng Dữ Liệu Xuất Excel",
-    data=convert_df_to_excel(edited_df),
-    file_name='Bao_Cao_Kiem_Soat_Ca_Ton.xlsx',
-    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    label="📥 Export Báo Cáo Excel",
+    data=edited_df.to_csv(index=False).encode('utf-8-sig'),
+    file_name='Bao_Cao_Kiem_Soat_Ca_Ton.csv',
+    mime='text/csv'
 )
