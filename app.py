@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# 1. CẤU HÌNH TRANG STREAMLIT (CẤU HÌNH THEME LIGHT BẮT BUỘC)
+# 1. CẤU HÌNH TRANG STREAMLIT & ÉP LIGHT MODE
 st.set_page_config(
     page_title="DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST",
     page_icon="📊",
@@ -10,25 +10,28 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. OVERRIDE CSS CỰC MẠNH ĐỂ DIỆT DỰT DARK MODE & ĐỔI BẢNG SANG MÀU XANH OLIU NHẠT
+# 2. OVERRIDE CSS CHO GIAO DIỆN XANH OLIU NHẠT CHUẨN
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     * { font-family: 'Inter', -apple-system, sans-serif !important; }
-
-    /* Ẩn Sidebar & Header thừa */
-    [data-testid="stSidebar"], [data-testid="collapsedControl"], #MainMenu, footer { display: none !important; }
+    
+    /* Ẩn Sidebar & UI mặc định thừa */
+    [data-testid="stSidebar"] { display: none !important; }
+    [data-testid="collapsedControl"] { display: none !important; }
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
     
     .main .block-container {
         max-width: 98% !important;
         padding: 0.8rem 1rem !important;
     }
 
-    /* Ép nền toàn trang sang màu trắng/xanh sáng nhạt */
-    html, body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {
-        background-color: #f7faf3 !important;
-        color: #1a2e05 !important;
+    /* Ép nền ứng dụng màu sáng nhạt */
+    .stApp, [data-testid="stAppViewContainer"] {
+        background-color: #f8fafc !important;
+        color: #0f172a !important;
     }
     
     /* Header chính */
@@ -38,12 +41,12 @@ st.markdown("""
         background-color: #ffffff;
         padding: 10px 18px;
         border-radius: 12px;
-        border: 1px solid #d0e1a9;
+        border: 1px solid #e2e8f0;
         box-shadow: 0 1px 3px rgba(0,0,0,0.03);
         margin-bottom: 12px;
     }
     .header-icon {
-        background-color: #709214;
+        background-color: #65a30d;
         color: white;
         border-radius: 50%;
         width: 34px;
@@ -54,17 +57,17 @@ st.markdown("""
         font-size: 18px;
         margin-right: 12px;
     }
-    .header-title { font-size: 17px; font-weight: 800; color: #233703; }
+    .header-title { font-size: 17px; font-weight: 800; color: #0f172a; }
     .badge-sub {
-        background-color: #eaf3d6;
-        color: #4a6708;
+        background-color: #ecfccb;
+        color: #4d7c0f;
         font-size: 11px;
         font-weight: 700;
         padding: 2px 8px;
         border-radius: 12px;
-        border: 1px solid #c0d982;
+        border: 1px solid #bef264;
     }
-    .header-desc { font-size: 11px; color: #586e2e; margin-top: 2px; }
+    .header-desc { font-size: 11px; color: #64748b; margin-top: 2px; }
 
     /* Top 6 KPI Cards */
     .kpi-container { display: flex; gap: 8px; margin-bottom: 12px; }
@@ -75,61 +78,70 @@ st.markdown("""
         padding: 10px 6px;
         text-align: center;
         box-shadow: 0 1px 2px rgba(0,0,0,0.04);
-        border: 1px solid #dce8be;
     }
-    .kpi-blue { border-top: 3.5px solid #3b82f6; }
-    .kpi-pink { border-top: 3.5px solid #f43f5e; }
-    .kpi-orange { border-top: 3.5px solid #f97316; }
-    .kpi-purple { border-top: 3.5px solid #a855f7; }
-    .kpi-cyan { border-top: 3.5px solid #06b6d4; }
-    .kpi-green { border-top: 3.5px solid #10b981; }
-    .kpi-label { font-size: 11px; font-weight: 600; color: #3d5214; white-space: nowrap; }
+    .kpi-blue { border-top: 3.5px solid #3b82f6; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+    .kpi-pink { border-top: 3.5px solid #f43f5e; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+    .kpi-orange { border-top: 3.5px solid #f97316; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+    .kpi-purple { border-top: 3.5px solid #a855f7; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+    .kpi-cyan { border-top: 3.5px solid #06b6d4; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+    .kpi-green { border-top: 3.5px solid #10b981; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; }
+    .kpi-label { font-size: 11px; font-weight: 600; color: #475569; white-space: nowrap; }
+    
+    /* Biểu đồ Card nền trắng */
+    .chart-card {
+        background-color: #ffffff !important;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 12px;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+    .chart-title { font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px; }
+    .chart-sub { font-size: 10px; color: #94a3b8; margin-bottom: 4px; }
 
-    /* KHU VỰC BẢNG & BỘ LỌC (MÀU XANH OLIU NHẠT CỰC NỔI) */
+    /* KHU VỰC BẢNG & BỘ LỌC MÀU XANH OLIU NHẠT */
     .table-container-box {
-        background-color: #eef5e2 !important;
-        border: 1.5px solid #9bbd38 !important;
+        background-color: #f4f8ec !important;
+        border: 1.5px solid #a3c234 !important;
         border-radius: 12px;
         padding: 16px;
         margin-top: 10px;
     }
-    .table-header-title { font-size: 15px; font-weight: 800; color: #2c3e0a; display: flex; align-items: center; gap: 6px; }
-    .table-header-sub { font-size: 11px; color: #577519; margin-bottom: 12px; }
+    .table-header-title { font-size: 15px; font-weight: 800; color: #3f5115; display: flex; align-items: center; gap: 6px; }
+    .table-header-sub { font-size: 11px; color: #6b8e23; margin-bottom: 12px; }
 
-    /* 1. Ép màu các ô Input & Selectbox sang Xanh Oliu Nhạt */
-    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div, input {
-        background-color: #dceabb !important;
-        color: #1c2b04 !important;
-        border-radius: 6px !important;
-        border: 1px solid #8eaf28 !important;
-        font-weight: 600 !important;
-    }
-    div[data-baseweb="select"] span, div[data-baseweb="select"] div {
-        color: #1c2b04 !important;
-    }
-    /* Đổi màu icon mũi tên trong dropdown */
-    div[data-baseweb="select"] svg {
-        fill: #2c3e0a !important;
-    }
-
-    /* 2. Ép màu Bảng data_editor / dataframe nền sáng Xanh Oliu Nhạt */
-    [data-testid="stDataFrame"], [data-testid="stDataEditor"] {
-        background-color: #eef5e2 !important;
-        border: 1px solid #a8c74d !important;
+    /* Bộ lọc Input/Selectbox màu xanh oliu nhạt */
+    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
+        background-color: #eaf1de !important;
+        color: #2c3e0e !important;
         border-radius: 8px !important;
+        border: 1px solid #b5cc75 !important;
     }
-    
-    /* Can thiệp shadow canvas của bảng st.data_editor */
-    [data-testid="stDataFrame"] canvas, [data-testid="stDataEditor"] canvas {
-        filter: invert(0) !important; /* Đảm bảo không bị dính Dark Mode trình duyệt */
+    div[data-baseweb="select"] span, input {
+        color: #2c3e0e !important;
+        font-weight: 500 !important;
     }
 
-    /* Text thông báo phía dưới */
+    /* Định dạng bảng data_editor theo tông xanh oliu nhạt */
+    [data-testid="stDataFrame"] div[role="columnheader"] {
+        background-color: #dce7c8 !important;
+        color: #2c3e0e !important;
+        font-weight: 700 !important;
+        border-bottom: 1px solid #b5cc75 !important;
+    }
+    [data-testid="stDataFrame"] div[role="gridcell"] {
+        background-color: #f7faef !important;
+        color: #2c3e0e !important;
+        border-bottom: 1px solid #e2ebd0 !important;
+    }
+    [data-testid="stDataFrame"] div[role="gridcell"]:hover {
+        background-color: #e4eed2 !important;
+    }
     .table-footer-text {
         font-size: 11px;
-        color: #4a6612;
+        color: #556b2f;
         margin-top: 8px;
-        font-weight: 700;
+        font-weight: 600;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -174,7 +186,7 @@ def load_excel_data(file):
         st.error(f"Lỗi đọc file: {e}")
         return pd.DataFrame()
 
-# 4. HEADER TRÊN CÙNG
+# 4. HEADER TRÊN CÙNG & NÚT UPLOAD FILE
 h_col1, h_col2 = st.columns([3.5, 1])
 
 with h_col1:
@@ -203,7 +215,7 @@ else:
         st.info("👆 Vui lòng bấm nạp file Excel ở góc trên bên phải.")
         st.stop()
 
-# 5. TOP KPI CARDS
+# 5. KHU VỰC TOP KPI CARDS
 st.markdown("""
 <div class="kpi-container">
     <div class="kpi-card kpi-blue"><div class="kpi-label">Tổng hợp hợp đồng tồn</div></div>
@@ -215,34 +227,81 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 6. KHU VỰC 4 BIỂU ĐỒ (SÁNG)
+# 6. KHU VỰC 4 BIỂU ĐỒ (LIGHT MODE)
 chart_style = {
     'paper_bgcolor': '#ffffff',
     'plot_bgcolor': '#ffffff',
-    'font': {'color': '#2c3e0a', 'size': 11, 'family': 'Inter'},
+    'font': {'color': '#1e293b', 'size': 11, 'family': 'Inter'},
     'margin': dict(l=10, r=10, t=10, b=10)
 }
 
 c1, c2 = st.columns(2)
 
 with c1:
+    st.markdown("""
+    <div class="chart-card">
+        <div class="chart-title">📊 1. Tỉ trọng Checklist Lặp Theo Mức Độ SOS</div>
+        <div class="chart-sub">Thống kê ca SOS vs Support lặp lại nhiều lần</div>
+    """, unsafe_allow_html=True)
     df_chart1 = df_raw.groupby(['CL LẶP', 'Độ Ưu Tiên']).size().reset_index(name='Số ca')
-    fig1 = px.bar(df_chart1, x='CL LẶP', y='Số ca', color='Độ Ưu Tiên', barmode='group', color_discrete_map={'SOS': '#f43f5e', 'Support': '#709214'})
-    fig1.update_layout(**chart_style, height=180, showlegend=True, legend=dict(orientation="h", y=1.1, x=0.2))
-    fig1.update_xaxes(showgrid=True, gridcolor='#f1f5f9')
-    fig1.update_yaxes(showgrid=True, gridcolor='#f1f5f9')
+    fig1 = px.bar(
+        df_chart1, x='CL LẶP', y='Số ca', color='Độ Ưu Tiên', barmode='group',
+        color_discrete_map={'SOS': '#f43f5e', 'Support': '#3b82f6'}
+    )
+    fig1.update_layout(**chart_style, height=200, showlegend=True, legend=dict(orientation="h", y=1.1, x=0.2))
+    fig1.update_xaxes(title_text="CL LẶP", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig1.update_yaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
     st.plotly_chart(fig1, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 with c2:
+    st.markdown("""
+    <div class="chart-card">
+        <div class="chart-title">📊 2. Top Block Tồn Ca Nhiều Nhất</div>
+        <div class="chart-sub">Đơn vị địa bàn phát sinh sự cố</div>
+    """, unsafe_allow_html=True)
     df_chart2 = df_raw['BLOCK'].value_counts().head(5).reset_index()
     df_chart2.columns = ['BLOCK', 'Số ca']
-    fig2 = px.bar(df_chart2, y='BLOCK', x='Số ca', orientation='h', color_discrete_sequence=['#4d7c0f'])
-    fig2.update_layout(**chart_style, height=180)
-    fig2.update_xaxes(showgrid=True, gridcolor='#f1f5f9')
-    fig2.update_yaxes(categoryorder='total ascending', showgrid=True, gridcolor='#f1f5f9')
+    fig2 = px.bar(df_chart2, y='BLOCK', x='Số ca', orientation='h', color_discrete_sequence=['#0284c7'])
+    fig2.update_layout(**chart_style, height=200)
+    fig2.update_xaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig2.update_yaxes(title_text="BLOCK", categoryorder='total ascending', title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
     st.plotly_chart(fig2, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-# 7. KHU VỰC BẢNG DỮ LIỆU (XANH OLIU NHẠT CHUẨN)
+c3, c4 = st.columns(2)
+
+with c3:
+    st.markdown("""
+    <div class="chart-card">
+        <div class="chart-title">📍 3. Tồn theo POP</div>
+        <div class="chart-sub">Cụm trạm kỹ thuật quản lý hạ tầng</div>
+    """, unsafe_allow_html=True)
+    df_chart3 = df_raw['POP'].value_counts().head(5).reset_index()
+    df_chart3.columns = ['POP', 'Số ca']
+    fig3 = px.bar(df_chart3, x='POP', y='Số ca', color_discrete_sequence=['#10b981'])
+    fig3.update_layout(**chart_style, height=200)
+    fig3.update_xaxes(title_text="POP", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig3.update_yaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    st.plotly_chart(fig3, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+with c4:
+    st.markdown("""
+    <div class="chart-card">
+        <div class="chart-title">👥 4. Top KTV Tồn Ca nhiều nhất</div>
+        <div class="chart-sub">Xếp hạng nhân sự có số tồn case vụ cao nhất</div>
+    """, unsafe_allow_html=True)
+    df_chart4 = df_raw['NHÂN SỰ'].value_counts().head(5).reset_index()
+    df_chart4.columns = ['NHÂN SỰ', 'Số ca']
+    fig4 = px.bar(df_chart4, x='NHÂN SỰ', y='Số ca', color_discrete_sequence=['#a855f7'])
+    fig4.update_layout(**chart_style, height=200)
+    fig4.update_xaxes(title_text="NHÂN SỰ", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    fig4.update_yaxes(title_text="Số ca", title_font=dict(color='#0f172a', size=11), tickfont=dict(color='#334155'), showgrid=True, gridcolor='#f1f5f9')
+    st.plotly_chart(fig4, use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# 7. KHU VỰC BẢNG DỮ LIỆU NỀN XANH OLIU NHẠT
 st.markdown("""
 <div class="table-container-box">
     <div class="table-header-title">📊 BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA</div>
@@ -276,7 +335,7 @@ with f6:
     list_block = sorted([str(x).strip() for x in df_sub['BLOCK'].unique() if pd.notna(x)])
     selected_block = st.selectbox("Block", options=["Tất cả Block"] + list_block, label_visibility="collapsed")
 
-# LỌC DỮ LIỆU
+# LỌC DỮ LIỆU BẢNG
 df_table = df_sub.copy()
 if selected_tech != "Tất cả Nhân sự":
     df_table = df_table[df_table['NHÂN SỰ'].astype(str) == selected_tech]
@@ -296,7 +355,7 @@ if search_input:
         df_table['GHI CHÚ CSKH'].astype(str).str.lower().str.contains(s_val)
     ]
 
-# TẠO DATAFRAME RENDER BẢNG
+# TẠO DATAFRAME TẢI LÊN BẢNG
 df_display = pd.DataFrame()
 df_display['STT'] = range(1, len(df_table) + 1)
 df_display['SỐ HĐ'] = df_table['SỐ HĐ'].astype(str).values
