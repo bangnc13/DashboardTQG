@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 
 # 1. CẤU HÌNH TRANG STREAMLIT
 st.set_page_config(
@@ -11,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS để giả lập giao diện Dark Theme Modern giống ảnh mẫu
+# Custom CSS để giả lập giao diện Dark Theme Modern
 st.markdown("""
     <style>
     /* Background màu tối cho App */
@@ -56,15 +55,10 @@ st.markdown("""
         border-radius: 12px;
         margin-top: 6px;
     }
-    /* Style bảng dữ liệu */
-    .stDataFrame {
-        border-radius: 8px;
-        overflow: hidden;
-    }
     </style>
-""", unsafe_allow_allow_html=True)
+""", unsafe_allow_html=True)
 
-# 2. KHỞI TẠO DỮ LIỆU MẪU (Sử dụng khi chưa upload file)
+# 2. KHỞI TẠO DỮ LIỆU MẪU
 @st.cache_data
 def get_sample_data():
     return pd.DataFrame([
@@ -104,7 +98,6 @@ else:
 mgr_options = ["Tất cả Quản lý"] + list(df_raw['Cột AN'].dropna().unique())
 selected_mgr = st.sidebar.selectbox("👨‍💼 Chọn Quản Lý Trực Tiếp", mgr_options)
 
-# Lọc nhân sự theo quản lý
 if selected_mgr != "Tất cả Quản lý":
     filtered_tech_df = df_raw[df_raw['Cột AN'] == selected_mgr]
 else:
@@ -164,7 +157,7 @@ st.markdown("<h2 style='color: #a3e635; font-weight: 800; margin-bottom: 0px;'>D
 st.markdown("<p style='color: #65a30d; font-size: 13px;'>Báo Cáo Kiểm Soát | Bảng dữ liệu chuẩn kiểm soát ca tồn</p>", unsafe_allow_html=True)
 st.markdown("---")
 
-# 6. HIỂN THỊ KPI CARDS (6 CARD THEO ẢNH MAU)
+# 6. HIỂN THỊ KPI CARDS
 total_cases = len(df)
 sos_cases = len(df[df['Độ Ưu Tiên'].astype(str).str.contains("SOS", na=False)])
 sos_pct = round((sos_cases / total_cases * 100), 1) if total_cases > 0 else 0
@@ -195,7 +188,7 @@ with kpi_col6:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# 7. VẼ 4 BIỂU ĐỒ CHARTS VỚI PLOTLY (MATCH DARK THEME)
+# 7. VẼ 4 BIỂU ĐỒ CHARTS
 chart_theme = {
     'paper_bgcolor': 'rgba(0,0,0,0)',
     'plot_bgcolor': 'rgba(0,0,0,0)',
@@ -207,7 +200,6 @@ c1, c2 = st.columns(2)
 
 with c1:
     st.markdown("##### 1. Tỉ trọng Checklist Lặp Theo Mức Độ SOS")
-    # Chart 1 Data
     repeat_sos = df.groupby(['CL Lặp', 'Độ Ưu Tiên']).size().reset_index(name='Số ca')
     fig1 = px.bar(
         repeat_sos, x='CL Lặp', y='Số ca', color='Độ Ưu Tiên', barmode='group',
@@ -242,11 +234,10 @@ with c4:
     fig4.update_layout(**chart_theme, height=260)
     st.plotly_chart(fig4, use_container_width=True)
 
-# 8. BẢNG DỮ LIỆU BÁO CÁO (INTERACTIVE TABLE)
+# 8. BẢNG DỮ LIỆU BÁO CÁO
 st.markdown("### 📋 BẢNG DỮ LIỆU KIỂM SOÁT CA TỒN")
 st.markdown(f"Hiển thị **{len(df)}** / **{len(df_raw)}** ca")
 
-# Hiển thị bảng tương tác cho phép chỉnh sửa trực tiếp cột "Kiểm soát"
 edited_df = st.data_editor(
     df,
     column_config={
@@ -262,7 +253,6 @@ edited_df = st.data_editor(
     use_container_width=True
 )
 
-# Nút Export Excel
 st.download_button(
     label="📥 Export Báo Cáo Excel",
     data=edited_df.to_csv(index=False).encode('utf-8-sig'),
