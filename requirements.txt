@@ -1,12 +1,4 @@
 streamlit
 pandas
-networkx
-folium
-streamlit-folium
+plotly
 openpyxl
-streamlit
-pandas
-openpyxl
-folium
-streamlit-folium
-networkx
