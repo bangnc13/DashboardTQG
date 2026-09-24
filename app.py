@@ -167,7 +167,7 @@ html_content = """
                                 Báo Cáo Kiểm Soát
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Khớp chính xác: Số HĐ, Khách Hàng, Block, Lần Hẹn, CL Lặp, Nhân Sự, Quản Lý, KH Giục Tiến Độ, Tồn Giờ Tự Động (Cột H)</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Make by BangNC13</p>
                     </div>
                 </div>
 
