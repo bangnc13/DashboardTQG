@@ -458,17 +458,55 @@ html_content = """
     <script>
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
         
+        // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
+        const managerMapping = {
+            "TQGTI.GIANGVH2": "ANHHV15",
+            "TQGTI.THANHNV41": "ANHHV15",
+            "TQGTI.CAONB": "ANHHV15",
+            "TQGTI.KHANHLQ1": "ANHHV15",
+            "TQGTI.CUHA": "HUONGTT33",
+            "TQGTI.QUANDM2": "HUONGTT33",
+            "TQGTI.ANHPH3": "HUONGTT33",
+            "TQGTI.HOANQV": "HUONGTT33",
+            "TQGTI.CHIENMM": "HUONGTT33",
+            "TQGTI.HUNGDQ5": "HUONGTT33",
+            "TQGTI.CUONGLM8": "LYHK7",
+            "TQGTI.NGHIANV6": "LYHK7",
+            "TQGTI.CONGND4": "LYHK7",
+            "TQGTI.QUYETNT1": "TAMVTT5",
+            "TQGTI.BINHLV6": "TAMVTT5",
+            "TQGTI.DUNGNT26": "TAMVTT5",
+            "TQGTI.QUANHV1": "TAMVTT5",
+            "TQGTI.HIEUNV38": "HANGVTT12",
+            "TQGTI.HUYNHNX": "HANGVTT12",
+            "TQGTI.HANHPB": "HANGVTT12",
+            "TQGTI.GIANGLV2": "HANGVTT12",
+            "TQGTI.NAMVD2": "TRANGDTH35",
+            "TQGTI.THANHNV8": "TRANGDTH35",
+            "TQGTI.TUANQD": "TRANGDTH35",
+            "TQGTI.CUONGDD9": "TRANGDTH35",
+            "TQGTI.DANGNV": "TRANGHT28",
+            "TQGTI.BINHTH1": "TRANGHT28",
+            "TQGTI.TRUNGNX3": "TRANGHT28",
+            "TQGTI.TUNGDT4": "TRANGHT28",
+            "TQGTI.TIENVT3": "UYENHT15",
+            "TQGTI.LUCMDC": "UYENHT15",
+            "TQGTI.CAOTT": "UYENHT15",
+            "TQGTI.TUANLQ2": "UYENHT15",
+            "TQGTI.HUNGCV4": "UYENHT15"
+        };
+
         const sampleExcelData = [
-            { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "Trần Văn Nam (QL-01)", "KH Giục Tiến Độ": "Có" },
-            { "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)", "KH Giục Tiến Độ": "" },
-            { "STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)", "KH Giục Tiến Độ": "Gióng gấp" },
-            { "STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)", "KH Giục Tiến Độ": "" },
-            { "STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "POP": "TQGP005", "Kiểm soát": "", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": "Trần Văn Nam (QL-01)", "KH Giục Tiến Độ": "Khách phàn nàn" },
-            { "STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP001", "Kiểm soát": "", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": "Lê Hoàng Long (QL-03)", "KH Giục Tiến Độ": "" },
-            { "STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP002", "Kiểm soát": "", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": "Lê Hoàng Long (QL-03)", "KH Giục Tiến Độ": "" },
-            { "STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": -29, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "POP": "TQGP038", "Kiểm soát": "", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": "Phạm Quốc Hùng (QL-02)", "KH Giục Tiến Độ": "Cần gấp" },
-            { "STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": "Trần Văn Nam (QL-01)", "KH Giục Tiến Độ": "" },
-            { "STT": 10, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE0730", "Tên đầy đủ": "LÝ THỊ LỰC", "Thời gian tạo": "2026-09-24 10:19:43", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DUNGNT26", "TTCL": "Đã PC", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE0730 - 034654", "Cột AN": "Phạm Quốc Hùng (QL-02)", "KH Giục Tiến Độ": "" }
+            { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": managerMapping["TQGTI.ANHPH3"] || "HUONGTT33", "KH Giục Tiến Độ": "Có" },
+            { "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": managerMapping["TQGTI.ANHPH3"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
+            { "STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": managerMapping["TQGTI.BINHLV6"] || "TAMVTT5", "KH Giục Tiến Độ": "Gióng gấp" },
+            { "STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": managerMapping["TQGTI.BINHLV6"] || "TAMVTT5", "KH Giục Tiến Độ": "" },
+            { "STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "POP": "TQGP005", "Kiểm soát": "", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": managerMapping["TQGTI.CAONB"] || "ANHHV15", "KH Giục Tiến Độ": "Khách phàn nàn" },
+            { "STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP001", "Kiểm soát": "", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": managerMapping["TQGTI.CUHA"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
+            { "STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP002", "Kiểm soát": "", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": managerMapping["TQGTI.CUHA"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
+            { "STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": -29, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "POP": "TQGP038", "Kiểm soát": "", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": managerMapping["TQGTI.CUONGDD9"] || "TRANGDTH35", "KH Giục Tiến Độ": "Cần gấp" },
+            { "STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": managerMapping["TQGTI.DANGNV"] || "TRANGHT28", "KH Giục Tiến Độ": "" },
+            { "STT": 10, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE0730", "Tên đầy đủ": "LÝ THỊ LỰC", "Thời gian tạo": "2026-09-24 10:19:43", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DUNGNT26", "TTCL": "Đã PC", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE0730 - 034654", "Cột AN": managerMapping["TQGTI.DUNGNT26"] || "TAMVTT5", "KH Giục Tiến Độ": "" }
         ];
 
         const GOOGLE_SHEET_ID = '1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM';
@@ -935,6 +973,10 @@ html_content = """
                 
                 if (!soHD && !block) continue;
 
+                const nhanSuKey = String(row[colTechIdx] || '').trim();
+                // VLOOKUP tên Quản lý từ managerMapping
+                const quanLyName = managerMapping[nhanSuKey] || String(row[colANIdx] || '').trim();
+
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
@@ -944,12 +986,12 @@ html_content = """
                     "Tồn giờ": parseTonGio(row[colTonGioIdx]),
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
-                    "Nhân sự": String(row[colTechIdx] || '').trim(),
+                    "Nhân sự": nhanSuKey,
                     "KH Giục Tiến Độ": String(row[colUrgentIdx] || '').trim(),
                     "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
                     "POP": String(row[colPopIdx] || '').trim(),
                     "Kiểm soát": String(row[colControlIdx] || '').trim(),
-                    "Cột AN": String(row[colANIdx] || '').trim(),
+                    "Cột AN": quanLyName, // Sử dụng kết quả VLOOKUP
                     "Ghi Chú CC": String(row[colNoteIdx] || '').trim()
                 });
             }
@@ -986,7 +1028,6 @@ html_content = """
                 }
             };
             reader.readAsArrayBuffer(file);
-            // Reset input file để có thể chọn lại cùng 1 file nhiều lần
             event.target.value = '';
         }
 
