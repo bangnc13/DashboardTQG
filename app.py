@@ -126,6 +126,33 @@ html_content = """
 
     <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
+    <!-- MODAL NHẬP PASSWORD BẢO MẬT -->
+    <div id="passwordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-sm mx-4 transform transition-all">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-lock text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Xác thực quyền nhập dữ liệu</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Vui lòng nhập mật khẩu để import File Excel</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <input type="password" id="importPasswordInput" placeholder="Nhập mật khẩu..." onkeyup="if(event.key==='Enter') verifyPassword()" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white">
+                    <p id="passwordError" class="text-xs text-rose-500 mt-1 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i>Mật khẩu không đúng!</p>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2">
+                    <button onclick="closePasswordModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition">Hủy</button>
+                    <button onclick="verifyPassword()" class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm">Xác nhận</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -150,11 +177,12 @@ html_content = """
                         <span>Đồng bộ Google Sheets</span>
                     </button>
 
-                    <label class="cursor-pointer inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
+                    <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
+                    <button onclick="openPasswordModal()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
                         <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
                         <span>File Excel</span>
-                        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileUpload(event)">
-                    </label>
+                    </button>
+                    <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileUpload(event)">
 
                     <button onclick="exportDataCSV()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm">
                         <i class="fa-solid fa-download mr-1.5"></i> Export Excel
@@ -428,6 +456,8 @@ html_content = """
     </footer>
 
     <script>
+        const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
+        
         const sampleExcelData = [
             { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "Trần Văn Nam (QL-01)", "KH Giục Tiến Độ": "Có" },
             { "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)", "KH Giục Tiến Độ": "" },
@@ -448,6 +478,30 @@ html_content = """
         let chartTopBlock = null;
         let chartTopPop = null;
         let chartTopTech = null;
+
+        // BẢO MẬT: Mở Modal Password
+        function openPasswordModal() {
+            document.getElementById('importPasswordInput').value = '';
+            document.getElementById('passwordError').classList.add('hidden');
+            document.getElementById('passwordModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('importPasswordInput').focus(), 100);
+        }
+
+        // BẢO MẬT: Đóng Modal Password
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+        }
+
+        // BẢO MẬT: Kiểm tra Password
+        function verifyPassword() {
+            const inputPwd = document.getElementById('importPasswordInput').value;
+            if (inputPwd === DEFAULT_PASSWORD) {
+                closePasswordModal();
+                document.getElementById('excelFileInput').click(); // Mở chọn file
+            } else {
+                document.getElementById('passwordError').classList.remove('hidden');
+            }
+        }
 
         function parseTonGio(val) {
             if (val === undefined || val === null || val === '') return 0;
@@ -932,6 +986,8 @@ html_content = """
                 }
             };
             reader.readAsArrayBuffer(file);
+            // Reset input file để có thể chọn lại cùng 1 file nhiều lần
+            event.target.value = '';
         }
 
         function exportDataCSV() {
