@@ -457,6 +457,7 @@ html_content = """
 
     <script>
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
+        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
         
         // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
@@ -547,17 +548,14 @@ html_content = """
 
             let parsedDate = null;
 
-            // Trường hợp 1: Nếu file Excel lưu dạng số Serial Date (VD: 45558.67)
             if (typeof dateStr === 'number') {
                 parsedDate = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
             } else {
                 const str = String(dateStr).trim();
                 if (!str) return 0;
 
-                // Thử parse dạng chuẩn ISO hoặc YYYY-MM-DD HH:mm:ss
                 parsedDate = new Date(str.replace(/-/g, '/'));
 
-                // Nếu không parse được, thử parse theo dạng DD/MM/YYYY HH:mm:ss
                 if (isNaN(parsedDate.getTime())) {
                     const parts = str.split(' ');
                     const dateParts = parts[0] ? parts[0].split('/') : [];
@@ -581,8 +579,8 @@ html_content = """
             if (!parsedDate || isNaN(parsedDate.getTime())) return 0;
 
             const now = new Date();
-            const diffMs = now - parsedDate; // Độ lệch tính theo Milliseconds
-            const diffHours = Math.floor(diffMs / (1000 * 60 * 60)); // Quy đổi ra Giờ
+            const diffMs = now - parsedDate;
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
 
             return diffHours > 0 ? diffHours : 0;
         }
@@ -792,7 +790,7 @@ html_content = """
             const ctx1 = document.getElementById('chartRepeatPriority')?.getContext('2d');
             if (ctx1) {
                 chartRepeatPriority = new Chart(ctx1, {
-                    type: 'doughnut', // Hoặc 'pie' cho hình tròn kín
+                    type: 'doughnut',
                     data: {
                         labels: ['Có CL Lặp (>0)', 'Không Lặp (=0)'],
                         datasets: [{
@@ -1000,18 +998,12 @@ html_content = """
             const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
-            
-            // CỘT H = Index 7 trong Excel (A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7)
             const colH_TimeIdx = 7; 
-            
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
             const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục'], 21);
-            
-            // CỘT U = Index 20
             const colPopIdx = 20; 
-
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
             const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
             const colTtclIdx = getColIndex(['TTCL', 'Trạng Thái', 'Trạng thái'], 19);
@@ -1030,11 +1022,9 @@ html_content = """
                 const nhanSuKey = String(row[colTechIdx] || '').trim();
                 const quanLyName = managerMapping[nhanSuKey] || String(row[colANIdx] || '').trim();
 
-                // Lấy 7 ký tự đầu tiên ở Cột U cho POP
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // TỰ ĐỘNG TÍNH TỒN GIỜ TỪ CỘT H: (Thời gian hiện tại - Cột H)
                 const rawTimeColH = row[colH_TimeIdx];
                 const calculatedTonGio = calculateTonGioFromColumnH(rawTimeColH);
 
@@ -1044,7 +1034,7 @@ html_content = """
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
                     "Thời gian tạo": rawTimeColH || '',
-                    "Tồn giờ": calculatedTonGio, // Gán giá trị tồn giờ đã được tính tự động
+                    "Tồn giờ": calculatedTonGio,
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": nhanSuKey,
@@ -1059,6 +1049,14 @@ html_content = """
 
             if (parsedRecords.length > 0) {
                 currentDataset = parsedRecords;
+                
+                // LƯU DỮ LIỆU MỚI VÀO BỘ NHỚ TRÌNH DUYỆT (LOCAL STORAGE)
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentDataset));
+                } catch (e) {
+                    console.error('Không thể lưu vào localStorage:', e);
+                }
+
                 populateFilterOptions();
                 renderDashboard();
                 return true;
@@ -1118,9 +1116,27 @@ html_content = """
         }
 
         window.onload = function() {
-            currentDataset = [...sampleExcelData];
-            renderDashboard();
-            fetchGoogleSheetData(false);
+            // KIỂM TRA XEM ĐÃ CÓ DỮ LIỆU LƯU TRONG LOCAL STORAGE CHƯA
+            let savedData = null;
+            try {
+                const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (stored) {
+                    savedData = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.error("Lỗi nạp localStorage:", e);
+            }
+
+            if (savedData && savedData.length > 0) {
+                currentDataset = savedData;
+                renderDashboard();
+                showToast(`Đã khôi phục ${currentDataset.length} ca tồn từ lần tải gần nhất!`, 'success');
+            } else {
+                // Nếu chưa từng nạp file nào, lấy dữ liệu mẫu
+                currentDataset = [...sampleExcelData];
+                renderDashboard();
+                fetchGoogleSheetData(false);
+            }
         };
     </script>
 </body>
