@@ -10,14 +10,14 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. OVERRIDE CSS CHO GIAO DIỆN SÁNG CHUẨN ĐÚNG MẪU
+# 2. OVERRIDE CSS CHO GIAO DIỆN XANH OLIU NHẠT CHUẨN
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
     * { font-family: 'Inter', -apple-system, sans-serif !important; }
     
-    /* Ẩn Sidebar & các UI mặc định thừa */
+    /* Ẩn Sidebar & UI mặc định thừa */
     [data-testid="stSidebar"] { display: none !important; }
     [data-testid="collapsedControl"] { display: none !important; }
     #MainMenu {visibility: hidden;}
@@ -28,7 +28,7 @@ st.markdown("""
         padding: 0.8rem 1rem !important;
     }
 
-    /* Ép nền ứng dụng màu sáng nhạt chuẩn */
+    /* Ép nền ứng dụng màu sáng nhạt */
     .stApp, [data-testid="stAppViewContainer"] {
         background-color: #f8fafc !important;
         color: #0f172a !important;
@@ -99,25 +99,50 @@ st.markdown("""
     .chart-title { font-size: 13px; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 6px; }
     .chart-sub { font-size: 10px; color: #94a3b8; margin-bottom: 4px; }
 
-    /* Ô Input & Selectbox màu sáng */
-    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
-        background-color: #ffffff !important;
-        color: #0f172a !important;
-        border-radius: 6px !important;
-        border: 1px solid #cbd5e1 !important;
-    }
-    input { color: #0f172a !important; }
-    
-    /* Bảng dữ liệu viền xanh lá mạ */
+    /* KHU VỰC BẢNG & BỘ LỌC MÀU XANH OLIU NHẠT */
     .table-container-box {
-        background-color: #f7fee7;
-        border: 1.5px solid #bef264;
+        background-color: #f4f8ec !important;
+        border: 1.5px solid #a3c234 !important;
         border-radius: 12px;
-        padding: 14px 16px;
+        padding: 16px;
         margin-top: 10px;
     }
-    .table-header-title { font-size: 14px; font-weight: 800; color: #1e293b; display: flex; align-items: center; gap: 6px; }
-    .table-header-sub { font-size: 11px; color: #65a30d; margin-bottom: 8px; }
+    .table-header-title { font-size: 15px; font-weight: 800; color: #3f5115; display: flex; align-items: center; gap: 6px; }
+    .table-header-sub { font-size: 11px; color: #6b8e23; margin-bottom: 12px; }
+
+    /* Bộ lọc Input/Selectbox màu xanh oliu nhạt */
+    div[data-baseweb="select"] > div, div[data-baseweb="input"] > div {
+        background-color: #eaf1de !important;
+        color: #2c3e0e !important;
+        border-radius: 8px !important;
+        border: 1px solid #b5cc75 !important;
+    }
+    div[data-baseweb="select"] span, input {
+        color: #2c3e0e !important;
+        font-weight: 500 !important;
+    }
+
+    /* Định dạng bảng data_editor theo tông xanh oliu nhạt */
+    [data-testid="stDataFrame"] div[role="columnheader"] {
+        background-color: #dce7c8 !important;
+        color: #2c3e0e !important;
+        font-weight: 700 !important;
+        border-bottom: 1px solid #b5cc75 !important;
+    }
+    [data-testid="stDataFrame"] div[role="gridcell"] {
+        background-color: #f7faef !important;
+        color: #2c3e0e !important;
+        border-bottom: 1px solid #e2ebd0 !important;
+    }
+    [data-testid="stDataFrame"] div[role="gridcell"]:hover {
+        background-color: #e4eed2 !important;
+    }
+    .table-footer-text {
+        font-size: 11px;
+        color: #556b2f;
+        margin-top: 8px;
+        font-weight: 600;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -202,7 +227,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 6. KHU VỰC 4 BIỂU ĐỒ (FIX LỖI UPDATE_LAYOUT & CHỮ SÁNG RÕ)
+# 6. KHU VỰC 4 BIỂU ĐỒ (LIGHT MODE)
 chart_style = {
     'paper_bgcolor': '#ffffff',
     'plot_bgcolor': '#ffffff',
@@ -276,7 +301,7 @@ with c4:
     st.plotly_chart(fig4, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# 7. KHU VỰC BẢNG DỮ LIỆU NỀN XANH LÁ MẠ CHUẨN
+# 7. KHU VỰC BẢNG DỮ LIỆU NỀN XANH OLIU NHẠT
 st.markdown("""
 <div class="table-container-box">
     <div class="table-header-title">📊 BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA</div>
@@ -366,4 +391,4 @@ st.data_editor(
     use_container_width=True
 )
 
-st.markdown(f"<div style='font-size: 11px; color: #4d7c0f; margin-top: 6px;'>Hiển thị <b>{len(df_display)}</b> / <b>{len(df_raw)}</b> ca tồn</div></div>", unsafe_allow_html=True)
+st.markdown(f"<div class='table-footer-text'>Hiển thị <b>{len(df_display)}</b> / <b>{len(df_raw)}</b> ca tồn</div></div>", unsafe_allow_html=True)
