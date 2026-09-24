@@ -330,7 +330,7 @@ html_content = """
                             <i class="fa-solid fa-network-wired text-emerald-500 mr-2"></i>
                             3. Tồn theo POP
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Cụm trạm kỹ thuật quản lý hạ tầng</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400"> </p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
