@@ -328,7 +328,7 @@ html_content = """
                     <div>
                         <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
                             <i class="fa-solid fa-network-wired text-emerald-500 mr-2"></i>
-                            3. Tồn theo POP (Cột U - 7 Ký Tự)
+                            3. Tồn theo POP
                         </h2>
                         <p class="text-xs text-slate-500 dark:text-slate-400">Cụm trạm kỹ thuật quản lý hạ tầng</p>
                     </div>
