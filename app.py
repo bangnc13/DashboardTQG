@@ -200,7 +200,7 @@ html_content = """
         </div>
 
         <!-- KPI Cards Area -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Ca Tồn</div>
                 <div class="mt-2 flex items-baseline justify-between">
@@ -209,19 +209,6 @@ html_content = """
                 </div>
                 <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng hợp hợp đồng tồn</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div class="text-xs font-medium text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Mức SOS</span>
-                    <i class="fa-solid fa-triangle-exclamation animate-pulse"></i>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span id="kpiSos" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</span>
-                    <span id="kpiSosPct" class="text-xs text-rose-700 bg-rose-50 dark:bg-rose-900/30 dark:text-rose-300 px-2 py-0.5 rounded-full">0%</span>
-                </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Số ca báo SOS</div>
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
             </div>
 
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
@@ -270,9 +257,9 @@ html_content = """
                     <div>
                         <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
                             <i class="fa-solid fa-chart-column text-amber-500 mr-2"></i>
-                            1. Tỉ trọng Checklist Lặp Theo Mức Độ SOS
+                            1. Thống Kê Checklist Lặp
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Thống kê ca SOS vs Support lặp lại nhiều lần</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Phân bố ca lặp vs không lặp</p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -349,7 +336,7 @@ html_content = """
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
                     <div class="relative sm:col-span-2 lg:col-span-1">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                         <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, KH, Ghi chú..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
@@ -358,15 +345,6 @@ html_content = """
                     <div>
                         <select id="filterTech" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
                             <option value="">Tất cả Nhân sự</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <select id="filterPriority" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
-                            <option value="">Tất cả Mức SOS</option>
-                            <option value="SOS">Chỉ lấy: SOS</option>
-                            <option value="Support">Chỉ lấy: Support</option>
-                            <option value="EMPTY">Giá trị trống</option>
                         </select>
                     </div>
 
@@ -398,7 +376,6 @@ html_content = """
                             <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Block</th>
                             <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Lần Hẹn</th>
                             <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">CL Lặp</th>
-                            <th class="py-3 px-3 text-center w-28 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Mức SOS</th>
                             <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Nhân Sự</th>
                             <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Quản Lý</th>
                             <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Tồn Giờ</th>
@@ -430,47 +407,28 @@ html_content = """
 
     <script>
         const sampleExcelData = [
-            { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP005", "Kiểm soát": "", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP001", "Kiểm soát": "", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP002", "Kiểm soát": "", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": -29, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP038", "Kiểm soát": "", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 10, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE0730", "Tên đầy đủ": "LÝ THỊ LỰC", "Thời gian tạo": "2026-09-24 10:19:43", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DUNGNT26", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE0730 - 034654", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 11, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC9017", "Tên đầy đủ": "Vũ Đình Khải", "Thời gian tạo": "2026-09-17 08:56:48", "Tồn giờ": 137, "Số lần hẹn": 2, "CL Lặp": 2, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP030", "Kiểm soát": "", "Ghi Chú CC": "TQGP030.0094/HO-2", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 12, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE0435", "Tên đầy đủ": "Lý Văn Đô", "Thời gian tạo": "2026-09-18 12:24:07", "Tồn giờ": -2, "Số lần hẹn": 9, "CL Lặp": 2, "Nhân sự": "TQGTI.HUNGCV4", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP037", "Kiểm soát": "", "Ghi Chú CC": "KH báo mất mạng", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 13, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD22905", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-21 00:12:59", "Tồn giờ": -2, "Số lần hẹn": 3, "CL Lặp": 2, "Nhân sự": "TQGTI.LUCMDC", "TTCL": "Đã XL-Đang TD", "Độ Ưu Tiên": "Support", "POP": "TQGP024", "Kiểm soát": "", "Ghi Chú CC": "TQFD2290 >> TQGTI.LUCMDC", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 14, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE8568", "Tên đầy đủ": "ĐỖ DUY H", "Thời gian tạo": "2026-09-19 11:57:53", "Tồn giờ": -7, "Số lần hẹn": 7, "CL Lặp": 1, "Nhân sự": "TQGTI.QUYETNT1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP031", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 15, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE0407", "Tên đầy đủ": "TRƯƠNG", "Thời gian tạo": "2026-09-23 17:09:04", "Tồn giờ": -2, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV41", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP014", "Kiểm soát": "", "Ghi Chú CC": "0388061208 báo mkn", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 16, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD01751", "Tên đầy đủ": "Cao Hong", "Thời gian tạo": "2026-09-24 08:57:55", "Tồn giờ": -2, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV8", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP004", "Kiểm soát": "", "Ghi Chú CC": "TQFD01751 - 097876", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 17, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAB7146", "Tên đầy đủ": "LƯU ĐÌNH", "Thời gian tạo": "2026-09-23 16:53:44", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV8", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "097971496 >> TQGTI.THANHNV8", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 18, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAF1512", "Tên đầy đủ": "Triệu Thị", "Thời gian tạo": "2026-09-23 07:56:09", "Tồn giờ": -2, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "Checklist >> TQGTI.TUANQD", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 19, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD12722", "Tên đầy đủ": "Nguyễn V", "Thời gian tạo": "2026-09-24 08:04:07", "Tồn giờ": 2, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "KH mkn nhờ KT xử lý", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 20, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD21035", "Tên đầy đủ": "ĐÌNH VĂN", "Thời gian tạo": "2026-09-23 18:01:15", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "0852269868 kh báo r", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 21, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD22274", "Tên đầy đủ": "PHẠM XUÂ", "Thời gian tạo": "2026-09-16 09:30:16", "Tồn giờ": 193, "Số lần hẹn": 4, "CL Lặp": 1, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "085659332 >> TQGTI.TUNGDT4", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 22, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAC4072", "Tên đầy đủ": "ĐẶNG THỊ", "Thời gian tạo": "2026-09-23 13:30:17", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "0379639154 mất kết", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 23, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE4800", "Tên đầy đủ": "Hoàng Văn", "Thời gian tạo": "2026-09-23 11:10:12", "Tồn giờ": 23, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAEC48C >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 24, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE5855", "Tên đầy đủ": "Trần Thị H", "Thời gian tạo": "2026-09-23 11:42:15", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAE5855 - 098768", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 25, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB1811", "Tên đầy đủ": "LÝ VĂN DŨ", "Thời gian tạo": "2026-09-23 15:23:30", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1811 - 037519 FTTH", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 26, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE7704", "Tên đầy đủ": "NGA VĂN", "Thời gian tạo": "2026-09-23 13:27:32", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAE7704 - 097767", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 27, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAA6787", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-23 18:06:26", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đang XL", "Độ Ưu Tiên": "SOS", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "TQAAA6787 - 038570", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 28, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC5689", "Tên đầy đủ": "HOÀNG V", "Thời gian tạo": "2026-09-24 09:21:16", "Tồn giờ": -26, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.CHIENMM", "TTCL": "Đã PC", "Độ Ưu Tiên": "SOS", "POP": "TQGP033", "Kiểm soát": "", "Ghi Chú CC": "TQAAC5689 - 039248", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 29, "Block": "Xa Dong Tho-001", "Số HĐ": "TQFD22609", "Tên đầy đủ": "TRẦN THỊ", "Thời gian tạo": "2026-09-23 17:18:55", "Tồn giờ": -5, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP021", "Kiểm soát": "", "Ghi Chú CC": "TQFD22609 - 0989711", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 30, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC6077", "Tên đầy đủ": "RIÊU VĂN", "Thời gian tạo": "2026-09-23 18:50:25", "Tồn giờ": -7, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP018", "Kiểm soát": "", "Ghi Chú CC": "TQAAC6077 - 098649", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 31, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE4058", "Tên đầy đủ": "TRẦN THỊ", "Thời gian tạo": "2026-09-24 06:38:46", "Tồn giờ": -7, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.HUNGDT5", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP035", "Kiểm soát": "", "Ghi Chú CC": "TQAAE4058 - 097806", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 32, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAE1876", "Tên đầy đủ": "NINH VĂN", "Thời gian tạo": "2026-09-23 20:05:45", "Tồn giờ": 14, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.NGHIANV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP032", "Kiểm soát": "", "Ghi Chú CC": "TQAAE1876 - 034763", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 33, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAB0488", "Tên đầy đủ": "LÊ TRUNG", "Thời gian tạo": "2026-09-24 08:38:51", "Tồn giờ": -26, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.NGHIANV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP030", "Kiểm soát": "", "Ghi Chú CC": "TQGP030.0172/HO-1", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 34, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAF1555", "Tên đầy đủ": "Trần Lệ Tri", "Thời gian tạo": "2026-09-23 08:55:18", "Tồn giờ": -2, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.QUANHV1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAF1555 - 091719", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 35, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB1352", "Tên đầy đủ": "CHU VĂN", "Thời gian tạo": "2026-09-23 21:18:41", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.QUANHV1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1352 - 097454", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 36, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE6009", "Tên đầy đủ": "ĐẰNG VĂN", "Thời gian tạo": "2026-09-23 10:54:23", "Tồn giờ": -24, "Số lần hẹn": 2, "CL Lặp": 0, "Nhân sự": "TQGTI.QUANHV1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE6009 - 083219", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 37, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6047", "Tên đầy đủ": "NGUYỄN V", "Thời gian tạo": "2026-09-23 20:35:51", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.QUYETNT1", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP031", "Kiểm soát": "", "Ghi Chú CC": "TQAAB6047 - 097711", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
-            { "STT": 38, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE7703", "Tên đầy đủ": "Lò Thị Ngăn", "Thời gian tạo": "2026-09-20 21:27:28", "Tồn giờ": 85, "Số lần hẹn": 4, "CL Lặp": 0, "Nhân sự": "TQGTI.THANHNV41", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP014", "Kiểm soát": "", "Ghi Chú CC": "TQAAE7703 - 039252", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 39, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD13770", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-21 15:31:48", "Tồn giờ": 24, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.THANHNV41", "TTCL": "Đang XL", "Độ Ưu Tiên": "SOS", "POP": "TQGP014", "Kiểm soát": "", "Ghi Chú CC": "TQFD13770 - 039537", "Cột AN": "Lê Hoàng Long (QL-03)" },
-            { "STT": 40, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAC8160", "Tên đầy đủ": "CHU VĂN", "Thời gian tạo": "2026-09-23 13:50:45", "Tồn giờ": 21, "Số lần hẹn": 3, "CL Lặp": 0, "Nhân sự": "TQGTI.TIENVT3", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP033", "Kiểm soát": "", "Ghi Chú CC": "TQAAC8160 - 034971", "Cột AN": "Trần Văn Nam (QL-01)" },
-            { "STT": 41, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAC7840", "Tên đầy đủ": "PHẠM ĐÌN", "Thời gian tạo": "2026-09-23 07:30:30", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 0, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đang XL", "Độ Ưu Tiên": "SOS", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "TQAAC7840 - 096321", "Cột AN": "Lê Hoàng Long (QL-03)" }
+            { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "POP": "TQGP005", "Kiểm soát": "", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP001", "Kiểm soát": "", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP002", "Kiểm soát": "", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": -29, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "POP": "TQGP038", "Kiểm soát": "", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 10, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE0730", "Tên đầy đủ": "LÝ THỊ LỰC", "Thời gian tạo": "2026-09-24 10:19:43", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DUNGNT26", "TTCL": "Đã PC", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE0730 - 034654", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 11, "Block": "Xa Dong Tho-001", "Số HĐ": "TQAAC9017", "Tên đầy đủ": "Vũ Đình Khải", "Thời gian tạo": "2026-09-17 08:56:48", "Tồn giờ": 137, "Số lần hẹn": 2, "CL Lặp": 2, "Nhân sự": "TQGTI.HIEUNV38", "TTCL": "Đang XL", "POP": "TQGP030", "Kiểm soát": "", "Ghi Chú CC": "TQGP030.0094/HO-2", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 12, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE0435", "Tên đầy đủ": "Lý Văn Đô", "Thời gian tạo": "2026-09-18 12:24:07", "Tồn giờ": -2, "Số lần hẹn": 9, "CL Lặp": 2, "Nhân sự": "TQGTI.HUNGCV4", "TTCL": "Đã nhận ca", "POP": "TQGP037", "Kiểm soát": "", "Ghi Chú CC": "KH báo mất mạng", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 13, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD22905", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-21 00:12:59", "Tồn giờ": -2, "Số lần hẹn": 3, "CL Lặp": 2, "Nhân sự": "TQGTI.LUCMDC", "TTCL": "Đã XL-Đang TD", "POP": "TQGP024", "Kiểm soát": "", "Ghi Chú CC": "TQFD2290 >> TQGTI.LUCMDC", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 14, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE8568", "Tên đầy đủ": "ĐỖ DUY H", "Thời gian tạo": "2026-09-19 11:57:53", "Tồn giờ": -7, "Số lần hẹn": 7, "CL Lặp": 1, "Nhân sự": "TQGTI.QUYETNT1", "TTCL": "Đã nhận ca", "POP": "TQGP031", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 15, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAE0407", "Tên đầy đủ": "TRƯƠNG", "Thời gian tạo": "2026-09-23 17:09:04", "Tồn giờ": -2, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV41", "TTCL": "Đã PC", "POP": "TQGP014", "Kiểm soát": "", "Ghi Chú CC": "0388061208 báo mkn", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 16, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD01751", "Tên đầy đủ": "Cao Hong", "Thời gian tạo": "2026-09-24 08:57:55", "Tồn giờ": -2, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV8", "TTCL": "Đã nhận ca", "POP": "TQGP004", "Kiểm soát": "", "Ghi Chú CC": "TQFD01751 - 097876", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 17, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAB7146", "Tên đầy đủ": "LƯU ĐÌNH", "Thời gian tạo": "2026-09-23 16:53:44", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.THANHNV8", "TTCL": "Đang XL", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "097971496 >> TQGTI.THANHNV8", "Cột AN": "Trần Văn Nam (QL-01)" },
+            { "STT": 18, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAF1512", "Tên đầy đủ": "Triệu Thị", "Thời gian tạo": "2026-09-23 07:56:09", "Tồn giờ": -2, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "Checklist >> TQGTI.TUANQD", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 19, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD12722", "Tên đầy đủ": "Nguyễn V", "Thời gian tạo": "2026-09-24 08:04:07", "Tồn giờ": 2, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "KH mkn nhờ KT xử lý", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 20, "Block": "Xa Ham Yen-001", "Số HĐ": "TQFD21035", "Tên đầy đủ": "ĐÌNH VĂN", "Thời gian tạo": "2026-09-23 18:01:15", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.TUANQD", "TTCL": "Đã nhận ca", "POP": "TQGP009", "Kiểm soát": "", "Ghi Chú CC": "0852269868 kh báo r", "Cột AN": "Phạm Quốc Hùng (QL-02)" },
+            { "STT": 21, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD22274", "Tên đầy đủ": "PHẠM XUÂ", "Thời gian tạo": "2026-09-16 09:30:16", "Tồn giờ": 193, "Số lần hẹn": 4, "CL Lặp": 1, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đang XL", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "085659332 >> TQGTI.TUNGDT4", "Cột AN": "Lê Hoàng Long (QL-03)" },
+            { "STT": 22, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAC4072", "Tên đầy đủ": "ĐẶNG THỊ", "Thời gian tạo": "2026-09-23 13:30:17", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.TUNGDT4", "TTCL": "Đã nhận ca", "POP": "TQGP008", "Kiểm soát": "", "Ghi Chú CC": "0379639154 mất kết", "Cột AN": "Lê Hoàng Long (QL-03)" }
         ];
 
         const GOOGLE_SHEET_ID = '1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM';
@@ -553,7 +511,6 @@ html_content = """
             document.getElementById('filterColAN').value = '';
             document.getElementById('searchInput').value = '';
             document.getElementById('filterTech').value = '';
-            document.getElementById('filterPriority').value = '';
             document.getElementById('filterRepeat').value = '';
             document.getElementById('filterBlock').value = '';
             document.getElementById('chkNonZero').checked = false;
@@ -568,7 +525,6 @@ html_content = """
             const managerFilter = document.getElementById('filterColAN')?.value || '';
             const searchFilter = document.getElementById('searchInput')?.value?.toLowerCase().trim() || '';
             const techFilter = document.getElementById('filterTech')?.value || '';
-            const priorityFilter = document.getElementById('filterPriority')?.value || '';
             const repeatFilter = document.getElementById('filterRepeat')?.value || '';
             const blockFilter = document.getElementById('filterBlock')?.value || '';
             const chkNonZero = document.getElementById('chkNonZero')?.checked || false;
@@ -577,14 +533,6 @@ html_content = """
                 if (managerFilter && item["Cột AN"] !== managerFilter) return false;
                 if (techFilter && item["Nhân sự"] !== techFilter) return false;
                 if (blockFilter && item["Block"] !== blockFilter) return false;
-                
-                if (priorityFilter) {
-                    if (priorityFilter === 'EMPTY') {
-                        if (item["Độ Ưu Tiên"]) return false;
-                    } else if (item["Độ Ưu Tiên"] !== priorityFilter) {
-                        return false;
-                    }
-                }
 
                 if (chkNonZero && item["CL Lặp"] === 0) return false;
 
@@ -616,15 +564,12 @@ html_content = """
 
         function updateKPIs(data) {
             const total = data.length;
-            const sosCases = data.filter(d => String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS')).length;
             const repeatCases = data.filter(d => (d["CL Lặp"] || 0) > 0);
             const totalRepeatCount = repeatCases.reduce((acc, d) => acc + (d["CL Lặp"] || 0), 0);
             const overdueCases = data.filter(d => (d["Tồn giờ"] || 0) >= 24).length;
             const processingCases = data.filter(d => d["TTCL"] === 'Đang XL').length;
 
             document.getElementById('kpiTotal').textContent = total;
-            document.getElementById('kpiSos').textContent = sosCases;
-            document.getElementById('kpiSosPct').textContent = total ? Math.round((sosCases / total) * 100) + '%' : '0%';
             
             document.getElementById('kpiRepeat').textContent = totalRepeatCount;
             document.getElementById('kpiRepeatCases').textContent = repeatCases.length + ' ca';
@@ -644,20 +589,13 @@ html_content = """
             if (!tbody) return;
 
             if (data.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>`;
                 return;
             }
 
             tbody.innerHTML = data.map((item, idx) => {
-                const isSOS = String(item["Độ Ưu Tiên"]).toUpperCase().includes('SOS');
                 const isRepeat = (item["CL Lặp"] || 0) > 0;
                 const isOverdue = (item["Tồn giờ"] || 0) >= 24;
-
-                const priorityBadge = isSOS 
-                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300"><i class="fa-solid fa-fire mr-1"></i>SOS</span>`
-                    : item["Độ Ưu Tiên"] 
-                        ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300">${item["Độ Ưu Tiên"]}</span>` 
-                        : `<span class="text-slate-400">-</span>`;
 
                 const repeatBadge = isRepeat
                     ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200">${item["CL Lặp"]}</span>`
@@ -672,7 +610,6 @@ html_content = """
                         <td class="py-2.5 px-3 text-slate-800 dark:text-slate-200 font-medium">${item["Block"] || '-'}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700 dark:text-slate-300">${item["Số lần hẹn"] || 0}</td>
                         <td class="py-2.5 px-3 text-center col-highlight font-semibold">${repeatBadge}</td>
-                        <td class="py-2.5 px-3 text-center">${priorityBadge}</td>
                         <td class="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">${item["Nhân sự"] || '-'}</td>
                         <td class="py-2.5 px-3 font-medium text-paleOlive-900 dark:text-paleOlive-200 col-highlight">${item["Cột AN"] || '-'}</td>
                         <td class="py-2.5 px-3 text-center ${tonGioClass}">${item["Tồn giờ"] ?? 0}h</td>
@@ -687,10 +624,8 @@ html_content = """
             const textColor = isDark ? '#94a3b8' : '#475569';
             const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(203, 213, 225, 0.4)';
 
-            const sosRepeat = data.filter(d => String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS') && (d["CL Lặp"] || 0) > 0).length;
-            const sosNoRepeat = data.filter(d => String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS') && (d["CL Lặp"] || 0) === 0).length;
-            const suppRepeat = data.filter(d => !String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS') && (d["CL Lặp"] || 0) > 0).length;
-            const suppNoRepeat = data.filter(d => !String(d["Độ Ưu Tiên"]).toUpperCase().includes('SOS') && (d["CL Lặp"] || 0) === 0).length;
+            const hasRepeat = data.filter(d => (d["CL Lặp"] || 0) > 0).length;
+            const noRepeat = data.filter(d => (d["CL Lặp"] || 0) === 0).length;
 
             if (chartRepeatPriority) chartRepeatPriority.destroy();
             const ctx1 = document.getElementById('chartRepeatPriority')?.getContext('2d');
@@ -698,17 +633,17 @@ html_content = """
                 chartRepeatPriority = new Chart(ctx1, {
                     type: 'bar',
                     data: {
-                        labels: ['SOS (Ưu Tiên)', 'Support (Thường)'],
+                        labels: ['Trạng Thái Lặp'],
                         datasets: [
                             {
                                 label: 'Có CL Lặp (>0)',
-                                data: [sosRepeat, suppRepeat],
+                                data: [hasRepeat],
                                 backgroundColor: '#f59e0b',
                                 borderRadius: 6
                             },
                             {
                                 label: 'Không Lặp (=0)',
-                                data: [sosNoRepeat, suppNoRepeat],
+                                data: [noRepeat],
                                 backgroundColor: '#3b82f6',
                                 borderRadius: 6
                             }
@@ -886,9 +821,6 @@ html_content = """
                         if (cleanName === 'an' || cleanName === 'cột an') {
                             return cleanH === 'an' || cleanH === 'cột an' || cleanH === 'cot an';
                         }
-                        if (cleanName === 'v' || cleanName === 'cột v') {
-                            return cleanH === 'v' || cleanH === 'cột v' || cleanH === 'cot v';
-                        }
                         return cleanH.includes(cleanName);
                     });
                 });
@@ -903,10 +835,6 @@ html_content = """
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
-            
-            // --- ĐÃ ĐIỀU CHỈNH: Lấy Mức SOS / Độ Ưu Tiên từ Cột V (Cột thứ 22 trong Excel/Google Sheets, Index 21 trong Mảng) ---
-            const colPriorityIdx = getColIndex(['cột v', 'v', 'mức sos', 'độ ưu tiên', 'độ ưu', 'sos'], 21);
-            
             const colPopIdx = getColIndex(['POP', 'Trạm POP'], 37);
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
             const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
@@ -934,7 +862,6 @@ html_content = """
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": String(row[colTechIdx] || '').trim(),
                     "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
-                    "Độ Ưu Tiên": String(row[colPriorityIdx] || '').trim(), // Lấy từ Cột V
                     "POP": String(row[colPopIdx] || '').trim(),
                     "Kiểm soát": String(row[colControlIdx] || '').trim(),
                     "Cột AN": String(row[colANIdx] || '').trim(),
