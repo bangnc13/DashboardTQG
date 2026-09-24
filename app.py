@@ -167,7 +167,7 @@ html_content = """
                                 Báo Cáo Kiểm Soát
                             </span>
                         </div>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Khớp chính xác: Số HĐ, Khách Hàng, Block, Lần Hẹn, CL Lặp, Nhân Sự, Quản Lý, KH Giục Tiến Độ, Tồn Giờ</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Khớp chính xác: Số HĐ, Khách Hàng, Block, Lần Hẹn, CL Lặp, Nhân Sự, Quản Lý, KH Giục Tiến Độ, Tồn Giờ Tự Động (Cột H)</p>
                     </div>
                 </div>
 
@@ -497,16 +497,16 @@ html_content = """
         };
 
         const sampleExcelData = [
-            { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": managerMapping["TQGTI.ANHPH3"] || "HUONGTT33", "KH Giục Tiến Độ": "Có" },
+            { "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": 18, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": managerMapping["TQGTI.ANHPH3"] || "HUONGTT33", "KH Giục Tiến Độ": "Có" },
             { "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Kiểm soát": "", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": managerMapping["TQGTI.ANHPH3"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
-            { "STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": managerMapping["TQGTI.BINHLV6"] || "TAMVTT5", "KH Giục Tiến Độ": "Gióng gấp" },
-            { "STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": managerMapping["TQGTI.BINHLV6"] || "TAMVTT5", "KH Giục Tiến Độ": "" },
-            { "STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "POP": "TQGP005", "Kiểm soát": "", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": managerMapping["TQGTI.CAONB"] || "ANHHV15", "KH Giục Tiến Độ": "Khách phàn nàn" },
-            { "STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP001", "Kiểm soát": "", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": managerMapping["TQGTI.CUHA"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
-            { "STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP002", "Kiểm soát": "", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": managerMapping["TQGTI.CUHA"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
-            { "STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": -29, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "POP": "TQGP038", "Kiểm soát": "", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": managerMapping["TQGTI.CUONGDD9"] || "TRANGDTH35", "KH Giục Tiến Độ": "Cần gấp" },
-            { "STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": -5, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": managerMapping["TQGTI.DANGNV"] || "TRANGHT28", "KH Giục Tiến Độ": "" },
-            { "STT": 10, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE0730", "Tên đầy đủ": "LÝ THỊ LỰC", "Thời gian tạo": "2026-09-24 10:19:43", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DUNGNT26", "TTCL": "Đã PC", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE0730 - 034654", "Cột AN": managerMapping["TQGTI.DUNGNT26"] || "TAMVTT5", "KH Giục Tiến Độ": "" }
+            { "STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": 125, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": managerMapping["TQGTI.BINHLV6"] || "TAMVTT5", "KH Giục Tiến Độ": "Gióng gấp" },
+            { "STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": 67, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "POP": "TQGP026", "Kiểm soát": "", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": managerMapping["TQGTI.BINHLV6"] || "TAMVTT5", "KH Giục Tiến Độ": "" },
+            { "STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 84, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "POP": "TQGP005", "Kiểm soát": "", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": managerMapping["TQGTI.CAONB"] || "ANHHV15", "KH Giục Tiến Độ": "Khách phàn nàn" },
+            { "STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": 20, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP001", "Kiểm soát": "", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": managerMapping["TQGTI.CUHA"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
+            { "STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": 2, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "POP": "TQGP002", "Kiểm soát": "", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": managerMapping["TQGTI.CUHA"] || "HUONGTT33", "KH Giục Tiến Độ": "" },
+            { "STT": 8, "Block": "Xa Chiem Hoa-001", "Số HĐ": "TQAAE3435", "Tên đầy đủ": "NGUYỄN T", "Thời gian tạo": "2026-09-15 16:27:27", "Tồn giờ": 210, "Số lần hẹn": 8, "CL Lặp": 1, "Nhân sự": "TQGTI.CUONGDD9", "TTCL": "Đã nhận ca", "POP": "TQGP038", "Kiểm soát": "", "Ghi Chú CC": "KH báo trễ >> NghiaVT", "Cột AN": managerMapping["TQGTI.CUONGDD9"] || "TRANGDTH35", "KH Giục Tiến Độ": "Cần gấp" },
+            { "STT": 9, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAB6659", "Tên đầy đủ": "TỔNG THỊ", "Thời gian tạo": "2026-09-23 13:38:57", "Tồn giờ": 21, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DANGNV", "TTCL": "Đã nhận ca", "POP": "TQGP006", "Kiểm soát": "", "Ghi Chú CC": "0369759687 KH mkn", "Cột AN": managerMapping["TQGTI.DANGNV"] || "TRANGHT28", "KH Giục Tiến Độ": "" },
+            { "STT": 10, "Block": "Xa Ham Yen-001", "Số HĐ": "TQAAE0730", "Tên đầy đủ": "LÝ THỊ LỰC", "Thời gian tạo": "2026-09-24 10:19:43", "Tồn giờ": 0, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.DUNGNT26", "TTCL": "Đã PC", "POP": "TQGP027", "Kiểm soát": "", "Ghi Chú CC": "TQAAE0730 - 034654", "Cột AN": managerMapping["TQGTI.DUNGNT26"] || "TAMVTT5", "KH Giục Tiến Độ": "" }
         ];
 
         const GOOGLE_SHEET_ID = '1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM';
@@ -541,11 +541,50 @@ html_content = """
             }
         }
 
-        function parseTonGio(val) {
-            if (val === undefined || val === null || val === '') return 0;
-            if (typeof val === 'number') return val;
-            const parsed = parseFloat(String(val).replace(',', '.'));
-            return isNaN(parsed) ? 0 : parsed;
+        // CÔNG THỨC TÍNH TỒN GIỜ TỰ ĐỘNG = (Thời gian hiện tại - Thời gian Cột H)
+        function calculateTonGioFromColumnH(dateStr) {
+            if (!dateStr) return 0;
+
+            let parsedDate = null;
+
+            // Trường hợp 1: Nếu file Excel lưu dạng số Serial Date (VD: 45558.67)
+            if (typeof dateStr === 'number') {
+                parsedDate = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
+            } else {
+                const str = String(dateStr).trim();
+                if (!str) return 0;
+
+                // Thử parse dạng chuẩn ISO hoặc YYYY-MM-DD HH:mm:ss
+                parsedDate = new Date(str.replace(/-/g, '/'));
+
+                // Nếu không parse được, thử parse theo dạng DD/MM/YYYY HH:mm:ss
+                if (isNaN(parsedDate.getTime())) {
+                    const parts = str.split(' ');
+                    const dateParts = parts[0] ? parts[0].split('/') : [];
+                    if (dateParts.length === 3) {
+                        const day = parseInt(dateParts[0], 10);
+                        const month = parseInt(dateParts[1], 10) - 1;
+                        const year = parseInt(dateParts[2], 10);
+
+                        let hour = 0, min = 0, sec = 0;
+                        if (parts[1]) {
+                            const timeParts = parts[1].split(':');
+                            hour = parseInt(timeParts[0], 10) || 0;
+                            min = parseInt(timeParts[1], 10) || 0;
+                            sec = parseInt(timeParts[2], 10) || 0;
+                        }
+                        parsedDate = new Date(year, month, day, hour, min, sec);
+                    }
+                }
+            }
+
+            if (!parsedDate || isNaN(parsedDate.getTime())) return 0;
+
+            const now = new Date();
+            const diffMs = now - parsedDate; // Độ lệch tính theo Milliseconds
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60)); // Quy đổi ra Giờ
+
+            return diffHours > 0 ? diffHours : 0;
         }
 
         function showToast(message, type = 'info') {
@@ -951,14 +990,16 @@ html_content = """
             const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
-            const colTimeIdx = getColIndex(['Thời gian tạo', 'Thoi gian tao', 'Ngày tạo'], 7);
-            const colTonGioIdx = getColIndex(['Tồn giờ', 'Ton gio'], 8);
+            
+            // CỘT H = Index 7 trong Excel (A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7)
+            const colH_TimeIdx = 7; 
+            
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
             const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục'], 21);
             
-            // CỘT U = index 20 (A=0, B=1, ..., U=20)
+            // CỘT U = Index 20
             const colPopIdx = 20; 
 
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
@@ -977,26 +1018,29 @@ html_content = """
                 if (!soHD && !block) continue;
 
                 const nhanSuKey = String(row[colTechIdx] || '').trim();
-                // VLOOKUP tên Quản lý từ managerMapping
                 const quanLyName = managerMapping[nhanSuKey] || String(row[colANIdx] || '').trim();
 
                 // Lấy 7 ký tự đầu tiên ở Cột U cho POP
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
+                // TỰ ĐỘNG TÍNH TỒN GIỜ TỪ CỘT H: (Thời gian hiện tại - Cột H)
+                const rawTimeColH = row[colH_TimeIdx];
+                const calculatedTonGio = calculateTonGioFromColumnH(rawTimeColH);
+
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
-                    "Thời gian tạo": row[colTimeIdx] || '',
-                    "Tồn giờ": parseTonGio(row[colTonGioIdx]),
+                    "Thời gian tạo": rawTimeColH || '',
+                    "Tồn giờ": calculatedTonGio, // Gán giá trị tồn giờ đã được tính tự động
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": nhanSuKey,
                     "KH Giục Tiến Độ": String(row[colUrgentIdx] || '').trim(),
                     "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
-                    "POP": popValue, // Cột U lấy 7 ký tự đầu tiên
+                    "POP": popValue,
                     "Kiểm soát": String(row[colControlIdx] || '').trim(),
                     "Cột AN": quanLyName,
                     "Ghi Chú CC": String(row[colNoteIdx] || '').trim()
