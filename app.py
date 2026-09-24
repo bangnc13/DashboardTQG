@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS Dark Theme
+# Custom CSS Dark Theme Minimalist
 st.markdown("""
     <style>
     .stApp { background-color: #090a10; color: #f1f5f9; }
@@ -22,101 +22,95 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# 2. KHỞI TẠO DỮ LIỆU MẪU
+# 2. HÀM NẠP VÀ CHUẨN HÓA DỮ LIỆU TỪ SHEET 'BT'
 @st.cache_data
-def get_sample_data():
-    return pd.DataFrame([
-        {"STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN", "Thời gian tạo": "2026-09-23 16:08:45", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "Trần Văn Nam (QL-01)"},
-        {"STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V", "Thời gian tạo": "2026-09-23 21:47:48", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "Độ Ưu Tiên": "Support", "POP": "TQGP013", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "Trần Văn Nam (QL-01)"},
-        {"STT": 3, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3290", "Tên đầy đủ": "PHAM THI", "Thời gian tạo": "2026-09-19 08:49:45", "Tồn giờ": -5, "Số lần hẹn": 6, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "Khách hãn hò >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)"},
-        {"STT": 4, "Block": "Xa Yen Son-001", "Số HĐ": "TQUAA3853", "Tên đầy đủ": "NGÔ THỊ T", "Thời gian tạo": "2026-09-21 14:48:57", "Tồn giờ": -7, "Số lần hẹn": 5, "CL Lặp": 1, "Nhân sự": "TQGTI.BINHLV6", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP026", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "0986265586 >> TQGTI.BINHLV6", "Cột AN": "Phạm Quốc Hùng (QL-02)"},
-        {"STT": 5, "Block": "Xa Nhu Khe-001", "Số HĐ": "TQFD00989", "Tên đầy đủ": "NGUYEN H", "Thời gian tạo": "2026-09-20 21:49:01", "Tồn giờ": 65, "Số lần hẹn": 2, "CL Lặp": 1, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "Độ Ưu Tiên": "Support", "POP": "TQGP005", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQFD0098 >> TQGTI.CAONB", "Cột AN": "Trần Văn Nam (QL-01)"},
-        {"STT": 6, "Block": "Xa Yen Son-001", "Số HĐ": "TQFD13450", "Tên đầy đủ": "TRỊNH KẾ", "Thời gian tạo": "2026-09-23 14:45:09", "Tồn giờ": -7, "Số lần hẹn": 1, "CL Lặp": 3, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "Support", "POP": "TQGP001", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "Hỏng điều khiển Sky", "Cột AN": "Lê Hoàng Long (QL-03)"},
-        {"STT": 7, "Block": "Xa Yen Son-001", "Số HĐ": "TQAAE9218", "Tên đầy đủ": "NGUYỄN N", "Thời gian tạo": "2026-09-24 08:35:09", "Tồn giờ": -24, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.CUHA", "TTCL": "Đã nhận ca", "Độ Ưu Tiên": "SOS", "POP": "TQGP002", "Kiểm soát": "Chưa duyệt", "Ghi Chú CC": "TQAAE9218 - 0968561111", "Cột AN": "Lê Hoàng Long (QL-03)"}
-    ])
-
-# Hàm chuẩn hóa và bảo vệ các cột bắt buộc trong DataFrame
-def sanitize_dataframe(df):
-    required_columns = {
-        'Cột AN': 'Chưa phân loại',
-        'Nhân sự': 'Chưa gán',
-        'Độ Ưu Tiên': 'Support',
-        'CL Lặp': 0,
-        'Block': 'Khác',
-        'POP': 'Khác',
-        'Số HĐ': '',
-        'Ghi Chú CC': '',
-        'Tồn giờ': 0,
-        'Kiểm soát': 'Chưa duyệt'
-    }
-    for col, default_val in required_columns.items():
-        if col not in df.columns:
-            df[col] = default_val
+def load_data(file):
+    try:
+        # Ưu tiên đọc từ Sheet BT
+        xls = pd.ExcelFile(file)
+        sheet_name = 'BT' if 'BT' in xls.sheet_names else xls.sheet_names[0]
+        df = pd.read_excel(xls, sheet_name=sheet_name)
+        
+        # Xử lý Cột AN (Quản lý/Trưởng bầy): Cột thứ 40 (Index 39)
+        if 'Trưởng bầy' in df.columns:
+            df['Quản lý'] = df['Trưởng bầy']
+        elif len(df.columns) >= 40:
+            df['Quản lý'] = df.iloc[:, 39]
         else:
-            df[col] = df[col].fillna(default_val)
-    return df
+            df['Quản lý'] = 'Chưa phân loại'
+            
+        # Chuẩn hóa các cột bắt buộc khác
+        cols_check = {
+            'Nhân sự': 'Chưa gán',
+            'Độ Ưu Tiên': 'Support',
+            'CL Lặp': 0,
+            'Block': 'Khác',
+            'POP': 'Khác',
+            'Số HĐ': '',
+            'Ghi Chú CC': '',
+            'Tồn giờ': 0,
+            'Kiểm soát': 'Chưa duyệt'
+        }
+        for col, default_val in cols_check.items():
+            if col not in df.columns:
+                df[col] = default_val
+            else:
+                df[col] = df[col].fillna(default_val)
+                
+        return df
+    except Exception as e:
+        st.error(f"Lỗi đọc dữ liệu: {e}")
+        return pd.DataFrame()
 
-# 3. SIDEBAR - BỘ LỌC DỮ LIỆU
+# 3. SIDEBAR - BỘ LỌC LIÊN KẾT ĐỘNG
 st.sidebar.markdown("### ⚙️ Cấu Hình & Bộ Lọc")
 
-uploaded_file = st.sidebar.file_uploader("📂 Upload File Excel mới", type=["xlsx", "xls", "csv"])
+uploaded_file = st.sidebar.file_uploader("📂 Upload File Excel (CLL2.xlsx)", type=["xlsx", "xls"])
 
 if uploaded_file is not None:
-    try:
-        if uploaded_file.name.endswith('.csv'):
-            df_raw = pd.read_csv(uploaded_file)
-        else:
-            df_raw = pd.read_excel(uploaded_file)
-        df_raw = sanitize_dataframe(df_raw)
-        st.sidebar.success("Đã nạp file Excel thành công!")
-    except Exception as e:
-        st.sidebar.error(f"Lỗi đọc file Excel: {e}")
-        df_raw = sanitize_dataframe(get_sample_data())
+    df_raw = load_data(uploaded_file)
 else:
-    df_raw = sanitize_dataframe(get_sample_data())
+    st.sidebar.warning("⚠️ Vui lòng upload file Excel 'CLL2.xlsx' để xem dữ liệu.")
+    st.stop()
 
-# Bộ Lọc
-mgr_list = [x for x in df_raw['Cột AN'].unique() if pd.notna(x) and str(x).strip() != ""]
-mgr_options = ["Tất cả Quản lý"] + mgr_list
-selected_mgr = st.sidebar.selectbox("👨‍💼 Chọn Quản Lý Trực Tiếp", mgr_options)
+# 1️⃣ BỘ LỌC QUẢN LÝ (LẤY TỪ CỘT AN SHEET BT)
+mgr_list = sorted([str(x).strip() for x in df_raw['Quản lý'].unique() if pd.notna(x) and str(x).strip() != ""])
+selected_mgr = st.sidebar.selectbox("👨‍💼 Chọn Quản Lý (Cột AN - BT)", ["Tất cả Quản lý"] + mgr_list)
 
+# 🛠️ LỌC DỮ LIỆU BƯỚC 1 THEO QUẢN LÝ
 if selected_mgr != "Tất cả Quản lý":
-    filtered_tech_df = df_raw[df_raw['Cột AN'] == selected_mgr]
+    df_filtered_mgr = df_raw[df_raw['Quản lý'].astype(str) == selected_mgr]
 else:
-    filtered_tech_df = df_raw
+    df_filtered_mgr = df_raw.copy()
 
-tech_list = [x for x in filtered_tech_df['Nhân sự'].unique() if pd.notna(x) and str(x).strip() != ""]
-tech_options = ["Tất cả"] + tech_list
-selected_tech = st.sidebar.selectbox("👷 Chọn Nhân Sự", tech_options)
+# 2️⃣ BỘ LỌC NHÂN SỰ (Chỉ hiển thị các bạn thuộc Quản lý đã chọn)
+tech_list = sorted([str(x).strip() for x in df_filtered_mgr['Nhân sự'].unique() if pd.notna(x) and str(x).strip() != ""])
+selected_tech = st.sidebar.selectbox("👷 Chọn Nhân Sự", ["Tất cả"] + tech_list)
 
-selected_priority = st.sidebar.selectbox("🔥 Độ Ưu Tiên / SOS", ["Tất cả", "Chỉ lấy: SOS", "Chỉ lấy: Support"])
+# 3️⃣ BỘ LỌC ĐỘ ƯU TIÊN (Chỉ chứa giá trị có trong Quản lý đã chọn)
+prio_list = sorted([str(x).strip() for x in df_filtered_mgr['Độ Ưu Tiên'].unique() if pd.notna(x) and str(x).strip() != ""])
+selected_priority = st.sidebar.selectbox("🔥 Độ Ưu Tiên / SOS", ["Tất cả"] + prio_list)
 
+# 4️⃣ BỘ LỌC CHECKLIST LẶP
 repeat_options = ["Tất cả", "Lặp > 0", "Bằng 0", "Lặp 1 lần", "Lặp 2 lần", "Lặp ≥ 3 lần"]
 selected_repeat = st.sidebar.selectbox("🔄 Checklist Lặp", repeat_options)
 
-block_list = [x for x in df_raw['Block'].unique() if pd.notna(x) and str(x).strip() != ""]
-block_options = ["Tất cả"] + block_list
-selected_block = st.sidebar.selectbox("📦 Chọn Block", block_options)
+# 5️⃣ BỘ LỌC BLOCK (Chỉ hiển thị Block thuộc Quản lý đã chọn)
+block_list = sorted([str(x).strip() for x in df_filtered_mgr['Block'].unique() if pd.notna(x) and str(x).strip() != ""])
+selected_block = st.sidebar.selectbox("📦 Chọn Block", ["Tất cả"] + block_list)
 
 search_term = st.sidebar.text_input("🔍 Tìm kiếm (Số HĐ, Ghi chú...)", "")
 
-# 4. XỬ LÝ LỌC DỮ LIỆU
-df = df_raw.copy()
-
-if selected_mgr != "Tất cả Quản lý":
-    df = df[df['Cột AN'] == selected_mgr]
+# 4. ÁP DỤNG TẤT CẢ BỘ LỌC VÀO DATAFRAME
+df = df_filtered_mgr.copy()
 
 if selected_tech != "Tất cả":
-    df = df[df['Nhân sự'] == selected_tech]
+    df = df[df['Nhân sự'].astype(str) == selected_tech]
 
-if selected_priority == "Chỉ lấy: SOS":
-    df = df[df['Độ Ưu Tiên'].astype(str).str.contains("SOS", case=False, na=False)]
-elif selected_priority == "Chỉ lấy: Support":
-    df = df[~df['Độ Ưu Tiên'].astype(str).str.contains("SOS", case=False, na=False)]
+if selected_priority != "Tất cả":
+    df = df[df['Độ Ưu Tiên'].astype(str) == selected_priority]
 
-# Ép kiểu CL Lặp về dạng số để lọc chính xác
 df['CL Lặp'] = pd.to_numeric(df['CL Lặp'], errors='coerce').fillna(0)
-
 if selected_repeat == "Lặp > 0":
     df = df[df['CL Lặp'] > 0]
 elif selected_repeat == "Bằng 0":
@@ -129,7 +123,7 @@ elif selected_repeat == "Lặp ≥ 3 lần":
     df = df[df['CL Lặp'] >= 3]
 
 if selected_block != "Tất cả":
-    df = df[df['Block'] == selected_block]
+    df = df[df['Block'].astype(str) == selected_block]
 
 if search_term:
     search_lower = search_term.lower()
@@ -139,9 +133,9 @@ if search_term:
         df['Block'].astype(str).str.lower().str.contains(search_lower)
     ]
 
-# 5. HEADER TIÊU ĐỀ
+# 5. HEADER DASHBOARD
 st.markdown("<h2 style='color: #a3e635; font-weight: 800; margin-bottom: 0px;'>DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</h2>", unsafe_allow_html=True)
-st.markdown("<p style='color: #65a30d; font-size: 13px;'>Báo Cáo Kiểm Soát | Bảng dữ liệu chuẩn kiểm soát ca tồn</p>", unsafe_allow_html=True)
+st.markdown(f"<p style='color: #65a30d; font-size: 13px;'>Đang xem dữ liệu của: <b>{selected_mgr}</b></p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # 6. HIỂN THỊ KPI CARDS
@@ -235,13 +229,18 @@ with c4:
     else:
         st.info("Không có dữ liệu phù hợp")
 
-# 8. BẢNG DỮ LIỆU BÁO CÁO
+# 8. BẢNG DỮ LIỆU HIỂN THỊ CÁC CỘT THEO YÊU CẦU
 st.markdown("### 📋 BẢNG DỮ LIỆU KIỂM SOÁT CA TỒN")
 st.markdown(f"Hiển thị **{len(df)}** / **{len(df_raw)}** ca")
 
+# Hiển thị các cột thông tin trọng tâm
+display_cols = ['Số HĐ', 'Quản lý', 'Nhân sự', 'Độ Ưu Tiên', 'CL Lặp', 'Block', 'Tồn giờ', 'POP', 'Kiểm soát', 'Ghi Chú CC']
+available_cols = [c for c in display_cols if c in df.columns]
+
 edited_df = st.data_editor(
-    df,
+    df[available_cols],
     column_config={
+        "Quản lý": st.column_config.TextColumn("Trưởng bầy (Cột AN)", disabled=True),
         "Kiểm soát": st.column_config.SelectboxColumn(
             "Kiểm Soát",
             options=["Chưa duyệt", "✅ Đã xử lý", "🚨 Cảnh báo"],
