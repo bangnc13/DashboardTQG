@@ -750,4 +750,4 @@ st.data_editor(
 )
 
 
-st.markdown(f"<div class='table-footer-text'>Hiển thị <b>{len(df_display)}</b> / <b>{len(df_raw)}</b> ca tồn</div></div>", unsafe_allow_html=True) Hãy chuyển hết màu chữ thành màu xanh tím than 
+st.markdown(f"<div class='table-footer-text'>Hiển thị <b>{len(df_display)}</b> / <b>{len(df_raw)}</b> ca tồn</div></div>", unsafe_allow_html=True)
