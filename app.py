@@ -297,10 +297,10 @@ html_content = """
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
-                            <i class="fa-solid fa-chart-column text-amber-500 mr-2"></i>
+                            <i class="fa-solid fa-chart-pie text-amber-500 mr-2"></i>
                             1. Thống Kê Checklist Lặp
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400"> </p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Tỷ lệ ca tồn có Checklist lặp so với không lặp</p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -787,42 +787,50 @@ html_content = """
             const hasRepeat = data.filter(d => (d["CL Lặp"] || 0) > 0).length;
             const noRepeat = data.filter(d => (d["CL Lặp"] || 0) === 0).length;
 
+            // 1. BIỂU ĐỒ HÌNH TRÒN: THỐNG KÊ CHECKLIST LẶP
             if (chartRepeatPriority) chartRepeatPriority.destroy();
             const ctx1 = document.getElementById('chartRepeatPriority')?.getContext('2d');
             if (ctx1) {
                 chartRepeatPriority = new Chart(ctx1, {
-                    type: 'bar',
+                    type: 'doughnut', // Hoặc 'pie' cho hình tròn kín
                     data: {
-                        labels: ['Trạng Thái Lặp'],
-                        datasets: [
-                            {
-                                label: 'Có CL Lặp (>0)',
-                                data: [hasRepeat],
-                                backgroundColor: '#f59e0b',
-                                borderRadius: 6
-                            },
-                            {
-                                label: 'Không Lặp (=0)',
-                                data: [noRepeat],
-                                backgroundColor: '#3b82f6',
-                                borderRadius: 6
-                            }
-                        ]
+                        labels: ['Có CL Lặp (>0)', 'Không Lặp (=0)'],
+                        datasets: [{
+                            data: [hasRepeat, noRepeat],
+                            backgroundColor: ['#f59e0b', '#3b82f6'],
+                            borderWidth: 2,
+                            borderColor: isDark ? '#1e293b' : '#ffffff'
+                        }]
                     },
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: {
-                            legend: { labels: { color: textColor, font: { family: 'Inter', size: 11 } } }
-                        },
-                        scales: {
-                            x: { ticks: { color: textColor }, grid: { display: false } },
-                            y: { ticks: { color: textColor }, grid: { color: gridColor }, beginAtZero: true }
+                            legend: {
+                                position: 'bottom',
+                                labels: { 
+                                    color: textColor, 
+                                    font: { family: 'Inter', size: 11 },
+                                    padding: 15
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = hasRepeat + noRepeat;
+                                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                        return ` ${label}: ${value} ca (${percentage}%)`;
+                                    }
+                                }
+                            }
                         }
                     }
                 });
             }
 
+            // 2. BIỂU ĐỒ TOP BLOCK TỒN
             const blockMap = {};
             data.forEach(d => {
                 if (d["Block"]) blockMap[d["Block"]] = (blockMap[d["Block"]] || 0) + 1;
@@ -856,6 +864,7 @@ html_content = """
                 });
             }
 
+            // 3. BIỂU ĐỒ TỒN THEO POP
             const popMap = {};
             data.forEach(d => {
                 if (d["POP"]) popMap[d["POP"]] = (popMap[d["POP"]] || 0) + 1;
@@ -888,6 +897,7 @@ html_content = """
                 });
             }
 
+            // 4. BIỂU ĐỒ TOP KTV TỒN CA
             const techMap = {};
             data.forEach(d => {
                 if (d["Nhân sự"]) techMap[d["Nhân sự"]] = (techMap[d["Nhân sự"]] || 0) + 1;
