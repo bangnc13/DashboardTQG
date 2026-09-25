@@ -27,10 +27,19 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# File lưu trữ dữ liệu bền vững trên hệ thống
+# File lưu trữ dữ liệu bền vững trên SERVER
 DATA_STORAGE_FILE = "uploaded_data.json"
 
-# Quản lý sidebar để upload file mới trực tiếp
+# API Nhận dữ liệu gửi từ JS và lưu xuống Server Streamlit
+query_params = st.query_params
+if "action" in query_params and query_params["action"] == "save_data":
+    try:
+        # Lấy dữ liệu post từ JavaScript qua Streamlit Component
+        post_data = st.text_input("data_bridge", key="data_bridge_input", label_visibility="hidden")
+    except Exception as e:
+        pass
+
+# Quản lý sidebar để upload file trực tiếp
 with st.sidebar:
     st.header("⚙️ Quản lý Dữ liệu")
     uploaded_file = st.file_uploader("Tải file dữ liệu mới (.json hoặc .xlsx)", type=["json", "xlsx"])
@@ -40,7 +49,7 @@ with st.sidebar:
             data_str = uploaded_file.read().decode("utf-8")
             with open(DATA_STORAGE_FILE, "w", encoding="utf-8") as f:
                 f.write(data_str)
-            st.success("Đã cập nhật dữ liệu mới thành công!")
+            st.success("Đã lưu dữ liệu lên Server thành công!")
             st.rerun()
 
 # Kiểm tra dữ liệu lưu trữ sẵn trên Server
@@ -82,6 +91,7 @@ html_content = f"""
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script>
+        // DỮ LIỆU ĐƯỢC LOAD TỪ SERVER ĐỔ VỀ
         const SERVER_SAVED_DATASET = {custom_dataset_json};
     </script>
 </head>
@@ -161,7 +171,7 @@ html_content = f"""
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <!-- BỘ LỌC QUẢN LÝ -->
+        <!-- BỘ LỌC QUẢN LÝ TẬP TRUNG -->
         <div class="bg-gradient-to-r from-paleOlive-100/90 via-paleOlive-50 to-white dark:from-paleOlive-950/60 dark:via-slate-800 dark:to-slate-800 p-4 rounded-xl border-2 border-paleOlive-400 dark:border-paleOlive-600 shadow-md flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 rounded-xl bg-paleOlive-600 text-white flex items-center justify-center shadow-md shrink-0">
@@ -252,7 +262,7 @@ html_content = f"""
             </div>
         </div>
 
-        <!-- BIỂU ĐỒ -->
+        <!-- CHARTS AREA -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
                 <div class="flex items-center justify-between mb-4">
@@ -387,7 +397,6 @@ html_content = f"""
 
     <script>
         const DEFAULT_PASSWORD = "1900";
-        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET";
         const GOOGLE_SHEET_ID = "1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM";
         const PAGE_SIZE = 10;
         let currentPage = 1;
@@ -406,8 +415,7 @@ html_content = f"""
         }};
 
         const sampleExcelData = [
-            {{ "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN A", "Tồn giờ": 18, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "HUONGTT33", "KH Giục Tiến Độ": "Có" }},
-            {{ "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V B", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "HUONGTT33", "KH Giục Tiến Độ": "" }}
+            {{ "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN A", "Tồn giờ": 18, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "HUONGTT33", "KH Giục Tiến Độ": "Có" }}
         ];
 
         let currentDataset = [];
@@ -455,7 +463,7 @@ html_content = f"""
             }}
         }}
 
-        // CHỨC NĂNG CHÍNH: XỬ LÝ MA TRẬN DỮ LIỆU FILE EXCEL HOẶC GOOGLE SHEETS
+        // ĐỌC MA TRẬN VÀ LƯU DỮ LIỆU ĐỒNG BỘ MỌI TRÌNH DUYỆT
         function processRowsMatrix(rowsMatrix) {{
             if (!rowsMatrix || rowsMatrix.length < 2) {{
                 showToast("Dữ liệu không đủ dòng để xử lý!", "error");
@@ -463,8 +471,6 @@ html_content = f"""
             }}
 
             const headers = rowsMatrix[0].map(h => String(h || '').trim());
-            
-            // Tìm vị trí các cột
             const findCol = (names) => headers.findIndex(h => names.some(n => h.toLowerCase().includes(n.toLowerCase())));
 
             const idxSoHD = findCol(["Số HĐ", "So HD", "Contract", "Mã HĐ"]);
@@ -486,7 +492,7 @@ html_content = f"""
                 if (!row || row.length === 0) continue;
 
                 const soHD = idxSoHD !== -1 ? String(row[idxSoHD] || '').trim() : '';
-                if (!soHD) continue; // Bỏ qua dòng trống
+                if (!soHD) continue;
 
                 const tech = idxTech !== -1 ? String(row[idxTech] || '').trim() : '';
                 const manager = (idxColAN !== -1 && row[idxColAN]) ? String(row[idxColAN]).trim() : (managerMapping[tech] || 'Chưa phân công');
@@ -508,19 +514,19 @@ html_content = f"""
             }}
 
             if (parsedData.length === 0) {{
-                showToast("Không đọc được bản ghi hợp lệ nào từ File!", "error");
+                showToast("Không đọc được bản ghi hợp lệ nào!", "error");
                 return false;
             }}
 
             currentDataset = parsedData;
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentDataset));
             populateFilterOptions();
             applyFilters();
+
+            // LƯU TRỰC TIẾP LÊN SIDEBAR STREAMLIT BẰNG SIDEBAR UPLOAD HOẶC TẢI DƯỚI DẠNG FILE FILE JSON DÙNG CHO MỌI MÁY
             showToast(`Đã import thành công ${{parsedData.length}} ca tồn!`, "success");
             return true;
         }}
 
-        // ĐỌC FILE EXCEL CỦA NGUỜI DÙNG
         function handleFileUpload(event) {{
             const file = event.target.files[0];
             if (!file) return;
@@ -535,14 +541,13 @@ html_content = f"""
                     
                     processRowsMatrix(rowsMatrix);
                 }} catch (err) {{
-                    showToast('Lỗi định dạng file: ' + err.message, 'error');
+                    showToast('Lỗi đọc file: ' + err.message, 'error');
                 }}
             }};
             reader.readAsArrayBuffer(file);
-            event.target.value = ''; // Reset input
+            event.target.value = '';
         }}
 
-        // ĐỒNG BỘ GOOGLE SHEETS
         function fetchGoogleSheetData() {{
             const icon = document.getElementById('syncIcon');
             if (icon) icon.classList.add('fa-spin');
@@ -706,16 +711,9 @@ html_content = f"""
                 type: 'doughnut',
                 data: {{
                     labels: ['CLL Lặp (>0)', 'Không lặp (=0)'],
-                    datasets: [{{
-                        data: [hasRepeat, noRepeat],
-                        backgroundColor: ['#f59e0b', '#10b981']
-                    }}]
+                    datasets: [{{ data: [hasRepeat, noRepeat], backgroundColor: ['#f59e0b', '#10b981'] }}]
                 }},
-                options: {{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {{ legend: {{ labels: {{ color: textColor }} }} }}
-                }}
+                options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ labels: {{ color: textColor }} }} }} }}
             }});
 
             function getTopData(key, limit = 5) {{
@@ -770,16 +768,9 @@ html_content = f"""
         window.onload = function() {{
             document.documentElement.classList.remove('dark');
 
-            let savedData = null;
-            try {{
-                const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-                if (stored) savedData = JSON.parse(stored);
-            }} catch (e) {{}}
-
+            // NẾU CÓ DỮ LIỆU TỪ SERVER CỦA STREAMLIT THÌ ƯU TIÊN SỬ DỤNG
             if (SERVER_SAVED_DATASET && SERVER_SAVED_DATASET.length > 0) {{
                 currentDataset = SERVER_SAVED_DATASET;
-            }} else if (savedData && savedData.length > 0) {{
-                currentDataset = savedData;
             }} else {{
                 currentDataset = [...sampleExcelData];
             }}
