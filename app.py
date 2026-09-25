@@ -134,8 +134,8 @@ html_content = """
                     <i class="fa-solid fa-lock text-lg"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Xác thực quyền nhập dữ liệu</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Vui lòng nhập mật khẩu để import File Excel</p>
+                    <h3 id="modalTitle" class="text-base font-bold text-slate-900 dark:text-white">Xác thực quyền thao tác</h3>
+                    <p id="modalDesc" class="text-xs text-slate-500 dark:text-slate-400">Vui lòng nhập mật khẩu để tiếp tục</p>
                 </div>
             </div>
 
@@ -172,13 +172,14 @@ html_content = """
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <button id="syncBtn" onclick="fetchGoogleSheetData(true)" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
+                    <!-- NÚT MỞ MODAL MẬT KHẨU ĐỒNG BỘ GOOGLE SHEETS -->
+                    <button id="syncBtn" onclick="openPasswordModal('SYNC')" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate mr-2 text-sm"></i>
                         <span>Đồng bộ Google Sheets</span>
                     </button>
 
                     <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
-                    <button onclick="openPasswordModal()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
+                    <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
                         <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
                         <span>File Excel</span>
                     </button>
@@ -468,6 +469,7 @@ html_content = """
         // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
         let currentPage = 1;
+        let pendingAction = null; // Lưu loại thao tác cần xác thực (SYNC hoặc EXCEL)
 
         // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
@@ -529,9 +531,22 @@ html_content = """
         let chartTopTech = null;
 
         // BẢO MẬT: Mở Modal Password
-        function openPasswordModal() {
+        function openPasswordModal(actionType = 'EXCEL') {
+            pendingAction = actionType;
             document.getElementById('importPasswordInput').value = '';
             document.getElementById('passwordError').classList.add('hidden');
+            
+            const titleEl = document.getElementById('modalTitle');
+            const descEl = document.getElementById('modalDesc');
+
+            if (actionType === 'SYNC') {
+                if (titleEl) titleEl.textContent = 'Đồng bộ Google Sheets';
+                if (descEl) descEl.textContent = 'Vui lòng nhập mật khẩu để đồng bộ dữ liệu';
+            } else {
+                if (titleEl) titleEl.textContent = 'Import File Excel';
+                if (descEl) descEl.textContent = 'Vui lòng nhập mật khẩu để import File Excel';
+            }
+
             document.getElementById('passwordModal').classList.remove('hidden');
             setTimeout(() => document.getElementById('importPasswordInput').focus(), 100);
         }
@@ -539,14 +554,21 @@ html_content = """
         // BẢO MẬT: Đóng Modal Password
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
+            pendingAction = null;
         }
 
         // BẢO MẬT: Kiểm tra Password
         function verifyPassword() {
             const inputPwd = document.getElementById('importPasswordInput').value;
             if (inputPwd === DEFAULT_PASSWORD) {
+                const action = pendingAction;
                 closePasswordModal();
-                document.getElementById('excelFileInput').click(); // Mở chọn file
+                
+                if (action === 'SYNC') {
+                    fetchGoogleSheetData(true);
+                } else if (action === 'EXCEL') {
+                    document.getElementById('excelFileInput').click(); // Mở chọn file
+                }
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
@@ -1210,10 +1232,9 @@ html_content = """
                 renderDashboard();
                 showToast(`Đã khôi phục ${currentDataset.length} ca tồn từ lần tải gần nhất!`, 'success');
             } else {
-                // Nếu chưa từng nạp file nào, lấy dữ liệu mẫu
+                // Nếu chưa từng nạp dữ liệu nào, lấy dữ liệu mẫu hiển thị
                 currentDataset = [...sampleExcelData];
                 renderDashboard();
-                fetchGoogleSheetData(false);
             }
         };
     </script>
