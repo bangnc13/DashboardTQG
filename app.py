@@ -262,7 +262,7 @@ html_content = """
                     <span id="kpiRepeat" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</span>
                     <span id="kpiRepeatCases" class="text-xs text-amber-700 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 px-2 py-0.5 rounded-full">0 ca</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tổng lượt lặp (Lặp > 0)</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tổng số ca vụ lặp (Lặp > 0)</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
@@ -743,10 +743,14 @@ html_content = """
             renderTable(filtered);
         }
 
+        // CẬP NHẬT HÀM UPDATE KPIS: ĐẾM SỐ CASE VỤ (LẦN VỤ TỒN) THAY VÌ CỘNG GIÁ TRỊ LẶP
         function updateKPIs(data) {
             const total = data.length;
             const repeatCases = data.filter(d => (d["CL Lặp"] || 0) > 0);
-            const totalRepeatCount = repeatCases.reduce((acc, d) => acc + (d["CL Lặp"] || 0), 0);
+            
+            // Đếm số case vụ bị lặp (Lặp > 0)
+            const totalRepeatCasesCount = repeatCases.length;
+            
             const overdueCases = data.filter(d => (d["Tồn giờ"] || 0) >= 24).length;
             const processingCases = data.filter(d => d["TTCL"] === 'Đang XL').length;
             const urgentCases = data.filter(d => d["KH Giục Tiến Độ"] && d["KH Giục Tiến Độ"].toString().trim() !== '').length;
@@ -756,8 +760,9 @@ html_content = """
             document.getElementById('kpiUrgent').textContent = urgentCases;
             document.getElementById('kpiUrgentPct').textContent = total ? Math.round((urgentCases / total) * 100) + '%' : '0%';
 
-            document.getElementById('kpiRepeat').textContent = totalRepeatCount;
-            document.getElementById('kpiRepeatCases').textContent = repeatCases.length + ' ca';
+            // Cập nhật số case hiển thị chuẩn xác
+            document.getElementById('kpiRepeat').textContent = totalRepeatCasesCount;
+            document.getElementById('kpiRepeatCases').textContent = totalRepeatCasesCount + ' ca';
 
             document.getElementById('kpiOverdue').textContent = overdueCases;
             document.getElementById('kpiOverduePct').textContent = total ? Math.round((overdueCases / total) * 100) + '%' : '0%';
