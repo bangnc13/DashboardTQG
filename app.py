@@ -175,7 +175,7 @@ html_content = """
                     <!-- NÚT ĐỒNG BỘ MỚI TẢI TRỰC TIẾP KHÔNG CẦN PASSWORD -->
                     <button id="syncBtn" onclick="fetchGoogleSheetData(true)" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate mr-2 text-sm"></i>
-                        <span>Đồng bộ Google Sheets</span>
+                        <span>Đồng bộ </span>
                     </button>
 
                     <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
