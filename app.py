@@ -398,11 +398,10 @@ html_content = """
                         </select>
                     </div>
 
+                    <!-- ĐÃ XÓA 2 LỰA CHỌN LẶP > 0 VÀ LẶP = 0 TẠI ĐÂY -->
                     <div>
                         <select id="filterRepeat" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
                             <option value="">Tất cả CL Lặp</option>
-                            <option value="NON_ZERO">Chỉ khác 0 (Lặp > 0)</option>
-                            <option value="0">Bằng 0 (= 0)</option>
                             <option value="1">Lặp 1 lần</option>
                             <option value="2">Lặp 2 lần</option>
                             <option value="3">Lặp ≥ 3 lần</option>
@@ -715,9 +714,8 @@ html_content = """
                     if (urgentFilter === 'NO' && hasUrgent) return false;
                 }
 
+                // CẬP NHẬT LOGIC LỌC CL LẶP THEO LẦN TƯƠNG ỨNG
                 if (repeatFilter) {
-                    if (repeatFilter === 'NON_ZERO' && item["CL Lặp"] === 0) return false;
-                    if (repeatFilter === '0' && item["CL Lặp"] !== 0) return false;
                     if (repeatFilter === '1' && item["CL Lặp"] !== 1) return false;
                     if (repeatFilter === '2' && item["CL Lặp"] !== 2) return false;
                     if (repeatFilter === '3' && item["CL Lặp"] < 3) return false;
@@ -743,12 +741,11 @@ html_content = """
             renderTable(filtered);
         }
 
-        // CẬP NHẬT HÀM UPDATE KPIS: ĐẾM SỐ CASE VỤ (LẦN VỤ TỒN) THAY VÌ CỘNG GIÁ TRỊ LẶP
         function updateKPIs(data) {
             const total = data.length;
             const repeatCases = data.filter(d => (d["CL Lặp"] || 0) > 0);
             
-            // Đếm số case vụ bị lặp (Lặp > 0)
+            // Đếm số ca vụ bị lặp (Lặp > 0)
             const totalRepeatCasesCount = repeatCases.length;
             
             const overdueCases = data.filter(d => (d["Tồn giờ"] || 0) >= 24).length;
@@ -760,7 +757,7 @@ html_content = """
             document.getElementById('kpiUrgent').textContent = urgentCases;
             document.getElementById('kpiUrgentPct').textContent = total ? Math.round((urgentCases / total) * 100) + '%' : '0%';
 
-            // Cập nhật số case hiển thị chuẩn xác
+            // Cập nhật số ca vụ hiển thị chuẩn xác
             document.getElementById('kpiRepeat').textContent = totalRepeatCasesCount;
             document.getElementById('kpiRepeatCases').textContent = totalRepeatCasesCount + ' ca';
 
