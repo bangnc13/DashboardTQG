@@ -134,8 +134,8 @@ html_content = """
                     <i class="fa-solid fa-lock text-lg"></i>
                 </div>
                 <div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Xác thực quyền truy cập</h3>
-                    <p id="passwordModalDesc" class="text-xs text-slate-500 dark:text-slate-400">Vui lòng nhập mật khẩu để thực hiện thao tác</p>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Xác thực quyền nhập dữ liệu</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Vui lòng nhập mật khẩu để import File Excel</p>
                 </div>
             </div>
 
@@ -172,14 +172,13 @@ html_content = """
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <!-- NÚT ĐỒNG BỘ GOOGLE SHEETS CÓ MẬT KHẨU -->
-                    <button id="syncBtn" onclick="openPasswordModal('sync_sheets')" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
+                    <button id="syncBtn" onclick="fetchGoogleSheetData(true)" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate mr-2 text-sm"></i>
                         <span>Đồng bộ Google Sheets</span>
                     </button>
 
-                    <!-- NÚT FILE EXCEL CÓ MẬT KHẨU -->
-                    <button onclick="openPasswordModal('import_excel')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
+                    <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
+                    <button onclick="openPasswordModal()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
                         <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
                         <span>File Excel</span>
                     </button>
@@ -438,10 +437,16 @@ html_content = """
                 </table>
             </div>
 
-            <div class="px-5 py-3 bg-paleOlive-100/50 dark:bg-paleOlive-950/40 border-t border-paleOlive-200 dark:border-paleOlive-800 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-paleOlive-900/80 dark:text-paleOlive-300">
+            <!-- NÚT PHÂN TRANG VÀ THÔNG TIN HIỂN THỊ -->
+            <div class="px-5 py-3 bg-paleOlive-100/50 dark:bg-paleOlive-950/40 border-t border-paleOlive-200 dark:border-paleOlive-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-paleOlive-900/80 dark:text-paleOlive-300">
                 <div>
-                    Hiển thị <span id="displayedCount" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> / <span id="totalCount" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> ca tồn
+                    Hiển thị từ <span id="startIndex" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> đến <span id="endIndex" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> trong tổng số <span id="totalCount" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> ca tồn
                 </div>
+                
+                <div id="paginationControls" class="flex items-center space-x-1">
+                    <!-- JS sẽ tự động vẽ nút phân trang ở đây -->
+                </div>
+
                 <div class="italic">
                     BangNC13-TQG.
                 </div>
@@ -459,8 +464,11 @@ html_content = """
     <script>
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
-        let pendingAction = null; // Lưu loại thao tác sau khi xác thực password thành công
         
+        // BẢN BIẾN PHÂN TRANG
+        const PAGE_SIZE = 10;
+        let currentPage = 1;
+
         // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
             "TQGTI.GIANGVH2": "ANHHV15",
@@ -520,15 +528,8 @@ html_content = """
         let chartTopPop = null;
         let chartTopTech = null;
 
-        // BẢO MẬT: Mở Modal Password với mô tả thao tác
-        function openPasswordModal(action = 'import_excel') {
-            pendingAction = action;
-            const descEl = document.getElementById('passwordModalDesc');
-            if (descEl) {
-                descEl.textContent = action === 'sync_sheets' 
-                    ? 'Vui lòng nhập mật khẩu để đồng bộ dữ liệu từ Google Sheets' 
-                    : 'Vui lòng nhập mật khẩu để import File Excel';
-            }
+        // BẢO MẬT: Mở Modal Password
+        function openPasswordModal() {
             document.getElementById('importPasswordInput').value = '';
             document.getElementById('passwordError').classList.add('hidden');
             document.getElementById('passwordModal').classList.remove('hidden');
@@ -538,20 +539,14 @@ html_content = """
         // BẢO MẬT: Đóng Modal Password
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
-            pendingAction = null;
         }
 
         // BẢO MẬT: Kiểm tra Password
         function verifyPassword() {
             const inputPwd = document.getElementById('importPasswordInput').value;
             if (inputPwd === DEFAULT_PASSWORD) {
-                const actionToPerform = pendingAction;
                 closePasswordModal();
-                if (actionToPerform === 'sync_sheets') {
-                    fetchGoogleSheetData(true);
-                } else {
-                    document.getElementById('excelFileInput').click(); // Mở chọn file
-                }
+                document.getElementById('excelFileInput').click(); // Mở chọn file
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
@@ -719,6 +714,7 @@ html_content = """
         }
 
         function applyFilters() {
+            currentPage = 1; // Reset về trang 1 khi lọc
             const filtered = getFilteredData();
             updateKPIs(filtered);
             renderCharts(filtered);
@@ -748,19 +744,39 @@ html_content = """
             document.getElementById('kpiProcessingPct').textContent = total ? Math.round((processingCases / total) * 100) + '%' : '0%';
         }
 
+        function goToPage(page) {
+            currentPage = page;
+            const filtered = getFilteredData();
+            renderTable(filtered);
+        }
+
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
-            document.getElementById('displayedCount').textContent = data.length;
-            document.getElementById('totalCount').textContent = currentDataset.length;
+            const total = data.length;
+            const totalPages = Math.ceil(total / PAGE_SIZE) || 1;
+
+            if (currentPage > totalPages) currentPage = totalPages;
+            if (currentPage < 1) currentPage = 1;
+
+            const startIdx = (currentPage - 1) * PAGE_SIZE;
+            const endIdx = Math.min(startIdx + PAGE_SIZE, total);
+
+            document.getElementById('startIndex').textContent = total > 0 ? startIdx + 1 : 0;
+            document.getElementById('endIndex').textContent = endIdx;
+            document.getElementById('totalCount').textContent = total;
+
+            renderPagination(totalPages);
 
             if (!tbody) return;
 
-            if (data.length === 0) {
+            if (total === 0) {
                 tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>`;
                 return;
             }
 
-            tbody.innerHTML = data.map((item, idx) => {
+            const pageData = data.slice(startIdx, endIdx);
+
+            tbody.innerHTML = pageData.map((item, idx) => {
                 const isRepeat = (item["CL Lặp"] || 0) > 0;
                 const isOverdue = (item["Tồn giờ"] || 0) >= 24;
                 const urgentVal = item["KH Giục Tiến Độ"] ? item["KH Giục Tiến Độ"].toString().trim() : '';
@@ -777,7 +793,7 @@ html_content = """
 
                 return `
                     <tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">
-                        <td class="py-2.5 px-3 text-center text-slate-500 font-medium">${idx + 1}</td>
+                        <td class="py-2.5 px-3 text-center text-slate-500 font-medium">${startIdx + idx + 1}</td>
                         <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400">${item["Số HĐ"] || '-'}</td>
                         <td class="py-2.5 px-3 text-slate-800 dark:text-slate-200 font-medium">${item["Block"] || '-'}</td>
                         <td class="py-2.5 px-3 text-center text-slate-700 dark:text-slate-300">${item["Số lần hẹn"] || 0}</td>
@@ -790,6 +806,53 @@ html_content = """
                     </tr>
                 `;
             }).join('');
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('paginationControls');
+            if (!container) return;
+
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // Nút Trước
+            html += `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>`;
+
+            // Danh sách các số trang
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+
+            if (startPage > 1) {
+                html += `<button onclick="goToPage(1)" class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">1</button>`;
+                if (startPage > 2) html += `<span class="px-1 text-slate-400">...</span>`;
+            }
+
+            for (let p = startPage; p <= endPage; p++) {
+                const isActive = p === currentPage;
+                const activeClass = isActive 
+                    ? 'bg-paleOlive-600 text-white font-bold border-paleOlive-600' 
+                    : 'bg-white dark:bg-slate-800 border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700';
+
+                html += `<button onclick="goToPage(${p})" class="px-2.5 py-1 rounded-md border ${activeClass} transition">${p}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) html += `<span class="px-1 text-slate-400">...</span>`;
+                html += `<button onclick="goToPage(${totalPages})" class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">${totalPages}</button>`;
+            }
+
+            // Nút Sau
+            html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>`;
+
+            container.innerHTML = html;
         }
 
         function renderCharts(data) {
@@ -1150,6 +1213,7 @@ html_content = """
                 // Nếu chưa từng nạp file nào, lấy dữ liệu mẫu
                 currentDataset = [...sampleExcelData];
                 renderDashboard();
+                fetchGoogleSheetData(false);
             }
         };
     </script>
