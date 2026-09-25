@@ -1,8 +1,9 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import json
 
-# Cấu hình trang
+# Cấu hình trang Streamlit
 st.set_page_config(
     page_title="TQG-Dashboard Kiểm Soát Ca Tồn & Checklist (CLL)",
     page_icon="📋",
@@ -10,7 +11,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Ẩn header/footer Streamlit
+# Ẩn các thành phần giao diện thừa của Streamlit
 st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
@@ -29,22 +30,20 @@ st.markdown("""
 # ID Google Sheet của bạn
 GOOGLE_SHEET_ID = "1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM"
 
-# Hàm lấy dữ liệu trực tiếp từ Google Sheets bằng Python
-@st.cache_data(ttl=60)  # Tự động làm mới dữ liệu sau mỗi 60 giây
+# Hàm lấy dữ liệu trực tiếp từ Google Sheets
+@st.cache_data(ttl=60)  # Làm mới dữ liệu tự động sau mỗi 60 giây
 def load_data_from_google_sheet(sheet_id):
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
     try:
         df = pd.read_csv(url, dtype=str)
-        # Chuyển đổi DataFrame thành list dictionary chuẩn JSON
-        data = df.to_dict(orient="records")
-        return data
+        return df.to_dict(orient="records")
     except Exception as e:
         return []
 
 # Đọc dữ liệu từ Server
 raw_data = load_data_from_google_sheet(GOOGLE_SHEET_ID)
 
-# Mapping danh sách Quản lý mặc định nếu dữ liệu thiếu
+# Mapping danh sách Quản lý mặc định nếu thiếu trong dữ liệu
 manager_mapping = {
     "TQGTI.GIANGVH2": "ANHHV15", "TQGTI.THANHNV41": "ANHHV15", "TQGTI.CAONB": "ANHHV15", "TQGTI.KHANHLQ1": "ANHHV15",
     "TQGTI.CUHA": "HUONGTT33", "TQGTI.QUANDM2": "HUONGTT33", "TQGTI.ANHPH3": "HUONGTT33", "TQGTI.HOANQV": "HUONGTT33",
@@ -61,7 +60,6 @@ manager_mapping = {
 processed_dataset = []
 if raw_data:
     for idx, row in enumerate(raw_data):
-        # Lấy thông tin cơ bản
         so_hd = str(row.get("Số HĐ", row.get("So HD", "")) or "").strip()
         if not so_hd:
             continue
@@ -100,7 +98,7 @@ if raw_data:
             "Cột AN": manager
         })
 
-# Encode JSON truyền xuống JavaScript
+# Encode JSON truyền xuống Giao diện Frontend
 server_json_str = json.dumps(processed_dataset, ensure_ascii=False)
 
 html_content = f"""
@@ -133,13 +131,10 @@ html_content = f"""
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <script>
-        // Dữ liệu được nạp trực tiếp từ Python (lấy từ Google Sheet)
         const SERVER_DATASET = {server_json_str};
     </script>
 </head>
 <body class="h-full text-slate-800 dark:text-slate-100 bg-slate-50 dark:bg-slate-900 font-sans antialiased flex flex-col">
-
-    <div id="toastContainer" class="fixed top-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
     <!-- HEADER -->
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
@@ -161,9 +156,9 @@ html_content = f"""
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <button onclick="window.location.reload()" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
+                    <button onclick="window.location.reload()" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-sm">
                         <i class="fa-solid fa-arrows-rotate mr-2 text-sm"></i>
-                        <span>Làm mới dữ liệu từ Google Sheet</span>
+                        <span>Làm mới dữ liệu</span>
                     </button>
 
                     <button onclick="exportDataCSV()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm">
@@ -352,10 +347,7 @@ html_content = f"""
     </main>
 
     <script>
-        const PAGE_SIZE = 10;
-        let currentPage = 1;
         let currentDataset = SERVER_DATASET || [];
-
         let chartRepeatPriority, chartTopBlock, chartTopPop, chartTopTech;
 
         function populateFilterOptions() {{
@@ -540,4 +532,5 @@ html_content = f"""
 </html>
 """
 
+# Hiển thị giao diện HTML/JS qua Streamlit Components
 components.html(html_content, height=1400, scrolling=True)
