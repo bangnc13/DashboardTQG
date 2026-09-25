@@ -83,6 +83,13 @@ if raw_data:
         except:
             lan_hen = 0
 
+        # Chuẩn hóa KH Giục Tiến Độ
+        raw_urgent = str(row.get("KH Giục Tiến Độ", row.get("Giục tiến độ", "")) or "").strip()
+        if raw_urgent.lower() in ["nan", "none", "null", "-", "0", "không", "khong", ""]:
+            val_urgent = ""
+        else:
+            val_urgent = raw_urgent
+
         processed_dataset.append({
             "STT": idx + 1,
             "Số HĐ": so_hd,
@@ -91,7 +98,7 @@ if raw_data:
             "CL Lặp": cl_lap,
             "Số lần hẹn": lan_hen,
             "Tồn giờ": ton_gio,
-            "KH Giục Tiến Độ": str(row.get("KH Giục Tiến Độ", "") or "").strip(),
+            "KH Giục Tiến Độ": val_urgent,
             "Ghi Chú CC": str(row.get("Ghi Chú CSKH", row.get("Ghi Chú CC", "")) or "").strip(),
             "POP": str(row.get("POP", "N/A") or "N/A").strip(),
             "TTCL": str(row.get("TTCL", "Bình thường") or "Bình thường").strip(),
@@ -350,6 +357,13 @@ html_content = f"""
         let currentDataset = SERVER_DATASET || [];
         let chartRepeatPriority, chartTopBlock, chartTopPop, chartTopTech;
 
+        // Kiểm tra chính xác ca có giục tiến độ hay không
+        function isUrgentCase(item) {{
+            if (!item["KH Giục Tiến Độ"]) return false;
+            const val = item["KH Giục Tiến Độ"].toString().trim().toLowerCase();
+            return val !== '' && val !== 'nan' && val !== 'none' && val !== 'null' && val !== '-' && val !== '0' && val !== 'không' && val !== 'khong';
+        }}
+
         function populateFilterOptions() {{
             const colANSelect = document.getElementById('filterColAN');
             const techSelect = document.getElementById('filterTech');
@@ -397,7 +411,7 @@ html_content = f"""
                 if (chkNonZero && (item["CL Lặp"] || 0) === 0) return false;
 
                 if (urgentFilter) {{
-                    const hasUrgent = Boolean(item["KH Giục Tiến Độ"] && item["KH Giục Tiến Độ"].toString().trim() !== '');
+                    const hasUrgent = isUrgentCase(item);
                     if (urgentFilter === 'YES' && !hasUrgent) return false;
                     if (urgentFilter === 'NO' && hasUrgent) return false;
                 }}
@@ -429,7 +443,7 @@ html_content = f"""
             const repeatCases = data.filter(d => (d["CL Lặp"] || 0) > 0).length;
             const overdueCases = data.filter(d => (d["Tồn giờ"] || 0) >= 24).length;
             const processingCases = data.filter(d => d["TTCL"] === 'Đang XL').length;
-            const urgentCases = data.filter(d => d["KH Giục Tiến Độ"] && d["KH Giục Tiến Độ"].toString().trim() !== '').length;
+            const urgentCases = data.filter(d => isUrgentCase(d)).length;
 
             document.getElementById('kpiTotal').textContent = total;
             document.getElementById('kpiUrgent').textContent = urgentCases;
