@@ -30,7 +30,7 @@ st.markdown("""
 # File lưu trữ dữ liệu bền vững trên hệ thống
 DATA_STORAGE_FILE = "uploaded_data.json"
 
-# Quản lý sidebar để upload file mới
+# Quản lý sidebar để upload file mới trực tiếp
 with st.sidebar:
     st.header("⚙️ Quản lý Dữ liệu")
     uploaded_file = st.file_uploader("Tải file dữ liệu mới (.json hoặc .xlsx)", type=["json", "xlsx"])
@@ -67,17 +67,9 @@ html_content = f"""
                 extend: {{
                     colors: {{
                         paleOlive: {{
-                            50: '#f6f7f2',
-                            100: '#e8ebe0',
-                            200: '#d3d9c5',
-                            300: '#b7c1a2',
-                            400: '#9aa780',
-                            500: '#7f8e65',
-                            600: '#63714d',
-                            700: '#4e593d',
-                            800: '#404833',
-                            900: '#363d2c',
-                            950: '#1b2016'
+                            50: '#f6f7f2', 100: '#e8ebe0', 200: '#d3d9c5', 300: '#b7c1a2',
+                            400: '#9aa780', 500: '#7f8e65', 600: '#63714d', 700: '#4e593d',
+                            800: '#404833', 900: '#363d2c', 950: '#1b2016'
                         }}
                     }}
                 }}
@@ -169,7 +161,7 @@ html_content = f"""
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-        <!-- BỘ LỌC QUẢN LÝ TẬP TRUNG -->
+        <!-- BỘ LỌC QUẢN LÝ -->
         <div class="bg-gradient-to-r from-paleOlive-100/90 via-paleOlive-50 to-white dark:from-paleOlive-950/60 dark:via-slate-800 dark:to-slate-800 p-4 rounded-xl border-2 border-paleOlive-400 dark:border-paleOlive-600 shadow-md flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 rounded-xl bg-paleOlive-600 text-white flex items-center justify-center shadow-md shrink-0">
@@ -260,7 +252,7 @@ html_content = f"""
             </div>
         </div>
 
-        <!-- CHARTS AREA -->
+        <!-- BIỂU ĐỒ -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
                 <div class="flex items-center justify-between mb-4">
@@ -396,6 +388,7 @@ html_content = f"""
     <script>
         const DEFAULT_PASSWORD = "1900";
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET";
+        const GOOGLE_SHEET_ID = "1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM";
         const PAGE_SIZE = 10;
         let currentPage = 1;
         let pendingAction = null;
@@ -414,8 +407,7 @@ html_content = f"""
 
         const sampleExcelData = [
             {{ "STT": 1, "Block": "Phuong My Lam-001", "Số HĐ": "TQAAB7120", "Tên đầy đủ": "TRẦN VĂN A", "Tồn giờ": 18, "Số lần hẹn": 1, "CL Lặp": 1, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Ghi Chú CC": "Checklist app hifpt/ Giga", "Cột AN": "HUONGTT33", "KH Giục Tiến Độ": "Có" }},
-            {{ "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V B", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "HUONGTT33", "KH Giục Tiến Độ": "" }},
-            {{ "STT": 3, "Block": "Phuong Tan Quang-002", "Số HĐ": "TQFD10099", "Tên đầy đủ": "NGUYỄN V C", "Tồn giờ": 28, "Số lần hẹn": 2, "CL Lặp": 2, "Nhân sự": "TQGTI.CAONB", "TTCL": "Đang XL", "POP": "TQGP001", "Ghi Chú CC": "Khách giục xử lý nhanh", "Cột AN": "ANHHV15", "KH Giục Tiến Độ": "Có" }}
+            {{ "STT": 2, "Block": "Phuong My Lam-001", "Số HĐ": "TQFD10048", "Tên đầy đủ": "DƯƠNG V B", "Tồn giờ": 13, "Số lần hẹn": 3, "CL Lặp": 0, "Nhân sự": "TQGTI.ANHPH3", "TTCL": "Đã PC", "POP": "TQGP013", "Ghi Chú CC": "TQAAB1004 >> TQGTI.ANHPH3", "Cột AN": "HUONGTT33", "KH Giục Tiến Độ": "" }}
         ];
 
         let currentDataset = [];
@@ -423,6 +415,17 @@ html_content = f"""
         let chartTopBlock = null;
         let chartTopPop = null;
         let chartTopTech = null;
+
+        function showToast(message, type = 'info') {{
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            const bgColors = {{ success: 'bg-emerald-600 text-white', error: 'bg-rose-600 text-white', info: 'bg-slate-800 text-white' }};
+            toast.className = `flex items-center space-x-2 px-4 py-3 rounded-xl shadow-lg text-xs font-medium ${{bgColors[type] || bgColors.info}} pointer-events-auto`;
+            toast.innerHTML = `<span>${{message}}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3500);
+        }}
 
         function openPasswordModal(actionType = 'EXCEL') {{
             pendingAction = actionType;
@@ -444,10 +447,122 @@ html_content = f"""
                 closePasswordModal();
                 if (action === 'EXCEL') {{
                     document.getElementById('excelFileInput').click();
+                }} else if (action === 'SYNC') {{
+                    fetchGoogleSheetData();
                 }}
             }} else {{
                 document.getElementById('passwordError').classList.remove('hidden');
             }}
+        }}
+
+        // CHỨC NĂNG CHÍNH: XỬ LÝ MA TRẬN DỮ LIỆU FILE EXCEL HOẶC GOOGLE SHEETS
+        function processRowsMatrix(rowsMatrix) {{
+            if (!rowsMatrix || rowsMatrix.length < 2) {{
+                showToast("Dữ liệu không đủ dòng để xử lý!", "error");
+                return false;
+            }}
+
+            const headers = rowsMatrix[0].map(h => String(h || '').trim());
+            
+            // Tìm vị trí các cột
+            const findCol = (names) => headers.findIndex(h => names.some(n => h.toLowerCase().includes(n.toLowerCase())));
+
+            const idxSoHD = findCol(["Số HĐ", "So HD", "Contract", "Mã HĐ"]);
+            const idxBlock = findCol(["Block", "Đơn vị"]);
+            const idxTech = findCol(["Nhân sự", "Nhan su", "KTV", "Kỹ thuật"]);
+            const idxRepeat = findCol(["CL Lặp", "CLL Lặp", "Lặp", "Checklist Lặp"]);
+            const idxHen = findCol(["Số lần hẹn", "Lần hẹn", "Hen"]);
+            const idxTonGio = findCol(["Tồn giờ", "Ton gio", "Số giờ"]);
+            const idxGiuc = findCol(["KH Giục Tiến Độ", "Giục", "KH Giục"]);
+            const idxNote = findCol(["Ghi Chú CSKH", "Ghi Chú CC", "Ghi chú"]);
+            const idxPOP = findCol(["POP"]);
+            const idxTTCL = findCol(["TTCL", "Trạng thái"]);
+            const idxColAN = findCol(["Cột AN", "Quản lý"]);
+
+            const parsedData = [];
+
+            for (let i = 1; i < rowsMatrix.length; i++) {{
+                const row = rowsMatrix[i];
+                if (!row || row.length === 0) continue;
+
+                const soHD = idxSoHD !== -1 ? String(row[idxSoHD] || '').trim() : '';
+                if (!soHD) continue; // Bỏ qua dòng trống
+
+                const tech = idxTech !== -1 ? String(row[idxTech] || '').trim() : '';
+                const manager = (idxColAN !== -1 && row[idxColAN]) ? String(row[idxColAN]).trim() : (managerMapping[tech] || 'Chưa phân công');
+
+                parsedData.push({{
+                    "STT": parsedData.length + 1,
+                    "Số HĐ": soHD,
+                    "Block": idxBlock !== -1 ? String(row[idxBlock] || '').trim() : 'N/A',
+                    "Nhân sự": tech || 'Unassigned',
+                    "CL Lặp": idxRepeat !== -1 ? (parseInt(row[idxRepeat]) || 0) : 0,
+                    "Số lần hẹn": idxHen !== -1 ? (parseInt(row[idxHen]) || 0) : 0,
+                    "Tồn giờ": idxTonGio !== -1 ? (parseFloat(row[idxTonGio]) || 0) : 0,
+                    "KH Giục Tiến Độ": idxGiuc !== -1 ? String(row[idxGiuc] || '').trim() : '',
+                    "Ghi Chú CC": idxNote !== -1 ? String(row[idxNote] || '').trim() : '',
+                    "POP": idxPOP !== -1 ? String(row[idxPOP] || '').trim() : 'N/A',
+                    "TTCL": idxTTCL !== -1 ? String(row[idxTTCL] || '').trim() : 'Bình thường',
+                    "Cột AN": manager
+                }});
+            }}
+
+            if (parsedData.length === 0) {{
+                showToast("Không đọc được bản ghi hợp lệ nào từ File!", "error");
+                return false;
+            }}
+
+            currentDataset = parsedData;
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentDataset));
+            populateFilterOptions();
+            applyFilters();
+            showToast(`Đã import thành công ${{parsedData.length}} ca tồn!`, "success");
+            return true;
+        }}
+
+        // ĐỌC FILE EXCEL CỦA NGUỜI DÙNG
+        function handleFileUpload(event) {{
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {{
+                try {{
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, {{ type: 'array' }});
+                    const firstSheetName = workbook.SheetNames[0];
+                    const rowsMatrix = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName], {{ header: 1, defval: '' }});
+                    
+                    processRowsMatrix(rowsMatrix);
+                }} catch (err) {{
+                    showToast('Lỗi định dạng file: ' + err.message, 'error');
+                }}
+            }};
+            reader.readAsArrayBuffer(file);
+            event.target.value = ''; // Reset input
+        }}
+
+        // ĐỒNG BỘ GOOGLE SHEETS
+        function fetchGoogleSheetData() {{
+            const icon = document.getElementById('syncIcon');
+            if (icon) icon.classList.add('fa-spin');
+            
+            const url = `https://docs.google.com/spreadsheets/d/${{GOOGLE_SHEET_ID}}/export?format=csv`;
+
+            fetch(url)
+                .then(res => res.text())
+                .then(csvText => {{
+                    const workbook = XLSX.read(csvText, {{ type: 'string' }});
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rowsMatrix = XLSX.utils.sheet_to_json(firstSheet, {{ header: 1, defval: '' }});
+                    processRowsMatrix(rowsMatrix);
+                }})
+                .catch(err => {{
+                    showToast("Lỗi đồng bộ Google Sheets: " + err.message, "error");
+                }})
+                .finally(() => {{
+                    if (icon) icon.classList.remove('fa-spin');
+                }});
         }}
 
         function populateFilterOptions() {{
@@ -578,12 +693,10 @@ html_content = f"""
             `).join('');
         }}
 
-        // HÀM KHÔI PHỤC VẼ 4 BIỂU ĐỒ CHART.JS
         function renderCharts(data) {{
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#cbd5e1' : '#334155';
 
-            // 1. Chart Checklist Lặp
             const hasRepeat = data.filter(d => (d["CL Lặp"] || 0) > 0).length;
             const noRepeat = data.length - hasRepeat;
 
@@ -605,7 +718,6 @@ html_content = f"""
                 }}
             }});
 
-            // Helper nhóm Top 5
             function getTopData(key, limit = 5) {{
                 const counts = {{}};
                 data.forEach(d => {{
@@ -616,41 +728,38 @@ html_content = f"""
                 return {{ labels: sorted.map(s => s[0]), values: sorted.map(s => s[1]) }};
             }}
 
-            // 2. Chart Top Block
             const topBlock = getTopData('Block', 5);
             if (chartTopBlock) chartTopBlock.destroy();
             chartTopBlock = new Chart(document.getElementById('chartTopBlock').getContext('2d'), {{
                 type: 'bar',
-                data: {{
-                    labels: topBlock.labels,
-                    datasets: [{{ label: 'Ca tồn', data: topBlock.values, backgroundColor: '#3b82f6' }}]
-                }},
+                data: {{ labels: topBlock.labels, datasets: [{{ label: 'Ca tồn', data: topBlock.values, backgroundColor: '#3b82f6' }}] }},
                 options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }} }}
             }});
 
-            // 3. Chart Top POP
             const topPop = getTopData('POP', 5);
             if (chartTopPop) chartTopPop.destroy();
             chartTopPop = new Chart(document.getElementById('chartTopPop').getContext('2d'), {{
                 type: 'bar',
-                data: {{
-                    labels: topPop.labels,
-                    datasets: [{{ label: 'Ca tồn', data: topPop.values, backgroundColor: '#10b981' }}]
-                }},
+                data: {{ labels: topPop.labels, datasets: [{{ label: 'Ca tồn', data: topPop.values, backgroundColor: '#10b981' }}] }},
                 options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }} }}
             }});
 
-            // 4. Chart Top KTV
             const topTech = getTopData('Nhân sự', 5);
             if (chartTopTech) chartTopTech.destroy();
             chartTopTech = new Chart(document.getElementById('chartTopTech').getContext('2d'), {{
                 type: 'bar',
-                data: {{
-                    labels: topTech.labels,
-                    datasets: [{{ label: 'Ca tồn', data: topTech.values, backgroundColor: '#8b5cf6' }}]
-                }},
+                data: {{ labels: topTech.labels, datasets: [{{ label: 'Ca tồn', data: topTech.values, backgroundColor: '#8b5cf6' }}] }},
                 options: {{ responsive: true, maintainAspectRatio: false, plugins: {{ legend: {{ display: false }} }} }}
             }});
+        }}
+
+        function exportDataCSV() {{
+            const dataToExport = getFilteredData();
+            if (!dataToExport.length) return;
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Kiểm Soát Ca Tồn");
+            XLSX.writeFile(wb, "Bao_Cao_Kiem_Soat_Ca_Ton.xlsx");
         }}
 
         function toggleDarkMode() {{
@@ -659,11 +768,18 @@ html_content = f"""
         }}
 
         window.onload = function() {{
-            // Luôn đặt chế độ sáng làm mặc định
             document.documentElement.classList.remove('dark');
+
+            let savedData = null;
+            try {{
+                const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
+                if (stored) savedData = JSON.parse(stored);
+            }} catch (e) {{}}
 
             if (SERVER_SAVED_DATASET && SERVER_SAVED_DATASET.length > 0) {{
                 currentDataset = SERVER_SAVED_DATASET;
+            }} else if (savedData && savedData.length > 0) {{
+                currentDataset = savedData;
             }} else {{
                 currentDataset = [...sampleExcelData];
             }}
