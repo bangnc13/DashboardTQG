@@ -234,9 +234,9 @@ html_content = """
             </div>
         </div>
 
-        <!-- KPI Cards Area -->
+        <!-- KPI Cards Area - ĐÃ TÍCH HỢP CLICK MỞ BẢNG & LỌC -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+            <div onclick="filterFromCard('ALL')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition">
                 <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Ca Tồn</div>
                 <div class="mt-2 flex items-baseline justify-between">
                     <span id="kpiTotal" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
@@ -246,7 +246,7 @@ html_content = """
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+            <div onclick="filterFromCard('URGENT')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition">
                 <div class="text-xs font-medium text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center justify-between">
                     <span>KH Giục Tiến Độ</span>
                     <i class="fa-solid fa-bullhorn"></i>
@@ -259,7 +259,7 @@ html_content = """
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+            <div onclick="filterFromCard('REPEAT')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition">
                 <div class="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center justify-between">
                     <span>CLL Đang Tồn</span>
                     <i class="fa-solid fa-rotate-right"></i>
@@ -272,7 +272,7 @@ html_content = """
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+            <div onclick="filterFromCard('OVERDUE')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition">
                 <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
                     <span>Tồn Giờ ≥ 24H</span>
                     <i class="fa-solid fa-clock"></i>
@@ -285,7 +285,7 @@ html_content = """
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
             </div>
 
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+            <div onclick="filterFromCard('PROCESSING')" class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md transition">
                 <div class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center justify-between">
                     <span>Đang Xử Lý</span>
                     <i class="fa-solid fa-gears"></i>
@@ -361,7 +361,7 @@ html_content = """
             </div>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-paleOlive-300 dark:border-paleOlive-700 shadow-sm overflow-hidden">
+        <div id="tableSection" class="bg-white dark:bg-slate-800 rounded-xl border border-paleOlive-300 dark:border-paleOlive-700 shadow-sm overflow-hidden">
             <div class="p-5 border-b border-paleOlive-200 dark:border-paleOlive-800 space-y-4 bg-paleOlive-50/60 dark:bg-paleOlive-950/20">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
@@ -469,10 +469,11 @@ html_content = """
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
         
-        // BẢN BIẾN PHÂN TRANG
+        // BẢN BIẾN PHÂN TRANG & THẺ LỌC KPI
         const PAGE_SIZE = 10;
         let currentPage = 1;
         let pendingAction = null; // Lưu loại thao tác cần xác thực (EXCEL)
+        let activeCardFilter = 'ALL'; // Biến theo dõi lọc theo thẻ KPI
 
         // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
@@ -519,6 +520,27 @@ html_content = """
         let chartTopBlock = null;
         let chartTopPop = null;
         let chartTopTech = null;
+
+        // XỬ LÝ SỰ KIỆN CLICK VÀO CÁC THẺ KPI
+        function filterFromCard(type) {
+            activeCardFilter = type;
+            
+            // Tự động đồng bộ các ô dropdown filter nếu cần
+            if (type === 'URGENT') {
+                document.getElementById('filterUrgent').value = 'YES';
+            } else if (type === 'REPEAT') {
+                document.getElementById('chkNonZero').checked = true;
+            }
+
+            // Áp dụng bộ lọc
+            applyFilters();
+
+            // Tự động cuộn trang mượt xuống Bảng dữ liệu
+            const tableEl = document.getElementById('tableSection');
+            if (tableEl) {
+                tableEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
 
         // BẢO MẬT: Mở Modal Password
         function openPasswordModal(actionType = 'EXCEL') {
@@ -695,6 +717,7 @@ html_content = """
         }
 
         function resetFilters() {
+            activeCardFilter = 'ALL'; // Reset lọc thẻ KPI
             document.getElementById('filterColAN').value = '';
             document.getElementById('searchInput').value = '';
             document.getElementById('filterTech').value = '';
@@ -719,6 +742,19 @@ html_content = """
             const chkNonZero = document.getElementById('chkNonZero')?.checked || false;
 
             return currentDataset.filter(item => {
+                // --- LỌC THEO CÁC THẺ KPI ĐƯỢC CLICK ---
+                if (activeCardFilter === 'URGENT') {
+                    const hasUrgent = Boolean(item["KH Giục Tiến Độ"] && item["KH Giục Tiến Độ"].toString().trim() !== '');
+                    if (!hasUrgent) return false;
+                } else if (activeCardFilter === 'REPEAT') {
+                    if ((item["CL Lặp"] || 0) <= 0) return false;
+                } else if (activeCardFilter === 'OVERDUE') {
+                    if ((item["Tồn giờ"] || 0) < 24) return false;
+                } else if (activeCardFilter === 'PROCESSING') {
+                    if (item["TTCL"] !== 'Đang XL') return false;
+                }
+
+                // Các bộ lọc bổ sung khác
                 if (managerFilter && item["Cột AN"] !== managerFilter) return false;
                 if (techFilter && item["Nhân sự"] !== techFilter) return false;
                 if (blockFilter && item["Block"] !== blockFilter) return false;
