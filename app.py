@@ -236,7 +236,7 @@ html_content = """
 
         <!-- KPI Cards Area -->
         <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-            <!-- Thẻ KPI Lượt Truy Cập Đồng Bộ Toàn Cầu -->
+            <!-- Thẻ KPI Lượt Truy Cập Đồng Bộ Trực Tiếp Từ Google Sheets -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wider flex items-center justify-between">
                     <span>Lượt Truy Cập</span>
@@ -244,7 +244,7 @@ html_content = """
                 </div>
                 <div class="mt-2 flex items-baseline justify-between">
                     <span id="kpiVisits" class="text-2xl font-bold text-teal-600 dark:text-teal-400">...</span>
-                    <span class="text-xs text-teal-700 bg-teal-50 dark:bg-teal-900/30 dark:text-teal-300 px-2 py-0.5 rounded-full">Toàn mạng</span>
+                    <span class="text-xs text-teal-700 bg-teal-50 dark:bg-teal-900/30 dark:text-teal-300 px-2 py-0.5 rounded-full">Google Sheet</span>
                 </div>
                 <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng lượt xem chung</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-teal-500"></div>
@@ -484,6 +484,9 @@ html_content = """
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
         const VISITS_STORAGE_KEY = "TQG_DASHBOARD_VISIT_COUNT"; // Key lưu dự phòng số lượt truy cập
         
+        // Đường dẫn Google Apps Script Web App của bạn
+        const COUNTER_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx7HkLmHZNhir9x-XXE4KCHq2TvkXtt31mJyg6ZUWDkEAORwhP4dAJcok3y9U8stOB-fw/exec";
+
         // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
         let currentPage = 1;
@@ -535,25 +538,29 @@ html_content = """
         let chartTopPop = null;
         let chartTopTech = null;
 
-        // XỬ LÝ ĐẾM SỐ LƯỢT TRUY CẬP ĐỒNG BỘ TOÀN HỆ THỐNG (CÁCH 1)
+        // XỬ LÝ ĐẾM SỐ LƯỢT TRUY CẬP TRỰC TIẾP QUA GOOGLE APPS SCRIPT WEB APP (CÁCH 2)
         async function updateVisitCounter() {
             const visitsEl = document.getElementById('kpiVisits');
-            
+            if (!visitsEl) return;
+
             try {
-                // Gọi API đếm lượt truy cập toàn cầu (CountAPI)
-                const response = await fetch('https://api.counterapi.dev/v1/tqg-dashboard-bangnc13-v2/visits/up');
+                // Gọi API Google Apps Script Web App
+                const response = await fetch(COUNTER_WEB_APP_URL);
                 const data = await response.json();
-                
+
                 if (data && data.count) {
-                    if (visitsEl) visitsEl.textContent = Number(data.count).toLocaleString('vi-VN');
+                    const countVal = data.count;
+                    visitsEl.textContent = Number(countVal).toLocaleString('vi-VN');
+                    localStorage.setItem(VISITS_STORAGE_KEY, countVal.toString());
+                    return;
                 }
             } catch (error) {
-                console.error("Lỗi kết nối Counter API, chuyển sang dùng LocalStorage:", error);
-                // Dự phòng nếu không có mạng/lỗi API thì đọc tạm từ localStorage
-                let visits = parseInt(localStorage.getItem(VISITS_STORAGE_KEY) || "0", 10) + 1;
-                localStorage.setItem(VISITS_STORAGE_KEY, visits.toString());
-                if (visitsEl) visitsEl.textContent = visits.toLocaleString('vi-VN');
+                console.warn("Lỗi kết nối Apps Script đếm lượt xem:", error);
             }
+
+            // Dự phòng nếu không kết nối được Apps Script
+            let visits = parseInt(localStorage.getItem(VISITS_STORAGE_KEY) || "1", 10);
+            visitsEl.textContent = visits.toLocaleString('vi-VN');
         }
 
         // BẢO MẬT: Mở Modal Password
@@ -1252,13 +1259,13 @@ html_content = """
 
         // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
         window.onload = function() {
-            // Đếm lượt truy cập toàn cầu ngay khi mở trang
+            // Đếm lượt truy cập qua Google Apps Script ngay khi mở trang
             updateVisitCounter();
 
             // Tải dữ liệu Google Sheets ngay lập tức lần đầu
             fetchGoogleSheetData(true);
 
-            // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
+            // Thiết lập chạy định kỳ ngầm tự động cập nhật dữ liệu mỗi 30 giây (30000 ms)
             setInterval(function() {
                 fetchGoogleSheetData(false);
             }, 30000);
