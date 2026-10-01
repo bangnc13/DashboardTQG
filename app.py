@@ -235,21 +235,7 @@ html_content = """
         </div>
 
         <!-- KPI Cards Area -->
-        <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
-            <!-- Thẻ KPI Lượt Truy Cập Đồng Bộ Trực Tiếp Từ Google Sheets -->
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div class="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Lượt Truy Cập</span>
-                    <i class="fa-solid fa-eye"></i>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span id="kpiVisits" class="text-2xl font-bold text-teal-600 dark:text-teal-400">...</span>
-                    <span class="text-xs text-teal-700 bg-teal-50 dark:bg-teal-900/30 dark:text-teal-300 px-2 py-0.5 rounded-full">Google Sheet</span>
-                </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng lượt xem chung</div>
-                <div class="absolute bottom-0 left-0 right-0 h-1 bg-teal-500"></div>
-            </div>
-
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Ca Tồn</div>
                 <div class="mt-2 flex items-baseline justify-between">
@@ -482,11 +468,7 @@ html_content = """
     <script>
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
-        const VISITS_STORAGE_KEY = "TQG_DASHBOARD_VISIT_COUNT"; // Key lưu dự phòng số lượt truy cập
         
-        // Đường dẫn Google Apps Script Web App của bạn
-        const COUNTER_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbx7HkLmHZNhir9x-XXE4KCHq2TvkXtt31mJyg6ZUWDkEAORwhP4dAJcok3y9U8stOB-fw/exec";
-
         // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
         let currentPage = 1;
@@ -537,31 +519,6 @@ html_content = """
         let chartTopBlock = null;
         let chartTopPop = null;
         let chartTopTech = null;
-
-        // XỬ LÝ ĐẾM SỐ LƯỢT TRUY CẬP TRỰC TIẾP QUA GOOGLE APPS SCRIPT WEB APP (CÁCH 2)
-        async function updateVisitCounter() {
-            const visitsEl = document.getElementById('kpiVisits');
-            if (!visitsEl) return;
-
-            try {
-                // Gọi API Google Apps Script Web App
-                const response = await fetch(COUNTER_WEB_APP_URL);
-                const data = await response.json();
-
-                if (data && data.count) {
-                    const countVal = data.count;
-                    visitsEl.textContent = Number(countVal).toLocaleString('vi-VN');
-                    localStorage.setItem(VISITS_STORAGE_KEY, countVal.toString());
-                    return;
-                }
-            } catch (error) {
-                console.warn("Lỗi kết nối Apps Script đếm lượt xem:", error);
-            }
-
-            // Dự phòng nếu không kết nối được Apps Script
-            let visits = parseInt(localStorage.getItem(VISITS_STORAGE_KEY) || "1", 10);
-            visitsEl.textContent = visits.toLocaleString('vi-VN');
-        }
 
         // BẢO MẬT: Mở Modal Password
         function openPasswordModal(actionType = 'EXCEL') {
@@ -1259,13 +1216,10 @@ html_content = """
 
         // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
         window.onload = function() {
-            // Đếm lượt truy cập qua Google Apps Script ngay khi mở trang
-            updateVisitCounter();
-
-            // Tải dữ liệu Google Sheets ngay lập tức lần đầu
+            // Tải dữ liệu ngay lập tức lần đầu
             fetchGoogleSheetData(true);
 
-            // Thiết lập chạy định kỳ ngầm tự động cập nhật dữ liệu mỗi 30 giây (30000 ms)
+            // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
             setInterval(function() {
                 fetchGoogleSheetData(false);
             }, 30000);
