@@ -235,7 +235,21 @@ html_content = """
         </div>
 
         <!-- KPI Cards Area -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+            <!-- Thẻ KPI Lượt Truy Cập -->
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
+                <div class="text-xs font-medium text-teal-600 dark:text-teal-400 uppercase tracking-wider flex items-center justify-between">
+                    <span>Lượt Truy Cập</span>
+                    <i class="fa-solid fa-eye"></i>
+                </div>
+                <div class="mt-2 flex items-baseline justify-between">
+                    <span id="kpiVisits" class="text-2xl font-bold text-teal-600 dark:text-teal-400">0</span>
+                    <span class="text-xs text-teal-700 bg-teal-50 dark:bg-teal-900/30 dark:text-teal-300 px-2 py-0.5 rounded-full">Tổng lượt</span>
+                </div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Số lượt mở Dashboard</div>
+                <div class="absolute bottom-0 left-0 right-0 h-1 bg-teal-500"></div>
+            </div>
+
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Ca Tồn</div>
                 <div class="mt-2 flex items-baseline justify-between">
@@ -468,6 +482,7 @@ html_content = """
     <script>
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
+        const VISITS_STORAGE_KEY = "TQG_DASHBOARD_VISIT_COUNT"; // Key lưu số lượt truy cập
         
         // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
@@ -519,6 +534,18 @@ html_content = """
         let chartTopBlock = null;
         let chartTopPop = null;
         let chartTopTech = null;
+
+        // XỬ LÝ ĐẾM SỐ LƯỢT TRUY CẬP
+        function updateVisitCounter() {
+            let visits = parseInt(localStorage.getItem(VISITS_STORAGE_KEY) || "0", 10);
+            visits += 1;
+            localStorage.setItem(VISITS_STORAGE_KEY, visits.toString());
+            
+            const visitsEl = document.getElementById('kpiVisits');
+            if (visitsEl) {
+                visitsEl.textContent = visits.toLocaleString('vi-VN');
+            }
+        }
 
         // BẢO MẬT: Mở Modal Password
         function openPasswordModal(actionType = 'EXCEL') {
@@ -1216,6 +1243,9 @@ html_content = """
 
         // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
         window.onload = function() {
+            // Tăng số lượt truy cập và cập nhật KPI lượt xem
+            updateVisitCounter();
+
             // Tải dữ liệu ngay lập tức lần đầu
             fetchGoogleSheetData(true);
 
