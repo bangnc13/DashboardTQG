@@ -387,7 +387,7 @@ html_content = """
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
                     <div class="relative sm:col-span-2 lg:col-span-1">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, KH, Ghi chú..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
+                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, KH..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
                     </div>
 
                     <div>
@@ -433,8 +433,7 @@ html_content = """
                             <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Nhân Sự</th>
                             <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Quản Lý</th>
                             <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">KH Giục Tiến Độ</th>
-                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Tồn Giờ</th>
-                            <th class="py-3 px-3 min-w-[250px]">Ghi Chú CSKH</th>
+                            <th class="py-3 px-3 text-center w-24">Tồn Giờ</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 dark:divide-paleOlive-800/40 bg-paleOlive-50/30 dark:bg-paleOlive-950/20">
@@ -558,9 +557,14 @@ html_content = """
             }
         }
 
-        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss)
-        function calculateTonGioFromColumnH(dateStr) {
+        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss) Hoặc lấy giá trị số trực tiếp
+        function calculateTonGioFromColumnI(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
+
+            // Nếu giá trị đã là số giờ cụ thể
+            if (typeof dateStr === 'number' && dateStr < 10000) {
+                return Math.max(0, Math.floor(dateStr));
+            }
 
             let parsedDate = null;
 
@@ -572,6 +576,10 @@ html_content = """
             else {
                 const str = String(dateStr).trim();
                 if (!str) return 0;
+
+                if (!isNaN(str) && Number(str) < 10000) {
+                    return Math.max(0, Math.floor(Number(str)));
+                }
 
                 // Tách ngày giờ bằng khoảng trắng hoặc 'T'
                 const parts = str.split(/[ T]+/);
@@ -732,9 +740,8 @@ html_content = """
                 if (searchFilter) {
                     const matchSoHD = item["Số HĐ"]?.toLowerCase().includes(searchFilter);
                     const matchName = item["Tên đầy đủ"]?.toLowerCase().includes(searchFilter);
-                    const matchNote = item["Ghi Chú CC"]?.toLowerCase().includes(searchFilter);
                     const matchUrgent = item["KH Giục Tiến Độ"]?.toLowerCase().includes(searchFilter);
-                    if (!matchSoHD && !matchName && !matchNote && !matchUrgent) return false;
+                    if (!matchSoHD && !matchName && !matchUrgent) return false;
                 }
 
                 return true;
@@ -795,7 +802,7 @@ html_content = """
             if (!tbody) return;
 
             if (total === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>`;
                 return;
             }
 
@@ -827,7 +834,6 @@ html_content = """
                         <td class="py-2.5 px-3 font-medium text-paleOlive-900 dark:text-paleOlive-200 col-highlight">${item["Cột AN"] || '-'}</td>
                         <td class="py-2.5 px-3 font-medium text-rose-600 dark:text-rose-400">${urgentBadge}</td>
                         <td class="py-2.5 px-3 text-center ${tonGioClass}">${item["Tồn giờ"] ?? 0}h</td>
-                        <td class="py-2.5 px-3 text-slate-600 dark:text-slate-400 whitespace-normal break-words min-w-[250px] leading-relaxed">${item["Ghi Chú CC"] || '-'}</td>
                     </tr>
                 `;
             }).join('');
@@ -1094,7 +1100,7 @@ html_content = """
             const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
-            const colH_TimeIdx = 7; 
+            const colITimeIdx = 8; // Lấy dữ liệu Cột I (Chỉ số mảng bắt đầu từ 0 -> Cột I là 8)
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
@@ -1103,7 +1109,6 @@ html_content = """
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
             const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
             const colTtclIdx = getColIndex(['TTCL', 'Trạng Thái', 'Trạng thái'], 19);
-            const colNoteIdx = getColIndex(['Ghi Chú CC', 'Ghi Chú', 'Ghi chú'], 20);
 
             const parsedRecords = [];
             for (let r = headerRowIdx + 1; r < rowsMatrix.length; r++) {
@@ -1121,15 +1126,15 @@ html_content = """
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                const rawTimeColH = row[colH_TimeIdx];
-                const calculatedTonGio = calculateTonGioFromColumnH(rawTimeColH);
+                const rawTimeColI = row[colITimeIdx];
+                const calculatedTonGio = calculateTonGioFromColumnI(rawTimeColI);
 
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
-                    "Thời gian tạo": rawTimeColH || '',
+                    "Thời gian tạo": rawTimeColI || '',
                     "Tồn giờ": calculatedTonGio,
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
@@ -1138,8 +1143,7 @@ html_content = """
                     "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
                     "POP": popValue,
                     "Kiểm soát": String(row[colControlIdx] || '').trim(),
-                    "Cột AN": quanLyName,
-                    "Ghi Chú CC": String(row[colNoteIdx] || '').trim()
+                    "Cột AN": quanLyName
                 });
             }
 
