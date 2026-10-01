@@ -172,11 +172,17 @@ html_content = """
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <!-- NÚT ĐỒNG BỘ MỚI TẢI TRỰC TIẾP KHÔNG CẦN PASSWORD -->
-                    <button id="syncBtn" onclick="fetchGoogleSheetData(true)" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
-                        <i id="syncIcon" class="fa-solid fa-arrows-rotate mr-2 text-sm"></i>
-                        <span>Đồng bộ </span>
-                    </button>
+                    <!-- NÚT ĐỒNG BỘ CÓ BÁO TRẠNG THÁI REALTIME PING -->
+                    <div class="flex items-center space-x-2">
+                        <span class="flex h-2.5 w-2.5 relative" title="Chế độ tự động đồng bộ Realtime đang bật">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                        </span>
+                        <button id="syncBtn" onclick="fetchGoogleSheetData(true)" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 transition shadow-sm">
+                            <i id="syncIcon" class="fa-solid fa-arrows-rotate mr-2 text-sm"></i>
+                            <span>Đồng bộ</span>
+                        </button>
+                    </div>
 
                     <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
                     <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
@@ -997,7 +1003,8 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv`;
+            // Thêm tham số chống lưu cache `&_nc=` bằng timestamp hiện tại
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&_nc=${Date.now()}`;
             const syncIcon = document.getElementById('syncIcon');
             
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -1180,9 +1187,15 @@ html_content = """
             applyFilters();
         }
 
-        // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS KHI TRANG MỞ LINK
+        // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
         window.onload = function() {
+            // Tải dữ liệu ngay lập tức lần đầu
             fetchGoogleSheetData(true);
+
+            // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
+            setInterval(function() {
+                fetchGoogleSheetData(false); // Đặt là false để không hiện thông báo toast rác màn hình
+            }, 30000);
         };
     </script>
 </body>
