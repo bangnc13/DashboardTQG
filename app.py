@@ -501,7 +501,7 @@ html_content = """
             "TQGTI.NAMVD2": "TRANGDTH35",
             "TQGTI.THANHNV8": "TRANGDTH35",
             "TQGTI.TUANQD": "TRANGDTH35",
-            "TQGTI.CUONGDD9": "TRANGDTH35",
+            "TQGTI.CUORGDD9": "TRANGDTH35",
             "TQGTI.DANGNV": "TRANGHT28",
             "TQGTI.BINHTH1": "TRANGHT28",
             "TQGTI.TRUNGNX3": "TRANGHT28",
@@ -558,42 +558,66 @@ html_content = """
             }
         }
 
-        // CÔNG THỨC TÍNH TỒN GIỜ TỰ ĐỘNG = (Thời gian hiện tại - Thời gian Cột H)
+        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss)
         function calculateTonGioFromColumnH(dateStr) {
-            if (!dateStr) return 0;
+            if (!dateStr && dateStr !== 0) return 0;
 
             let parsedDate = null;
 
+            // Case 1: Excel Serial Number (dạng số thực như 45200.5)
             if (typeof dateStr === 'number') {
                 parsedDate = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
-            } else {
+            } 
+            // Case 2: Dạng chuỗi String
+            else {
                 const str = String(dateStr).trim();
                 if (!str) return 0;
 
-                parsedDate = new Date(str.replace(/-/g, '/'));
+                // Tách ngày giờ bằng khoảng trắng hoặc 'T'
+                const parts = str.split(/[ T]+/);
+                const datePart = parts[0]; // DD/MM/YYYY hoặc YYYY-MM-DD
+                const timePart = parts[1] || "00:00:00";
 
-                if (isNaN(parsedDate.getTime())) {
-                    const parts = str.split(' ');
-                    const dateParts = parts[0] ? parts[0].split('/') : [];
-                    if (dateParts.length === 3) {
-                        const day = parseInt(dateParts[0], 10);
-                        const month = parseInt(dateParts[1], 10) - 1;
-                        const year = parseInt(dateParts[2], 10);
+                // Trường hợp định dạng DD/MM/YYYY hoặc DD-MM-YYYY (Chuẩn Việt Nam)
+                if (datePart.includes('/') || datePart.includes('-')) {
+                    const separator = datePart.includes('/') ? '/' : '-';
+                    const dateComponents = datePart.split(separator);
 
-                        let hour = 0, min = 0, sec = 0;
-                        if (parts[1]) {
-                            const timeParts = parts[1].split(':');
-                            hour = parseInt(timeParts[0], 10) || 0;
-                            min = parseInt(timeParts[1], 10) || 0;
-                            sec = parseInt(timeParts[2], 10) || 0;
+                    if (dateComponents.length === 3) {
+                        let day, month, year;
+
+                        // Nếu phần đầu tiên là Năm (YYYY/MM/DD)
+                        if (dateComponents[0].length === 4) {
+                            year = parseInt(dateComponents[0], 10);
+                            month = parseInt(dateComponents[1], 10) - 1;
+                            day = parseInt(dateComponents[2], 10);
+                        } 
+                        // Chuẩn Việt Nam (DD/MM/YYYY)
+                        else {
+                            day = parseInt(dateComponents[0], 10);
+                            month = parseInt(dateComponents[1], 10) - 1; // Tháng trong JS từ 0-11
+                            year = parseInt(dateComponents[2], 10);
                         }
+
+                        // Tách Giờ : Phút : Giây
+                        const timeComponents = timePart.split(':');
+                        const hour = parseInt(timeComponents[0], 10) || 0;
+                        const min = parseInt(timeComponents[1], 10) || 0;
+                        const sec = parseInt(timeComponents[2], 10) || 0;
+
                         parsedDate = new Date(year, month, day, hour, min, sec);
                     }
+                }
+
+                // Dự phòng cho các định dạng khác
+                if (!parsedDate || isNaN(parsedDate.getTime())) {
+                    parsedDate = new Date(str);
                 }
             }
 
             if (!parsedDate || isNaN(parsedDate.getTime())) return 0;
 
+            // Tính chênh lệch giờ so với hiện tại
             const now = new Date();
             const diffMs = now - parsedDate;
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -1003,7 +1027,6 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            // Thêm tham số chống lưu cache `&_nc=` bằng timestamp hiện tại
             const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&_nc=${Date.now()}`;
             const syncIcon = document.getElementById('syncIcon');
             
@@ -1194,7 +1217,7 @@ html_content = """
 
             // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
             setInterval(function() {
-                fetchGoogleSheetData(false); // Đặt là false để không hiện thông báo toast rác màn hình
+                fetchGoogleSheetData(false);
             }, 30000);
         };
     </script>
