@@ -32,7 +32,7 @@ ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSA
 ZALO_GROUP_ID = "zgr-9207abe0d78f3ed1679e"
 
 # Cấu hình Telegram Bot (Bạn hãy thay token bot Telegram của bạn vào đây)
-TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"  
+TELEGRAM_BOT_TOKEN = "8800368290:AAFwOejPNccmO5HyXy5FVMH5symEgkqPNak"  
 TELEGRAM_GROUP_ID = "-1004469807641"
 
 def send_zalo_group_message(message):
