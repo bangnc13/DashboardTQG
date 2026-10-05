@@ -27,22 +27,22 @@ st.markdown('''
     </style>
 ''', unsafe_allow_html=True)
 
-# Lấy Group ID và Token Zalo Bot
+# Lấy Token và User ID từ Webhook (d71241c2588cb1d2e89d)[cite: 6]
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
-ZALO_GROUP_ID = "d71241c2588cb1d2e89d"
+ZALO_USER_ID = "d71241c2588cb1d2e89d"
 
 def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
+    """Hàm gửi tin nhắn qua Zalo Bot Platform API sử dụng user_id"""
     url = "https://bot.zaloplatforms.com/api/v1/message"
     headers = {
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
         "Content-Type": "application/json"
     }
     
-    # Cấu trúc payload chuẩn cho tin nhắn nhóm qua Zalo Bot
+    # Cấu trúc payload sử dụng user_id thay cho group_id/chat_id
     payload = {
         "recipient": {
-            "chat_id": ZALO_GROUP_ID
+            "user_id": ZALO_USER_ID
         },
         "message": {
             "text": message
@@ -52,7 +52,6 @@ def send_zalo_group_message(message):
     try:
         response = requests.post(url, json=payload, headers=headers)
         
-        # Kiểm tra phản hồi thô từ server
         if not response.text or not response.text.strip():
             return False, f"API trả về phản hồi rỗng (HTTP Status Code: {response.status_code})"
         
@@ -74,9 +73,9 @@ with st.container():
         <div style="background: linear-gradient(to right, #eff6ff, #dbeafe); padding: 12px 20px; border-bottom: 2px solid #3b82f6; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <i class="fa-brands fa-diaspora" style="color: #2563eb; font-size: 20px;"></i>
-                <span style="font-weight: bold; color: #1e3a8a; font-size: 14px;">BẢNG ĐIỀU KHIỂN GỬI BÁO CÁO NHÓM ZALO BOT</span>
+                <span style="font-weight: bold; color: #1e3a8a; font-size: 14px;">BẢNG ĐIỀU KHIỂN GỬI BÁO CÁO ZALO BOT (USER_ID)</span>
             </div>
-            <span style="font-size: 12px; color: #64748b;">(Tích hợp bắt lỗi chi tiết HTTP 500)</span>
+            <span style="font-size: 12px; color: #64748b;">(Đã chuyển đổi sang phương thức gửi theo user_id)</span>
         </div>
     """, unsafe_allow_html=True)
     
@@ -93,7 +92,7 @@ with st.container():
                 with st.spinner("Đang kết nối Zalo Bot API..."):
                     success, res = send_zalo_group_message(zalo_msg_input)
                     if success:
-                        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
+                        st.success("✅ Đã gửi báo cáo thành công qua Zalo!")
                     else:
                         st.error(f"❌ Lỗi gửi tin nhắn: {res}")
 
@@ -357,7 +356,7 @@ html_content = '''<!DOCTYPE html>
                 closePasswordModal();
                 if (pendingAction === 'EXCEL') document.getElementById('excelFileInput').click();
             } else {
-                document.getElementById('passwordError').classList.remove('hidden');
+                document.getElementById('passwordError').classList.add('hidden');
             }
         }
 
