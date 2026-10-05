@@ -29,7 +29,7 @@ st.markdown('''
 
 # Lấy Group ID và Token
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
-ZALO_GROUP_ID = "zgr-9207abe0d78f3ed1679e"
+ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
 
 def send_zalo_group_message(message):
     """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
@@ -38,7 +38,6 @@ def send_zalo_group_message(message):
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
         "Content-Type": "application/json"
     }
-    # Cấu trúc payload chuẩn cho Zalo Bot Platform
     payload = {
         "recipient": {
             "group_id": ZALO_GROUP_ID
@@ -58,19 +57,19 @@ def send_zalo_group_message(message):
     except Exception as e:
         return False, str(e)
 
-# Khu vực điều khiển Zalo trực tiếp qua Streamlit Sidebar (Đảm bảo 100% không bị lỗi sandbox iframe)
+# Bảng điều khiển Zalo trực tiếp qua Streamlit Sidebar (Đảm bảo hoạt động ổn định, không bị chặn iframe)
 with st.sidebar:
-    st.markdown("### 💬 Gửi Báo Cáo Zalo Bot")
-    st.markdown("Sử dụng bảng điều khiển này nếu nút trong Dashboard gặp hạn chế bảo mật trình duyệt.")
+    st.markdown("### 💬 Điều Khiển Zalo Bot")
+    st.markdown("Nhập nội dung và bấm gửi trực tiếp để đẩy báo cáo vào nhóm Zalo.")
     
     default_sidebar_msg = (
         "📊 Báo cáo Kiểm soát Ca tồn (CLL):\n"
         "- Đơn vị: TQG\n"
-        "- Trạng thái: Đang theo dõi ca tồn\n\n"
+        "- Trạng thái: Đang theo dõi ca tồn hệ thống\n\n"
         "Truy cập Dashboard để xem chi tiết biểu đồ!"
     )
     
-    zalo_msg_input = st.text_area("Nội dung tin nhắn:", value=default_sidebar_msg, height=140)
+    zalo_msg_input = st.text_area("Nội dung tin nhắn Zalo:", value=default_sidebar_msg, height=150)
     
     if st.button("🚀 Gửi ngay vào Nhóm Zalo", type="primary", use_container_width=True):
         with st.spinner("Đang gửi tin nhắn qua Zalo Bot API..."):
@@ -79,19 +78,6 @@ with st.sidebar:
                 st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
             else:
                 st.error(f"❌ Lỗi gửi tin nhắn: {res}")
-
-# Xử lý sự kiện gửi Zalo (nếu có param trong URL từ HTML Backend)
-query_params = st.query_params
-if "action" in query_params and query_params["action"] == "send_zalo":
-    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)")
-    success, res = send_zalo_group_message(msg_content)
-    
-    if success:
-        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
-    else:
-        st.error(f"❌ Lỗi gửi tin nhắn: {res}")
-        
-    st.query_params.clear()
 
 html_content = '''<!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
@@ -116,13 +102,10 @@ html_content = '''<!DOCTYPE html>
             theme: {
                 extend: {
                     colors: {
-                        brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' },
                         paleOlive: {
                             50: '#f7f9f2', 100: '#e9efdc', 200: '#d4e1bd', 300: '#b7ce96', 400: '#94b36c',
                             500: '#759948', 600: '#5c7b35', 700: '#465e28', 800: '#3a4e23', 900: '#30411d', 950: '#1c2810'
-                        },
-                        amberYellow: '#fef08a',
-                        amberBorder: '#eab308'
+                        }
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -133,7 +116,6 @@ html_content = '''<!DOCTYPE html>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .col-highlight { background-color: #f7f9f2 !important; border-left: 1px solid #d4e1bd; border-right: 1px solid #d4e1bd; }
         .dark .col-highlight { background-color: rgba(117, 153, 72, 0.12) !important; border-left: 1px solid rgba(117, 153, 72, 0.3); border-right: 1px solid rgba(117, 153, 72, 0.3); }
         @keyframes slideIn { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
@@ -146,50 +128,22 @@ html_content = '''<!DOCTYPE html>
 
     <!-- MODAL NHẬP PASSWORD BẢO MẬT -->
     <div id="passwordModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-sm mx-4 transform transition-all">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-sm mx-4">
             <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center font-bold">
                     <i class="fa-solid fa-lock text-lg"></i>
                 </div>
                 <div>
                     <h3 id="modalTitle" class="text-base font-bold text-slate-900 dark:text-white">Xác thực quyền thao tác</h3>
-                    <p id="modalDesc" class="text-xs text-slate-500 dark:text-slate-400">Vui lòng nhập mật khẩu để tiếp tục</p>
+                    <p id="modalDesc" class="text-xs text-slate-500">Vui lòng nhập mật khẩu để tiếp tục</p>
                 </div>
             </div>
             <div class="space-y-4">
-                <div>
-                    <input type="password" id="importPasswordInput" placeholder="Nhập mật khẩu..." onkeyup="if(event.key==='Enter') verifyPassword()" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 dark:text-white">
-                    <p id="passwordError" class="text-xs text-rose-500 mt-1 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i>Mật khẩu không đúng!</p>
-                </div>
+                <input type="password" id="importPasswordInput" placeholder="Nhập mật khẩu..." onkeyup="if(event.key==='Enter') verifyPassword()" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border rounded-lg focus:outline-none dark:text-white">
+                <p id="passwordError" class="text-xs text-rose-500 mt-1 hidden"><i class="fa-solid fa-circle-exclamation mr-1"></i>Mật khẩu không đúng!</p>
                 <div class="flex items-center justify-end space-x-2">
-                    <button onclick="closePasswordModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition">Hủy</button>
-                    <button onclick="verifyPassword()" class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition shadow-sm">Xác nhận</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL CONFIRM ZALO -->
-    <div id="zaloModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-md mx-4 transform transition-all">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-paper-plane text-lg"></i>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Gửi báo cáo qua Zalo</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Bot Thư Ký TQG sẽ gửi nội dung này vào nhóm</p>
-                </div>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <textarea id="zaloMessageContent" rows="7" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"></textarea>
-                </div>
-                <div class="flex items-center justify-end space-x-2">
-                    <button onclick="closeZaloModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition">Hủy</button>
-                    <button onclick="triggerSendZalo()" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">
-                        <i class="fa-brands fa-diaspora mr-1"></i> Gửi ngay
-                    </button>
+                    <button onclick="closePasswordModal()" class="px-4 py-2 text-xs font-medium text-slate-600">Hủy</button>
+                    <button onclick="verifyPassword()" class="px-4 py-2 text-xs font-semibold text-white bg-emerald-600 rounded-lg">Xác nhận</button>
                 </div>
             </div>
         </div>
@@ -203,26 +157,14 @@ html_content = '''<!DOCTYPE html>
                         <i class="fa-solid fa-list-check text-xl"></i>
                     </div>
                     <div>
-                        <div class="flex items-center space-x-2">
-                            <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</h1>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-paleOlive-100 text-paleOlive-900 border border-paleOlive-300 dark:bg-paleOlive-900/40 dark:text-paleOlive-200">
-                                Báo Cáo Kiểm Soát
-                            </span>
-                        </div>
+                        <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</h1>
                         <p class="text-xs text-slate-500 dark:text-slate-400">Make by BangNC13</p>
                     </div>
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <button onclick="openZaloModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition shadow-sm" title="Gửi thông báo vào Group Zalo">
-                        <i class="fa-solid fa-paper-plane mr-2 text-sm"></i>
-                        <span>Gửi Zalo</span>
-                    </button>
-                    
-                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
-
                     <div class="flex items-center space-x-2">
-                        <span class="flex h-2.5 w-2.5 relative" title="Chế độ tự động đồng bộ Realtime đang bật">
+                        <span class="flex h-2.5 w-2.5 relative">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                             <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                         </span>
@@ -232,13 +174,13 @@ html_content = '''<!DOCTYPE html>
                         </button>
                     </div>
 
-                    <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm">
-                        <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
+                    <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 transition">
+                        <i class="fa-solid fa-file-excel text-emerald-600 mr-2 text-sm"></i>
                         <span>File Excel</span>
                     </button>
                     <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" class="hidden" onchange="handleFileUpload(event)">
 
-                    <button onclick="exportDataCSV()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition shadow-sm">
+                    <button onclick="exportDataCSV()" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 transition">
                         <i class="fa-solid fa-download mr-1.5"></i> Export Excel
                     </button>
 
@@ -252,220 +194,113 @@ html_content = '''<!DOCTYPE html>
     </header>
 
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-
-        <!-- BỘ LỌC QUẢN LÝ TẬP TRUNG -->
-        <div class="bg-gradient-to-r from-paleOlive-100/90 via-paleOlive-50 to-white dark:from-paleOlive-950/60 dark:via-slate-800 dark:to-slate-800 p-4 rounded-xl border-2 border-paleOlive-400 dark:border-paleOlive-600 shadow-md flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+        <!-- BỘ LỌC QUẢN LÝ -->
+        <div class="bg-gradient-to-r from-paleOlive-100/90 via-paleOlive-50 to-white dark:from-paleOlive-950/60 dark:via-slate-800 p-4 rounded-xl border-2 border-paleOlive-400 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             <div class="flex items-center space-x-3">
                 <div class="w-11 h-11 rounded-xl bg-paleOlive-600 text-white flex items-center justify-center shadow-md shrink-0">
                     <i class="fa-solid fa-user-shield text-xl"></i>
                 </div>
                 <div>
-                    <div class="flex items-center space-x-2">
-                        <label for="filterColAN" class="text-sm font-bold text-paleOlive-950 dark:text-paleOlive-100 uppercase tracking-wide">
-                            Lọc Theo Quản Lý Phụ Trách
-                        </label>
-                        <span id="activeManagerBadge" class="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-paleOlive-200 text-paleOlive-900 dark:bg-paleOlive-800 dark:text-paleOlive-100">
-                            Tất cả
-                        </span>
-                    </div>
-                    <p class="text-xs text-slate-600 dark:text-slate-400">Chọn Quản lý để cập nhật lại toàn bộ các ô chỉ số KPI, Biểu đồ phân tích và Bảng dữ liệu phía dưới</p>
+                    <label class="text-sm font-bold text-paleOlive-950 dark:text-paleOlive-100 uppercase tracking-wide">
+                        Lọc Theo Quản Lý Phụ Trách <span id="activeManagerBadge" class="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-paleOlive-200 text-paleOlive-900">Tất cả</span>
+                    </label>
+                    <p class="text-xs text-slate-600 dark:text-slate-400">Chọn Quản lý để cập nhật lại KPI, Biểu đồ và Dữ liệu</p>
                 </div>
             </div>
-
             <div class="w-full md:w-80 shrink-0">
-                <div class="relative">
-                    <select id="filterColAN" onchange="onColANChange()" class="w-full py-2.5 pl-3 pr-8 text-xs font-bold bg-white dark:bg-slate-900 border-2 border-paleOlive-500 text-paleOlive-950 dark:text-paleOlive-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-paleOlive-600 shadow-sm cursor-pointer transition">
-                        <option value="">-- Tất cả Quản lý --</option>
-                    </select>
-                </div>
+                <select id="filterColAN" onchange="onColANChange()" class="w-full py-2.5 pl-3 pr-8 text-xs font-bold bg-white dark:bg-slate-900 border-2 border-paleOlive-500 rounded-xl focus:outline-none dark:text-white cursor-pointer">
+                    <option value="">-- Tất cả Quản lý --</option>
+                </select>
             </div>
         </div>
 
-        <!-- KPI Cards Area -->
+        <!-- KPI CARDS -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Tổng Ca Tồn</div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span id="kpiTotal" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
-                    <span id="kpiTotalSub" class="text-xs text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-0.5 rounded-full">Tất cả</span>
-                </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng hợp hợp đồng tồn</div>
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Tổng Ca Tồn</div>
+                <div class="mt-2 flex items-baseline justify-between"><span id="kpiTotal" class="text-2xl font-bold">0</span></div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
             </div>
-
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div class="text-xs font-medium text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>KH Giục Tiến Độ</span>
-                    <i class="fa-solid fa-bullhorn"></i>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span id="kpiUrgent" class="text-2xl font-bold text-rose-600 dark:text-rose-400">0</span>
-                    <span id="kpiUrgentPct" class="text-xs text-rose-700 bg-rose-50 dark:bg-rose-900/30 dark:text-rose-300 px-2 py-0.5 rounded-full">0%</span>
-                </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Có ghi nhận giục tiến độ</div>
+                <div class="text-xs font-medium text-rose-600 uppercase tracking-wider">KH Giục Tiến Độ</div>
+                <div class="mt-2 flex items-baseline justify-between"><span id="kpiUrgent" class="text-2xl font-bold text-rose-600">0</span><span id="kpiUrgentPct" class="text-xs px-2 py-0.5 rounded-full bg-rose-50 text-rose-700">0%</span></div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-rose-500"></div>
             </div>
-
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div class="text-xs font-medium text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>CLL Đang Tồn</span>
-                    <i class="fa-solid fa-rotate-right"></i>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span id="kpiRepeat" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</span>
-                    <span id="kpiRepeatCases" class="text-xs text-amber-700 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 px-2 py-0.5 rounded-full">0 ca</span>
-                </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tổng số ca vụ lặp (Lặp > 0)</div>
+                <div class="text-xs font-medium text-amber-600 uppercase tracking-wider">CLL Đang Tồn</div>
+                <div class="mt-2 flex items-baseline justify-between"><span id="kpiRepeat" class="text-2xl font-bold text-amber-600">0</span><span id="kpiRepeatCases" class="text-xs px-2 py-0.5 rounded-full bg-amber-50 text-amber-700">0 ca</span></div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
-
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Tồn Giờ ≥ 24H</span>
-                    <i class="fa-solid fa-clock"></i>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span id="kpiOverdue" class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</span>
-                    <span id="kpiOverduePct" class="text-xs text-purple-700 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-0.5 rounded-full">0%</span>
-                </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca quá hạn 1 ngày</div>
+                <div class="text-xs font-medium text-purple-600 uppercase tracking-wider">Tồn Giờ ≥ 24H</div>
+                <div class="mt-2 flex items-baseline justify-between"><span id="kpiOverdue" class="text-2xl font-bold text-purple-600">0</span><span id="kpiOverduePct" class="text-xs px-2 py-0.5 rounded-full bg-purple-50 text-purple-700">0%</span></div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
             </div>
-
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
-                <div class="text-xs font-medium text-indigo-600 dark:text-indigo-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Đang Xử Lý</span>
-                    <i class="fa-solid fa-gears"></i>
-                </div>
-                <div class="mt-2 flex items-baseline justify-between">
-                    <span id="kpiProcessing" class="text-2xl font-bold text-indigo-600 dark:text-indigo-400">0</span>
-                    <span id="kpiProcessingPct" class="text-xs text-indigo-700 bg-indigo-50 dark:bg-indigo-900/30 dark:text-indigo-300 px-2 py-0.5 rounded-full">0%</span>
-                </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Trạng thái Đang XL</div>
+                <div class="text-xs font-medium text-indigo-600 uppercase tracking-wider">Đang Xử Lý</div>
+                <div class="mt-2 flex items-baseline justify-between"><span id="kpiProcessing" class="text-2xl font-bold text-indigo-600">0</span><span id="kpiProcessingPct" class="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700">0%</span></div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-indigo-500"></div>
             </div>
         </div>
 
+        <!-- BIỂU ĐỒ -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
-                        <i class="fa-solid fa-chart-pie text-amber-500 mr-2"></i> 1. Thống Kê Checklist Lặp
-                    </h2>
-                </div>
-                <div class="relative flex-1 min-h-[260px]"><canvas id="chartRepeatPriority"></canvas></div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
-                        <i class="fa-solid fa-chart-bar text-blue-500 mr-2"></i> 2. Top Block Tồn Ca Nhiều Nhất
-                    </h2>
-                </div>
-                <div class="relative flex-1 min-h-[260px]"><canvas id="chartTopBlock"></canvas></div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
-                        <i class="fa-solid fa-network-wired text-emerald-500 mr-2"></i> 3. Tồn theo POP
-                    </h2>
-                </div>
-                <div class="relative flex-1 min-h-[260px]"><canvas id="chartTopPop"></canvas></div>
-            </div>
-
-            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-sm font-bold text-slate-900 dark:text-white flex items-center">
-                        <i class="fa-solid fa-user-gear text-purple-500 mr-2"></i> 4. Top KTV Tồn Ca nhiều nhất
-                    </h2>
-                </div>
-                <div class="relative flex-1 min-h-[260px]"><canvas id="chartTopTech"></canvas></div>
-            </div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 shadow-sm"><canvas id="chartRepeatPriority"></canvas></div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 shadow-sm"><canvas id="chartTopBlock"></canvas></div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 shadow-sm"><canvas id="chartTopPop"></canvas></div>
+            <div class="bg-white dark:bg-slate-800 p-5 rounded-xl border border-slate-200 shadow-sm"><canvas id="chartTopTech"></canvas></div>
         </div>
 
-        <div class="bg-white dark:bg-slate-800 rounded-xl border border-paleOlive-300 dark:border-paleOlive-700 shadow-sm overflow-hidden">
-            <div class="p-5 border-b border-paleOlive-200 dark:border-paleOlive-800 space-y-4 bg-paleOlive-50/60 dark:bg-paleOlive-950/20">
+        <!-- BẢNG DỮ LIỆU -->
+        <div class="bg-white dark:bg-slate-800 rounded-xl border border-paleOlive-300 shadow-sm overflow-hidden">
+            <div class="p-5 border-b space-y-4 bg-paleOlive-50/60 dark:bg-slate-900">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h2 class="text-base font-bold text-paleOlive-950 dark:text-paleOlive-100 flex items-center">
-                            <i class="fa-solid fa-table-cells text-paleOlive-600 mr-2"></i> BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA
-                        </h2>
-                    </div>
+                    <h2 class="text-base font-bold text-paleOlive-950 dark:text-paleOlive-100 flex items-center">
+                        <i class="fa-solid fa-table-cells text-paleOlive-600 mr-2"></i> BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA
+                    </h2>
                     <div class="flex items-center space-x-2">
-                        <label class="inline-flex items-center space-x-2 text-xs font-semibold text-paleOlive-900 dark:text-paleOlive-200 bg-paleOlive-100 dark:bg-paleOlive-900/50 px-3 py-1.5 rounded-lg cursor-pointer border border-paleOlive-300 dark:border-paleOlive-700 transition shadow-sm">
-                            <input type="checkbox" id="chkNonZero" onchange="applyFilters()" class="w-4 h-4 text-paleOlive-600 rounded border-paleOlive-300">
-                            <span><i class="fa-solid fa-filter mr-1"></i> Chỉ lấy CL Lặp khác 0</span>
+                        <label class="inline-flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-lg cursor-pointer bg-paleOlive-100 border border-paleOlive-300">
+                            <input type="checkbox" id="chkNonZero" onchange="applyFilters()" class="w-4 h-4 text-paleOlive-600 rounded">
+                            <span>Chỉ lấy CL Lặp khác 0</span>
                         </label>
-                        <button onclick="resetFilters()" class="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-700 rounded-lg transition">
-                            <i class="fa-solid fa-arrows-rotate mr-1"></i> Xóa Tất Cả Lọc
-                        </button>
+                        <button onclick="resetFilters()" class="px-3 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 rounded-lg">Xóa Lọc</button>
                     </div>
                 </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
-                    <div class="relative sm:col-span-2 lg:col-span-1">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, KH..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none dark:text-white">
-                    </div>
-                    <div>
-                        <select id="filterTech" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg dark:text-white">
-                            <option value="">Tất cả Nhân sự</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select id="filterUrgent" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg dark:text-white">
-                            <option value="">Tất cả KH Giục</option>
-                            <option value="YES">Có giục tiến độ</option>
-                            <option value="NO">Không giục tiến độ</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select id="filterRepeat" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg dark:text-white">
-                            <option value="">Tất cả CL Lặp</option>
-                            <option value="1">Lặp 1 lần</option>
-                            <option value="2">Lặp 2 lần</option>
-                            <option value="3">Lặp ≥ 3 lần</option>
-                        </select>
-                    </div>
-                    <div>
-                        <select id="filterBlock" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg dark:text-white">
-                            <option value="">Tất cả Block</option>
-                        </select>
-                    </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, KH..." class="w-full px-3 py-1.5 text-xs bg-white dark:bg-slate-900 border rounded-lg dark:text-white">
+                    <select id="filterTech" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border rounded-lg dark:text-white"><option value="">Tất cả Nhân sự</option></select>
+                    <select id="filterUrgent" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border rounded-lg dark:text-white"><option value="">Tất cả KH Giục</option><option value="YES">Có giục</option><option value="NO">Không giục</option></select>
+                    <select id="filterRepeat" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border rounded-lg dark:text-white"><option value="">Tất cả CL Lặp</option><option value="1">Lặp 1</option><option value="2">Lặp 2</option><option value="3">Lặp ≥ 3</option></select>
+                    <select id="filterBlock" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border rounded-lg dark:text-white"><option value="">Tất cả Block</option></select>
                 </div>
             </div>
-
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-xs">
                     <thead>
-                        <tr class="bg-paleOlive-100 dark:bg-paleOlive-900/60 text-paleOlive-900 dark:text-paleOlive-200 font-bold border-b border-paleOlive-300 dark:border-paleOlive-700 uppercase tracking-wider">
-                            <th class="py-3 px-3 w-12 text-center border-r border-paleOlive-200/80">STT</th>
-                            <th class="py-3 px-3 w-32 border-r border-paleOlive-200/80">Số HĐ</th>
-                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80">Block</th>
-                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80">Lần Hẹn</th>
-                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80">CL Lặp</th>
-                            <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80">Nhân Sự</th>
-                            <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80">Quản Lý</th>
-                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80">KH Giục Tiến Độ</th>
-                            <th class="py-3 px-3 text-center w-24">Tồn Giờ</th>
+                        <tr class="bg-paleOlive-100 dark:bg-slate-700 text-paleOlive-900 font-bold border-b">
+                            <th class="py-3 px-3 text-center">STT</th>
+                            <th class="py-3 px-3">Số HĐ</th>
+                            <th class="py-3 px-3">Block</th>
+                            <th class="py-3 px-3 text-center">Lần Hẹn</th>
+                            <th class="py-3 px-3 text-center">CL Lặp</th>
+                            <th class="py-3 px-3">Nhân Sự</th>
+                            <th class="py-3 px-3">Quản Lý</th>
+                            <th class="py-3 px-3">KH Giục</th>
+                            <th class="py-3 px-3 text-center">Tồn Giờ</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 bg-paleOlive-50/30 dark:bg-paleOlive-950/20"></tbody>
+                    <tbody id="tableBody" class="divide-y"></tbody>
                 </table>
             </div>
-
-            <div class="px-5 py-3 bg-paleOlive-100/50 dark:bg-paleOlive-950/40 border-t border-paleOlive-200 dark:border-paleOlive-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-paleOlive-900/80 dark:text-paleOlive-300">
-                <div>Hiển thị từ <span id="startIndex" class="font-bold">0</span> đến <span id="endIndex" class="font-bold">0</span> trong tổng số <span id="totalCount" class="font-bold">0</span> ca tồn</div>
+            <div class="px-5 py-3 bg-paleOlive-100/50 flex items-center justify-between text-xs">
+                <div>Hiển thị <span id="startIndex">0</span> - <span id="endIndex">0</span> / <span id="totalCount">0</span> ca tồn</div>
                 <div id="paginationControls" class="flex items-center space-x-1"></div>
-                <div class="italic">BangNC13-TQG.</div>
             </div>
         </div>
     </main>
 
     <script>
         const DEFAULT_PASSWORD = "1900";
-        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET";
         const PAGE_SIZE = 10;
         let currentPage = 1;
         let pendingAction = null;
@@ -506,27 +341,6 @@ html_content = '''<!DOCTYPE html>
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
-        }
-        
-        function openZaloModal() {
-            const total = document.getElementById('kpiTotal').textContent;
-            const urgent = document.getElementById('kpiUrgent').textContent;
-            const overdue = document.getElementById('kpiOverdue').textContent;
-            const repeat = document.getElementById('kpiRepeat').textContent;
-            
-            document.getElementById('zaloMessageContent').value = `📊 Báo cáo Kiểm soát Ca tồn (CLL):\n- Tổng tồn: ${total} ca\n- KH Giục: ${urgent} ca\n- Quá 24h: ${overdue} ca\n- CL Lặp: ${repeat} ca\n\nTruy cập Dashboard để xem chi tiết!`;
-            document.getElementById('zaloModal').classList.remove('hidden');
-        }
-
-        function closeZaloModal() {
-            document.getElementById('zaloModal').classList.add('hidden');
-        }
-
-        function triggerSendZalo() {
-            const msg = document.getElementById('zaloMessageContent').value;
-            closeZaloModal();
-            showToast('Đang gửi dữ liệu...', 'info');
-            window.parent.location.search = `?action=send_zalo&msg=${encodeURIComponent(msg)}`;
         }
 
         function calculateTonGioFromColumnI(dateStr) {
@@ -595,8 +409,7 @@ html_content = '''<!DOCTYPE html>
         }
 
         function onColANChange() {
-            const managerVal = document.getElementById('filterColAN').value;
-            document.getElementById('activeManagerBadge').textContent = managerVal || 'Tất cả';
+            document.getElementById('activeManagerBadge').textContent = document.getElementById('filterColAN').value || 'Tất cả';
             applyFilters();
         }
 
@@ -691,7 +504,7 @@ html_content = '''<!DOCTYPE html>
 
             if (!tbody) return;
             if (total === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp</td></tr>`;
                 return;
             }
 
@@ -704,10 +517,10 @@ html_content = '''<!DOCTYPE html>
                 const urgentBadge = urgentVal ? `<span class="px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-100 text-rose-800 border border-rose-300"><i class="fa-solid fa-triangle-exclamation mr-1"></i>${urgentVal}</span>` : `<span class="text-slate-400">-</span>`;
 
                 return `
-                    <tr class="hover:bg-paleOlive-100/50 transition border-b border-paleOlive-200/50">
+                    <tr class="hover:bg-paleOlive-100/50 transition border-b">
                         <td class="py-2.5 px-3 text-center text-slate-500 font-medium">${startIdx + idx + 1}</td>
                         <td class="py-2.5 px-3 font-semibold text-blue-600">${item["Số HĐ"] || '-'}</td>
-                        <td class="py-2.5 px-3 text-slate-800 dark:text-slate-200 font-medium">${item["Block"] || '-'}</td>
+                        <td class="py-2.5 px-3 font-medium">${item["Block"] || '-'}</td>
                         <td class="py-2.5 px-3 text-center">${item["Số lần hẹn"] || 0}</td>
                         <td class="py-2.5 px-3 text-center col-highlight font-semibold">${repeatBadge}</td>
                         <td class="py-2.5 px-3 font-medium">${item["Nhân sự"] || '-'}</td>
@@ -788,6 +601,7 @@ html_content = '''<!DOCTYPE html>
             }
         }
 
+        // ĐÃ KHẮC PHỤC LỖI BODY HAS ALREADY BEEN CONSUMED BẰNG CÁCH GỌI RESPONSE.TEXT() 1 LẦN DUY NHẤT
         async function fetchGoogleSheetData(showNotification = true) {
             const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&_nc=${Date.now()}`;
             const syncIcon = document.getElementById('syncIcon');
@@ -796,9 +610,15 @@ html_content = '''<!DOCTYPE html>
                 if (showNotification) showToast('Đang đồng bộ Google Sheets...', 'info');
                 const response = await fetch(csvUrl);
                 if (!response.ok) throw new Error('Không thể kết nối Google Sheets.');
-                const rowsMatrix = XLSX.utils.sheet_to_json(XLSX.read(await response.text(), { type: 'string' }).Sheets[XLSX.read(await response.text(), { type: 'string' }).SheetNames[0]], { header: 1, defval: '' });
-                if (processRowsMatrix(rowsMatrix) && showNotification) {
-                    showToast(`Đồng bộ thành công ${currentDataset.length} ca tồn!`, 'success');
+                
+                const csvText = await response.text(); // Đọc đúng 1 lần duy nhất ở đây
+                const workbook = XLSX.read(csvText, { type: 'string' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+
+                if (processRowsMatrix(rowsMatrix)) {
+                    if (showNotification) showToast(`Đồng bộ thành công ${currentDataset.length} ca tồn!`, 'success');
                 }
             } catch (err) {
                 if (showNotification) showToast('Lỗi đồng bộ: ' + err.message, 'error');
@@ -869,7 +689,7 @@ html_content = '''<!DOCTYPE html>
 
         function exportDataCSV() {
             const dataToExport = getFilteredData();
-            if (!dataToExport.length) { showToast('Không có dữ liệu xuất!', 'error'); return; }f
+            if (!dataToExport.length) { showToast('Không có dữ liệu xuất!', 'error'); return; }
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(dataToExport), "Kiểm Soát Ca Tồn");
             XLSX.writeFile(wb, "Bao_Cao_Kiem_Soat_Ca_Ton.xlsx");
