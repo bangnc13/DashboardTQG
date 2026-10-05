@@ -1,5 +1,6 @@
 import streamlit as st
 import streamlit.components.v1 as components
+import requests
 
 # Cấu hình trang rộng tràn màn hình (Wide mode)
 st.set_page_config(
@@ -10,7 +11,7 @@ st.set_page_config(
 )
 
 # Thêm CSS ẩn header/footer mặc định của Streamlit
-st.markdown("""
+st.markdown('''
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
@@ -23,10 +24,9 @@ st.markdown("""
             max-width: 100% !important;
         }
     </style>
-""", unsafe_allow_html=True)
+''', unsafe_allow_html=True)
 
-html_content = """
-<!DOCTYPE html>
+html_content = '''<!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
@@ -1226,8 +1226,54 @@ html_content = """
         };
     </script>
 </body>
-</html>
-"""
+</html>'''
+
+# --- TÍCH HỢP ZALO BOT BÊN TRONG STREAMLIT ---
+# Token cấp quyền từ hệ thống (Cần bảo mật nghiêm ngặt)
+ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
+# ID của Group Zalo cần gửi
+ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c" 
+
+def send_zalo_group_message(message):
+    """Hàm gửi tin nhắn vào Group Zalo qua API"""
+    url = "https://bot-api.zaloplatforms.com/bot/sendMessage"
+    headers = {
+        "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "chat_id": ZALO_GROUP_ID,
+        "text": message
+    }
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        return response.status_code == 200, response.json()
+    except Exception as e:
+        return False, str(e)
+
+# Giao diện gửi Zalo trên Sidebar của Streamlit
+with st.sidebar:
+    st.header("🤖 Trợ Lý Bot TQG")
+    st.markdown("Đẩy thông tin báo cáo nhanh vào Group Zalo.")
+    
+    # Nội dung mặc định
+    default_msg = """📊 Báo cáo Kiểm soát Ca tồn (CLL):
+- Truy cập Dashboard để xem biểu đồ chi tiết.
+- Các trưởng nhóm chú ý các ca tồn quá 24h!
+🌐 Link Dashboard: [Đính kèm link web của bạn]"""
+    
+    report_content = st.text_area("Nội dung báo cáo:", value=default_msg, height=150)
+    
+    if st.button("🚀 Gửi vào Group Zalo", use_container_width=True):
+        if ZALO_GROUP_ID == "NHAP_GROUP_ID_CUA_BAN_TAI_DAY":
+            st.warning("⚠️ Lỗi: Bạn chưa khai báo ZALO_GROUP_ID trong file app.py!")
+        else:
+            with st.spinner('Đang gửi dữ liệu...'):
+                is_success, response_data = send_zalo_group_message(report_content)
+                if is_success:
+                    st.success("✅ Đã gửi thông báo thành công!")
+                else:
+                    st.error(f"❌ Gửi thất bại: {response_data}")
 
 # Render full screen Dashboard
 components.html(html_content, height=1400, scrolling=True)
