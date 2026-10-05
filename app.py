@@ -29,10 +29,10 @@ st.markdown('''
 
 # Lấy Group ID và Token Zalo Bot
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
-ZALO_GROUP_ID = "zgr-9207abe0d78f3ed1679e"
+ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
 
 def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
+    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API với cơ chế bắt lỗi an toàn"""
     url = "https://bot.zaloplatforms.com/api/v1/message"
     headers = {
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
@@ -49,7 +49,17 @@ def send_zalo_group_message(message):
     
     try:
         response = requests.post(url, json=payload, headers=headers)
-        res_data = response.json()
+        
+        # Kiểm tra nếu phản hồi rỗng hoặc không có nội dung text
+        if not response.text or not response.text.strip():
+            return False, f"API trả về phản hồi rỗng (HTTP Status Code: {response.status_code})"
+        
+        # Thử phân tích JSON an toàn để tránh lỗi crash
+        try:
+            res_data = response.json()
+        except json.JSONDecodeError:
+            return False, f"API trả về dữ liệu không phải JSON (HTTP Status Code: {response.status_code}): {response.text[:200]}"
+        
         if response.status_code == 200 and res_data.get("error") == 0:
             return True, res_data
         else:
@@ -57,7 +67,7 @@ def send_zalo_group_message(message):
     except Exception as e:
         return False, str(e)
 
-# --- KHU VỰC GỬI ZALO TRỰC QUAN NGAY TRÊN STREAMLIT (100% HOẠT ĐỘNG, KHÔNG BỊ CHẶN) ---
+# --- KHU VỰC GỬI ZALO TRỰC QUAN TRÊN STREAMLIT ---
 with st.container():
     st.markdown("""
         <div style="background: linear-gradient(to right, #eff6ff, #dbeafe); padding: 12px 20px; border-bottom: 2px solid #3b82f6; display: flex; align-items: center; justify-content: space-between;">
@@ -65,7 +75,7 @@ with st.container():
                 <i class="fa-brands fa-diaspora" style="color: #2563eb; font-size: 20px;"></i>
                 <span style="font-weight: bold; color: #1e3a8a; font-size: 14px;">BẢNG ĐIỀU KHIỂN GỬI BÁO CÁO NHÓM ZALO BOT</span>
             </div>
-            <span style="font-size: 12px; color: #64748b;">(Giải pháp thay thế modal HTML để vượt qua cơ chế chặn bảo mật iframe của trình duyệt)</span>
+            <span style="font-size: 12px; color: #64748b;">(Tích hợp xử lý chống lỗi phản hồi rỗng từ API)</span>
         </div>
     """, unsafe_allow_html=True)
     
