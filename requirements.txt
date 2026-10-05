@@ -4,3 +4,9 @@ pandas
 plotly
 openpyxl
 streamlit>=1.30.0
+streamlit
+requests
+pandas
+openpyxl
+xlsxwriter
+flask
