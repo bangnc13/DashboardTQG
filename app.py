@@ -32,14 +32,14 @@ ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSA
 ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
 
 def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API với cấu trúc chat_id chuẩn"""
+    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
     url = "https://bot.zaloplatforms.com/api/v1/message"
     headers = {
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
         "Content-Type": "application/json"
     }
     
-    # Đã sửa "group_id" thành "chat_id" khớp với cấu trúc chat.id từ webhook
+    # Cấu trúc payload chuẩn cho tin nhắn nhóm qua Zalo Bot
     payload = {
         "recipient": {
             "chat_id": ZALO_GROUP_ID
@@ -52,18 +52,19 @@ def send_zalo_group_message(message):
     try:
         response = requests.post(url, json=payload, headers=headers)
         
+        # Kiểm tra phản hồi thô từ server
         if not response.text or not response.text.strip():
             return False, f"API trả về phản hồi rỗng (HTTP Status Code: {response.status_code})"
         
         try:
             res_data = response.json()
         except json.JSONDecodeError:
-            return False, f"API trả về dữ liệu không phải JSON (HTTP Status Code: {response.status_code}): {response.text[:200]}"
+            return False, f"HTTP Status {response.status_code} - Phản hồi từ Zalo: {response.text}"
         
         if response.status_code == 200 and res_data.get("error") == 0:
             return True, res_data
         else:
-            return False, res_data
+            return False, f"Mã lỗi từ Zalo: {res_data}"
     except Exception as e:
         return False, str(e)
 
@@ -75,7 +76,7 @@ with st.container():
                 <i class="fa-brands fa-diaspora" style="color: #2563eb; font-size: 20px;"></i>
                 <span style="font-weight: bold; color: #1e3a8a; font-size: 14px;">BẢNG ĐIỀU KHIỂN GỬI BÁO CÁO NHÓM ZALO BOT</span>
             </div>
-            <span style="font-size: 12px; color: #64748b;">(Đã tối ưu cấu trúc payload chat_id theo chuẩn webhook)</span>
+            <span style="font-size: 12px; color: #64748b;">(Tích hợp bắt lỗi chi tiết HTTP 500)</span>
         </div>
     """, unsafe_allow_html=True)
     
