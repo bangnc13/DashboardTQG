@@ -27,9 +27,13 @@ st.markdown('''
     </style>
 ''', unsafe_allow_html=True)
 
-# Lấy Group ID và Token
+# --- CẤU HÌNH BOT (ZALO & TELEGRAM) ---
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
 ZALO_GROUP_ID = "zgr-9207abe0d78f3ed1679e"
+
+# Cấu hình Telegram Bot (Bạn hãy thay token bot Telegram của bạn vào đây)
+TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"  
+TELEGRAM_GROUP_ID = "-1004469807641"
 
 def send_zalo_group_message(message):
     """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
@@ -38,7 +42,6 @@ def send_zalo_group_message(message):
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
         "Content-Type": "application/json"
     }
-    # Cấu trúc payload chuẩn cho Zalo Bot Platform
     payload = {
         "recipient": {
             "group_id": ZALO_GROUP_ID
@@ -51,7 +54,6 @@ def send_zalo_group_message(message):
     try:
         response = requests.post(url, json=payload, headers=headers)
         res_data = response.json()
-        # Zalo Bot API thường trả về error: 0 nếu thành công
         if response.status_code == 200 and res_data.get("error") == 0:
             return True, res_data
         else:
@@ -59,17 +61,45 @@ def send_zalo_group_message(message):
     except Exception as e:
         return False, str(e)
 
-# Xử lý sự kiện gửi Zalo (nếu có param trong URL từ HTML Backend)
-query_params = st.query_params
-if "action" in query_params and query_params["action"] == "send_zalo":
-    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)")
-    success, res = send_zalo_group_message(msg_content)
+def send_telegram_group_message(message):
+    """Hàm gửi tin nhắn vào Group Telegram qua Telegram Bot API"""
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+    payload = {
+        "chat_id": TELEGRAM_GROUP_ID,
+        "text": message,
+        "parse_mode": "Markdown"
+    }
     
-    if success:
-        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
-    else:
-        st.error(f"❌ Lỗi gửi tin nhắn: {res}")
-        
+    try:
+        response = requests.post(url, json=payload)
+        res_data = response.json()
+        if response.status_code == 200 and res_data.get("ok"):
+            return True, res_data
+        else:
+            return False, res_data
+    except Exception as e:
+        return False, str(e)
+
+# Xử lý sự kiện gửi Zalo hoặc Telegram (nếu có param trong URL từ HTML Backend)
+query_params = st.query_params
+if "action" in query_params:
+    action = query_params["action"]
+    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)")
+    
+    if action == "send_zalo":
+        success, res = send_zalo_group_message(msg_content)
+        if success:
+            st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
+        else:
+            st.error(f"❌ Lỗi gửi tin nhắn Zalo: {res}")
+            
+    elif action == "send_telegram":
+        success, res = send_telegram_group_message(msg_content)
+        if success:
+            st.success("✅ Đã gửi báo cáo thành công vào Group Telegram!")
+        else:
+            st.error(f"❌ Lỗi gửi tin nhắn Telegram: {res}")
+            
     # Xoá param để tránh gửi lại khi refresh
     st.query_params.clear()
 
@@ -153,13 +183,6 @@ html_content = '''<!DOCTYPE html>
             border-right: 1px solid rgba(117, 153, 72, 0.3);
         }
         
-        .table-olive-theme {
-            background-color: #f7f9f2;
-        }
-        .dark .table-olive-theme {
-            background-color: rgba(117, 153, 72, 0.08);
-        }
-        
         @keyframes slideIn {
             from { transform: translateY(-100%); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
@@ -228,6 +251,34 @@ html_content = '''<!DOCTYPE html>
         </div>
     </div>
 
+    <!-- MODAL CONFIRM TELEGRAM -->
+    <div id="telegramModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-md mx-4 transform transition-all">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-sky-100 dark:bg-sky-900/40 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">
+                    <i class="fa-brands fa-telegram text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Gửi báo cáo qua Telegram</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Bot sẽ gửi nội dung này vào nhóm Telegram</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <textarea id="telegramMessageContent" rows="7" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 dark:text-white resize-none"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2">
+                    <button onclick="closeTelegramModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition">Hủy</button>
+                    <button onclick="triggerSendTelegram()" class="px-4 py-2 text-xs font-semibold text-white bg-sky-600 hover:bg-sky-700 rounded-lg transition shadow-sm">
+                        <i class="fa-brands fa-telegram mr-1"></i> Gửi ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -247,15 +298,20 @@ html_content = '''<!DOCTYPE html>
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <!-- NÚT GỬI ZALO ĐƯỢC THÊM VÀO ĐÂY -->
+                    <!-- NÚT GỬI ZALO -->
                     <button onclick="openZaloModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition shadow-sm" title="Gửi thông báo vào Group Zalo">
                         <i class="fa-solid fa-paper-plane mr-2 text-sm"></i>
                         <span>Gửi Zalo</span>
                     </button>
-                    
-                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div> <!-- Đường kẻ chia cắt -->
 
-                    <!-- NÚT ĐỒNG BỘ CÓ BÁO TRẠNG THÁI REALTIME PING -->
+                    <!-- NÚT GỬI TELEGRAM -->
+                    <button onclick="openTelegramModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-sky-500 hover:bg-sky-600 transition shadow-sm" title="Gửi thông báo vào Group Telegram">
+                        <i class="fa-brands fa-telegram mr-2 text-sm"></i>
+                        <span>Gửi Telegram</span>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
+
                     <div class="flex items-center space-x-2">
                         <span class="flex h-2.5 w-2.5 relative" title="Chế độ tự động đồng bộ Realtime đang bật">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -267,7 +323,6 @@ html_content = '''<!DOCTYPE html>
                         </button>
                     </div>
 
-                    <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
                     <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
                         <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
                         <span>File Excel</span>
@@ -530,9 +585,7 @@ html_content = '''<!DOCTYPE html>
                     Hiển thị từ <span id="startIndex" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> đến <span id="endIndex" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> trong tổng số <span id="totalCount" class="font-bold text-paleOlive-950 dark:text-paleOlive-100">0</span> ca tồn
                 </div>
                 
-                <div id="paginationControls" class="flex items-center space-x-1">
-                    <!-- JS sẽ tự động vẽ nút phân trang ở đây -->
-                </div>
+                <div id="paginationControls" class="flex items-center space-x-1"></div>
 
                 <div class="italic">
                     BangNC13-TQG.
@@ -549,15 +602,13 @@ html_content = '''<!DOCTYPE html>
     </footer>
 
     <script>
-        const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
-        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
+        const DEFAULT_PASSWORD = "1900"; 
+        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; 
         
-        // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
         let currentPage = 1;
-        let pendingAction = null; // Lưu loại thao tác cần xác thực (EXCEL)
+        let pendingAction = null; 
 
-        // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
             "TQGTI.GIANGVH2": "ANHHV15",
             "TQGTI.THANHNV41": "ANHHV15",
@@ -603,7 +654,6 @@ html_content = '''<!DOCTYPE html>
         let chartTopPop = null;
         let chartTopTech = null;
 
-        // BẢO MẬT: Mở Modal Password
         function openPasswordModal(actionType = 'EXCEL') {
             pendingAction = actionType;
             document.getElementById('importPasswordInput').value = '';
@@ -619,30 +669,25 @@ html_content = '''<!DOCTYPE html>
             setTimeout(() => document.getElementById('importPasswordInput').focus(), 100);
         }
 
-        // BẢO MẬT: Đóng Modal Password
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
             pendingAction = null;
         }
 
-        // BẢO MẬT: Kiểm tra Password
         function verifyPassword() {
             const inputPwd = document.getElementById('importPasswordInput').value;
             if (inputPwd === DEFAULT_PASSWORD) {
                 const action = pendingAction;
                 closePasswordModal();
-                
                 if (action === 'EXCEL') {
-                    document.getElementById('excelFileInput').click(); // Mở chọn file
+                    document.getElementById('excelFileInput').click();
                 }
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
         }
         
-        // MODAL ZALO GIAO TIẾP VỚI STREAMLIT BACKEND
         function openZaloModal() {
-            // Cập nhật nội dung mặc định với các số liệu Real-time
             const total = document.getElementById('kpiTotal').textContent;
             const urgent = document.getElementById('kpiUrgent').textContent;
             const overdue = document.getElementById('kpiOverdue').textContent;
@@ -667,64 +712,77 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
         function triggerSendZalo() {
             const msg = document.getElementById('zaloMessageContent').value;
             closeZaloModal();
-            showToast('Đang gửi dữ liệu...', 'info');
-            
-            // Gửi dữ liệu về Streamlit qua URL query params
+            showToast('Đang gửi dữ liệu Zalo...', 'info');
             const encodedMsg = encodeURIComponent(msg);
             window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
         }
 
-        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss) Hoặc lấy giá trị số trực tiếp
+        function openTelegramModal() {
+            const total = document.getElementById('kpiTotal').textContent;
+            const urgent = document.getElementById('kpiUrgent').textContent;
+            const overdue = document.getElementById('kpiOverdue').textContent;
+            const repeat = document.getElementById('kpiRepeat').textContent;
+            
+            const defaultMsg = `📊 *Báo cáo Kiểm soát Ca tồn (CLL)*:
+- Tổng tồn: ${total} ca
+- KH Giục: ${urgent} ca
+- Quá 24h: ${overdue} ca
+- CL Lặp: ${repeat} ca
+
+Truy cập Dashboard để xem biểu đồ chi tiết!`;
+
+            document.getElementById('telegramMessageContent').value = defaultMsg;
+            document.getElementById('telegramModal').classList.remove('hidden');
+        }
+
+        function closeTelegramModal() {
+            document.getElementById('telegramModal').classList.add('hidden');
+        }
+
+        function triggerSendTelegram() {
+            const msg = document.getElementById('telegramMessageContent').value;
+            closeTelegramModal();
+            showToast('Đang gửi dữ liệu đến Telegram...', 'info');
+            const encodedMsg = encodeURIComponent(msg);
+            window.parent.location.search = `?action=send_telegram&msg=${encodedMsg}`;
+        }
+
         function calculateTonGioFromColumnI(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
-
-            // Nếu giá trị đã là số giờ cụ thể
             if (typeof dateStr === 'number' && dateStr < 10000) {
                 return Math.max(0, Math.floor(dateStr));
             }
 
             let parsedDate = null;
-
-            // Case 1: Excel Serial Number (dạng số thực như 45200.5)
             if (typeof dateStr === 'number') {
                 parsedDate = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
-            } 
-            // Case 2: Dạng chuỗi String
-            else {
+            } else {
                 const str = String(dateStr).trim();
                 if (!str) return 0;
-
                 if (!isNaN(str) && Number(str) < 10000) {
                     return Math.max(0, Math.floor(Number(str)));
                 }
 
-                // Tách ngày giờ bằng khoảng trắng hoặc 'T'
                 const parts = str.split(/[ T]+/);
-                const datePart = parts[0]; // DD/MM/YYYY hoặc YYYY-MM-DD
+                const datePart = parts[0]; 
                 const timePart = parts[1] || "00:00:00";
 
-                // Trường hợp định dạng DD/MM/YYYY hoặc DD-MM-YYYY (Chuẩn Việt Nam)
                 if (datePart.includes('/') || datePart.includes('-')) {
                     const separator = datePart.includes('/') ? '/' : '-';
                     const dateComponents = datePart.split(separator);
 
                     if (dateComponents.length === 3) {
                         let day, month, year;
-
-                        // Nếu phần đầu tiên là Năm (YYYY/MM/DD)
                         if (dateComponents[0].length === 4) {
                             year = parseInt(dateComponents[0], 10);
                             month = parseInt(dateComponents[1], 10) - 1;
                             day = parseInt(dateComponents[2], 10);
-                        } 
-                        // Chuẩn Việt Nam (DD/MM/YYYY)
-                        else {
+                        } else {
                             day = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1; // Tháng trong JS từ 0-11
+                            month = parseInt(dateComponents[1], 10) - 1;
                             year = parseInt(dateComponents[2], 10);
                         }
 
-                        // Tách Giờ : Phút : Giây
                         const timeComponents = timePart.split(':');
                         const hour = parseInt(timeComponents[0], 10) || 0;
                         const min = parseInt(timeComponents[1], 10) || 0;
@@ -734,7 +792,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     }
                 }
 
-                // Dự phòng cho các định dạng khác
                 if (!parsedDate || isNaN(parsedDate.getTime())) {
                     parsedDate = new Date(str);
                 }
@@ -742,7 +799,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
 
             if (!parsedDate || isNaN(parsedDate.getTime())) return 0;
 
-            // Tính chênh lệch giờ so với hiện tại
             const now = new Date();
             const diffMs = now - parsedDate;
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -839,7 +895,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                 if (managerFilter && item["Cột AN"] !== managerFilter) return false;
                 if (techFilter && item["Nhân sự"] !== techFilter) return false;
                 if (blockFilter && item["Block"] !== blockFilter) return false;
-
                 if (chkNonZero && item["CL Lặp"] === 0) return false;
 
                 if (urgentFilter) {
@@ -966,7 +1021,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             }
 
             let html = '';
-
             html += `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>`;
@@ -1028,22 +1082,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                         plugins: {
                             legend: {
                                 position: 'bottom',
-                                labels: { 
-                                    color: textColor, 
-                                    font: { family: 'Inter', size: 11 },
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        const label = context.label || '';
-                                        const value = context.raw || 0;
-                                        const total = hasRepeat + noRepeat;
-                                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                        return ` ${label}: ${value} ca (${percentage}%)`;
-                                    }
-                                }
+                                labels: { color: textColor, font: { family: 'Inter', size: 11 }, padding: 15 }
                             }
                         }
                     }
@@ -1051,9 +1090,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             }
 
             const blockMap = {};
-            data.forEach(d => {
-                if (d["Block"]) blockMap[d["Block"]] = (blockMap[d["Block"]] || 0) + 1;
-            });
+            data.forEach(d => { if (d["Block"]) blockMap[d["Block"]] = (blockMap[d["Block"]] || 0) + 1; });
             const sortedBlocks = Object.entries(blockMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
             if (chartTopBlock) chartTopBlock.destroy();
@@ -1063,12 +1100,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     type: 'bar',
                     data: {
                         labels: sortedBlocks.map(b => b[0]),
-                        datasets: [{
-                            label: 'Số ca tồn',
-                            data: sortedBlocks.map(b => b[1]),
-                            backgroundColor: '#0284c7',
-                            borderRadius: 6
-                        }]
+                        datasets: [{ label: 'Số ca tồn', data: sortedBlocks.map(b => b[1]), backgroundColor: '#0284c7', borderRadius: 6 }]
                     },
                     options: {
                         indexAxis: 'y',
@@ -1084,9 +1116,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             }
 
             const popMap = {};
-            data.forEach(d => {
-                if (d["POP"]) popMap[d["POP"]] = (popMap[d["POP"]] || 0) + 1;
-            });
+            data.forEach(d => { if (d["POP"]) popMap[d["POP"]] = (popMap[d["POP"]] || 0) + 1; });
             const sortedPops = Object.entries(popMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
             if (chartTopPop) chartTopPop.destroy();
@@ -1096,12 +1126,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     type: 'bar',
                     data: {
                         labels: sortedPops.map(p => p[0]),
-                        datasets: [{
-                            label: 'Số ca tồn',
-                            data: sortedPops.map(p => p[1]),
-                            backgroundColor: '#10b981',
-                            borderRadius: 6
-                        }]
+                        datasets: [{ label: 'Số ca tồn', data: sortedPops.map(p => p[1]), backgroundColor: '#10b981', borderRadius: 6 }]
                     },
                     options: {
                         responsive: true,
@@ -1116,9 +1141,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             }
 
             const techMap = {};
-            data.forEach(d => {
-                if (d["Nhân sự"]) techMap[d["Nhân sự"]] = (techMap[d["Nhân sự"]] || 0) + 1;
-            });
+            data.forEach(d => { if (d["Nhân sự"]) techMap[d["Nhân sự"]] = (techMap[d["Nhân sự"]] || 0) + 1; });
             const sortedTechs = Object.entries(techMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
 
             if (chartTopTech) chartTopTech.destroy();
@@ -1128,12 +1151,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     type: 'bar',
                     data: {
                         labels: sortedTechs.map(t => t[0]),
-                        datasets: [{
-                            label: 'Số ca tồn',
-                            data: sortedTechs.map(t => t[1]),
-                            backgroundColor: '#8b5cf6',
-                            borderRadius: 6
-                        }]
+                        datasets: [{ label: 'Số ca tồn', data: sortedTechs.map(t => t[1]), backgroundColor: '#8b5cf6', borderRadius: 6 }]
                     },
                     options: {
                         indexAxis: 'y',
@@ -1152,42 +1170,32 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
         async function fetchGoogleSheetData(showNotification = true) {
             const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&_nc=${Date.now()}`;
             const syncIcon = document.getElementById('syncIcon');
-            
             if (syncIcon) syncIcon.classList.add('fa-spin');
 
             try {
                 if (showNotification) showToast('Đang tự động đồng bộ Google Sheets...', 'info');
-                
                 const response = await fetch(csvUrl);
-                if (!response.ok) {
-                    throw new Error('Không thể kết nối Google Sheets. Kiểm tra quyền truy cập công khai.');
-                }
+                if (!response.ok) throw new Error('Không thể kết nối Google Sheets.');
                 
                 const csvText = await response.text();
                 const workbook = XLSX.read(csvText, { type: 'string' });
                 const firstSheetName = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheetName];
-                
                 const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
                 
                 if (processRowsMatrix(rowsMatrix)) {
                     if (showNotification) showToast(`Tự động đồng bộ thành công ${currentDataset.length} ca tồn!`, 'success');
                 }
             } catch (err) {
-                console.error('Google Sheets Fetch Error:', err);
-                if (showNotification) {
-                    showToast('Lỗi đồng bộ Google Sheets: ' + err.message, 'error');
-                }
+                console.error('Fetch Error:', err);
+                if (showNotification) showToast('Lỗi đồng bộ Google Sheets: ' + err.message, 'error');
             } finally {
                 if (syncIcon) syncIcon.classList.remove('fa-spin');
             }
         }
 
         function processRowsMatrix(rowsMatrix) {
-            if (!rowsMatrix || rowsMatrix.length <= 1) {
-                showToast('Không tìm thấy dữ liệu trong sheet!', 'error');
-                return false;
-            }
+            if (!rowsMatrix || rowsMatrix.length <= 1) return false;
 
             let headerRowIdx = 0;
             for (let r = 0; r < Math.min(10, rowsMatrix.length); r++) {
@@ -1199,7 +1207,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             }
 
             const headers = rowsMatrix[headerRowIdx].map(h => String(h).trim());
-
             function getColIndex(candidateNames, fallbackIndex) {
                 const idx = headers.findIndex(h => {
                     const cleanH = String(h).trim().toLowerCase();
@@ -1215,17 +1222,17 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             }
 
             const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
-            const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
+            const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
-            const colITimeIdx = 8; // Lấy dữ liệu Cột I (Chỉ số mảng bắt đầu từ 0 -> Cột I là 8)
-            const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
-            const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
-            const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
-            const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục'], 21);
+            const colITimeIdx = 8; 
+            const colHenIdx = getColIndex(['Số lần hẹn', 'Lần hẹn'], 14);
+            const colCLLapIdx = getColIndex(['CL Lặp', 'Lặp'], 15);
+            const colTechIdx = getColIndex(['Nhân sự', 'KTV'], 18);
+            const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục'], 21);
             const colPopIdx = 20; 
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
-            const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
-            const colTtclIdx = getColIndex(['TTCL', 'Trạng Thái', 'Trạng thái'], 19);
+            const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader'], 39);
+            const colTtclIdx = getColIndex(['TTCL', 'Trạng thái'], 19);
 
             const parsedRecords = [];
             for (let r = headerRowIdx + 1; r < rowsMatrix.length; r++) {
@@ -1234,15 +1241,12 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
 
                 const soHD = String(row[colSoHDIdx] || '').trim();
                 const block = String(row[colBlockIdx] || '').trim();
-                
                 if (!soHD && !block) continue;
 
                 const nhanSuKey = String(row[colTechIdx] || '').trim();
                 const quanLyName = managerMapping[nhanSuKey] || String(row[colANIdx] || '').trim();
-
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
-
                 const rawTimeColI = row[colITimeIdx];
                 const calculatedTonGio = calculateTonGioFromColumnI(rawTimeColI);
 
@@ -1266,34 +1270,23 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
 
             if (parsedRecords.length > 0) {
                 currentDataset = parsedRecords;
-                
-                try {
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentDataset));
-                } catch (e) {
-                    console.error('Không thể lưu vào localStorage:', e);
-                }
-
+                try { localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentDataset)); } catch (e) {}
                 populateFilterOptions();
                 renderDashboard();
                 return true;
-            } else {
-                showToast('Không tìm thấy bản ghi hợp lệ nào!', 'error');
-                return false;
             }
+            return false;
         }
 
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    
+                    const worksheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
                     if (processRowsMatrix(rowsMatrix)) {
                         showToast(`Nạp thành công ${currentDataset.length} ca tồn từ File Excel!`, 'success');
@@ -1312,7 +1305,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                 showToast('Không có dữ liệu để xuất!', 'error');
                 return;
             }
-
             const ws = XLSX.utils.json_to_sheet(dataToExport);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Kiểm Soát Ca Tồn");
@@ -1322,8 +1314,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
 
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
-            const filtered = getFilteredData();
-            renderCharts(filtered);
+            renderCharts(getFilteredData());
         }
 
         function renderDashboard() {
@@ -1331,19 +1322,13 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             applyFilters();
         }
 
-        // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
         window.onload = function() {
-            // Tải dữ liệu ngay lập tức lần đầu
             fetchGoogleSheetData(true);
-
-            // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
-            setInterval(function() {
-                fetchGoogleSheetData(false);
-            }, 30000);
+            setInterval(() => fetchGoogleSheetData(false), 30000);
         };
     </script>
 </body>
 </html>'''
 
-# Render full screen Dashboard
+# Render Dashboard
 components.html(html_content, height=1400, scrolling=True)
