@@ -658,7 +658,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
         }
 
-        // HÀM TÍNH TỒN GIỜ CHUẨN XÁC: REALTIME - CỘT H (Index 7)
+        // HÀM TÍNH TỒN GIỜ: XỬ LÝ CHUẨN ĐỊNH DẠNG GOOGLE SHEETS CSV (MM/DD/YYYY) & EXCEL
         function calculateTonGioFromColumnH(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
 
@@ -690,13 +690,24 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                         let day, month, year;
 
                         if (dateComponents[0].length === 4) {
+                            // YYYY-MM-DD
                             year = parseInt(dateComponents[0], 10);
                             month = parseInt(dateComponents[1], 10) - 1;
                             day = parseInt(dateComponents[2], 10);
                         } else {
-                            day = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1; 
+                            const v1 = parseInt(dateComponents[0], 10);
+                            const v2 = parseInt(dateComponents[1], 10);
                             year = parseInt(dateComponents[2], 10);
+
+                            // Google Sheets CSV gviz xuất theo chuẩn US (MM/DD/YYYY)
+                            // v1 là Tháng, v2 là Ngày (Trừ trường hợp v1 > 12 bắt buộc là ngày)
+                            if (v1 > 12) {
+                                day = v1;
+                                month = v2 - 1;
+                            } else {
+                                month = v1 - 1; // Tháng (ví dụ 10 là tháng 10)
+                                day = v2;       // Ngày
+                            }
                         }
 
                         const timeComponents = timePart.split(':');
@@ -1190,7 +1201,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            // ĐÃ SỬA: Cột H (Index 7) theo đúng yêu cầu
+            // Cột H (Index 7)
             const colHTimeIdx = 7; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
