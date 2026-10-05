@@ -27,19 +27,20 @@ st.markdown('''
     </style>
 ''', unsafe_allow_html=True)
 
-# Lấy Token và User ID từ Webhook (d71241c2588cb1d2e89d)[cite: 6]
+# Cấu hình Zalo Bot Token, Secret Token và User ID từ Webhook[cite: 6, 8]
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
+ZALO_SECRET_TOKEN = "bangnc123" # Lấy từ log x-bot-api-secret-token trên Webhook site[cite: 6, 8]
 ZALO_USER_ID = "d71241c2588cb1d2e89d"
 
 def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn qua Zalo Bot Platform API sử dụng user_id"""
+    """Hàm gửi tin nhắn qua Zalo Bot Platform API có kèm secret-token"""
     url = "https://bot.zaloplatforms.com/api/v1/message"
     headers = {
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
+        "x-bot-api-secret-token": ZALO_SECRET_TOKEN,
         "Content-Type": "application/json"
     }
     
-    # Cấu trúc payload sử dụng user_id thay cho group_id/chat_id
     payload = {
         "recipient": {
             "user_id": ZALO_USER_ID
@@ -73,9 +74,9 @@ with st.container():
         <div style="background: linear-gradient(to right, #eff6ff, #dbeafe); padding: 12px 20px; border-bottom: 2px solid #3b82f6; display: flex; align-items: center; justify-content: space-between;">
             <div style="display: flex; align-items: center; gap: 10px;">
                 <i class="fa-brands fa-diaspora" style="color: #2563eb; font-size: 20px;"></i>
-                <span style="font-weight: bold; color: #1e3a8a; font-size: 14px;">BẢNG ĐIỀU KHIỂN GỬI BÁO CÁO ZALO BOT (USER_ID)</span>
+                <span style="font-weight: bold; color: #1e3a8a; font-size: 14px;">BẢNG ĐIỀU KHIỂN GỬI BÁO CÁO ZALO BOT</span>
             </div>
-            <span style="font-size: 12px; color: #64748b;">(Đã chuyển đổi sang phương thức gửi theo user_id)</span>
+            <span style="font-size: 12px; color: #64748b;">(Đã tích hợp thêm header x-bot-api-secret-token)</span>
         </div>
     """, unsafe_allow_html=True)
     
@@ -356,7 +357,7 @@ html_content = '''<!DOCTYPE html>
                 closePasswordModal();
                 if (pendingAction === 'EXCEL') document.getElementById('excelFileInput').click();
             } else {
-                document.getElementById('passwordError').classList.add('hidden');
+                document.getElementById('passwordError').classList.remove('hidden');
             }
         }
 
