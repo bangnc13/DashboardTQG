@@ -40,7 +40,7 @@ def send_zalo_group_message(message):
     }
     payload = {
         "recipient": {
-            "group_id": ZALO_GROUP_ID
+            "group_id": zgr-9207abe0d78f3cd1679c
         },
         "message": {
             "text": message
