@@ -51,7 +51,7 @@ def fetch_kpi_summary_for_bot():
                 repeat_cases = len(df[pd.to_numeric(df[col], errors='coerce') > 0])
 
         report_msg = (
-            f"📊 **BẢO CÁO NHANH CA TỒN (CLL)**\n"
+            f"📊 **BÁO CÁO NHANH CA TỒN (CLL)**\n"
             f"- Tổng tồn: {total_cases} ca\n"
             f"- KH Giục: {urgent_cases} ca\n"
             f"- Tồn quá 24h: {overdue_cases} ca\n"
@@ -60,7 +60,7 @@ def fetch_kpi_summary_for_bot():
         )
         return report_msg
     except Exception as e:
-        return f"⚠️ Không thể đọc dữ liệu báo cáo lúc này: {str(e)}"
+        return f"⚠️️ Không thể đọc dữ liệu báo cáo lúc này: {str(e)}"
 
 # --- KHỞI TẠO FLASK SERVER NHẬN WEBHOOK TỪ ZALO ---
 flask_app = Flask(__name__)
@@ -113,16 +113,16 @@ st.markdown('''
     </style>
 ''', unsafe_allow_html=True)
 
-# Xử lý sự kiện gửi Zalo từ giao diện web
-query_params = st.query_params
-if "action" in query_params and query_params["action"] == "send_zalo":
-    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)")
-    success, res = send_zalo_group_message(msg_content)
-    if success:
-        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
-    else:
-        st.error(f"❌ Lỗi gửi tin nhắn: {res}")
-    st.query_params.clear()
+# Tạo một thanh công cụ trực tiếp bằng Streamlit ở ngay đầu trang để bấm gửi Zalo chắc chắn thành công
+col_zalo_1, col_zalo_2 = st.columns([6, 1])
+with col_zalo_2:
+    if st.button("📤 Gửi ngay qua Zalo", use_container_width=True, type="primary"):
+        default_msg = f"📊 Báo cáo Kiểm soát Ca tồn (CLL) từ Web Dashboard:\n- Cập nhật lúc hệ thống trực tuyến."
+        success, res = send_zalo_group_message(default_msg)
+        if success:
+            st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
+        else:
+            st.error(f"❌ Lỗi gửi tin nhắn: {res}")
 
 # --- GIAO DIỆN HTML/CSS/JS DASHBOARD HOÀN CHỈNH ---
 html_content = '''<!DOCTYPE html>
@@ -191,28 +191,6 @@ html_content = '''<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- MODAL CONFIRM ZALO -->
-    <div id="zaloModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border p-6 w-full max-w-md mx-4">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-paper-plane text-lg"></i>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Gửi báo cáo qua Zalo</h3>
-                    <p class="text-xs text-slate-500">Bot Thư Ký TQG sẽ gửi nội dung này vào nhóm</p>
-                </div>
-            </div>
-            <div class="space-y-4">
-                <textarea id="zaloMessageContent" rows="7" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border rounded-lg dark:text-white resize-none"></textarea>
-                <div class="flex items-center justify-end space-x-2">
-                    <button onclick="closeZaloModal()" class="px-4 py-2 text-xs font-medium text-slate-600 dark:text-slate-300">Hủy</button>
-                    <button onclick="triggerSendZalo()" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 rounded-lg">Gửi ngay</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <header class="bg-white dark:bg-slate-800 border-b sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -230,10 +208,6 @@ html_content = '''<!DOCTYPE html>
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <button onclick="openZaloModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition shadow-sm">
-                        <i class="fa-solid fa-paper-plane mr-2"></i><span>Gửi Zalo</span>
-                    </button>
-                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
                     <button id="syncBtn" onclick="fetchGoogleSheetData(true)" class="inline-flex items-center px-3 py-2 text-xs font-semibold rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-sm">
                         <i id="syncIcon" class="fa-solid fa-arrows-rotate mr-2"></i><span>Đồng bộ</span>
                     </button>
@@ -429,22 +403,6 @@ html_content = '''<!DOCTYPE html>
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
-        }
-        
-        function openZaloModal() {
-            const total = document.getElementById('kpiTotal').textContent;
-            const urgent = document.getElementById('kpiUrgent').textContent;
-            const overdue = document.getElementById('kpiOverdue').textContent;
-            const repeat = document.getElementById('kpiRepeat').textContent;
-            document.getElementById('zaloMessageContent').value = `📊 Báo cáo Kiểm soát Ca tồn (CLL):\n- Tổng tồn: ${total} ca\n- KH Giục: ${urgent} ca\n- Quá 24h: ${overdue} ca\n- CL Lặp: ${repeat} ca\n\nTruy cập Dashboard để xem chi tiết!`;
-            document.getElementById('zaloModal').classList.remove('hidden');
-        }
-        function closeZaloModal() { document.getElementById('zaloModal').classList.add('hidden'); }
-        function triggerSendZalo() {
-            const msg = document.getElementById('zaloMessageContent').value;
-            closeZaloModal();
-            showToast('Đang gửi dữ liệu...', 'info');
-            window.parent.location.search = `?action=send_zalo&msg=${encodeURIComponent(msg)}`;
         }
 
         function calculateTonGioFromColumnI(dateStr) {
