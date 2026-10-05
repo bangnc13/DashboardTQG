@@ -38,7 +38,6 @@ def send_zalo_group_message(message):
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
         "Content-Type": "application/json"
     }
-    # Cấu trúc payload chuẩn cho Zalo Bot Platform
     payload = {
         "recipient": {
             "group_id": ZALO_GROUP_ID
@@ -51,7 +50,6 @@ def send_zalo_group_message(message):
     try:
         response = requests.post(url, json=payload, headers=headers)
         res_data = response.json()
-        # Zalo Bot API thường trả về error: 0 nếu thành công
         if response.status_code == 200 and res_data.get("error") == 0:
             return True, res_data
         else:
@@ -70,7 +68,6 @@ if "action" in query_params and query_params["action"] == "send_zalo":
     else:
         st.error(f"❌ Lỗi gửi tin nhắn: {res}")
         
-    # Xoá param để tránh gửi lại khi refresh
     st.query_params.clear()
 
 html_content = '''<!DOCTYPE html>
@@ -247,15 +244,13 @@ html_content = '''<!DOCTYPE html>
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <!-- NÚT GỬI ZALO ĐƯỢC THÊM VÀO ĐÂY -->
                     <button onclick="openZaloModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition shadow-sm" title="Gửi thông báo vào Group Zalo">
                         <i class="fa-solid fa-paper-plane mr-2 text-sm"></i>
                         <span>Gửi Zalo</span>
                     </button>
                     
-                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div> <!-- Đường kẻ chia cắt -->
+                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
 
-                    <!-- NÚT ĐỒNG BỘ CÓ BÁO TRẠNG THÁI REALTIME PING -->
                     <div class="flex items-center space-x-2">
                         <span class="flex h-2.5 w-2.5 relative" title="Chế độ tự động đồng bộ Realtime đang bật">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -267,7 +262,6 @@ html_content = '''<!DOCTYPE html>
                         </button>
                     </div>
 
-                    <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
                     <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
                         <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
                         <span>File Excel</span>
@@ -552,10 +546,9 @@ html_content = '''<!DOCTYPE html>
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
         
-        // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
         let currentPage = 1;
-        let pendingAction = null; // Lưu loại thao tác cần xác thực (EXCEL)
+        let pendingAction = null;
 
         // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
@@ -603,7 +596,6 @@ html_content = '''<!DOCTYPE html>
         let chartTopPop = null;
         let chartTopTech = null;
 
-        // BẢO MẬT: Mở Modal Password
         function openPasswordModal(actionType = 'EXCEL') {
             pendingAction = actionType;
             document.getElementById('importPasswordInput').value = '';
@@ -619,13 +611,11 @@ html_content = '''<!DOCTYPE html>
             setTimeout(() => document.getElementById('importPasswordInput').focus(), 100);
         }
 
-        // BẢO MẬT: Đóng Modal Password
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
             pendingAction = null;
         }
 
-        // BẢO MẬT: Kiểm tra Password
         function verifyPassword() {
             const inputPwd = document.getElementById('importPasswordInput').value;
             if (inputPwd === DEFAULT_PASSWORD) {
@@ -633,16 +623,14 @@ html_content = '''<!DOCTYPE html>
                 closePasswordModal();
                 
                 if (action === 'EXCEL') {
-                    document.getElementById('excelFileInput').click(); // Mở chọn file
+                    document.getElementById('excelFileInput').click();
                 }
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
         }
         
-        // MODAL ZALO GIAO TIẾP VỚI STREAMLIT BACKEND
         function openZaloModal() {
-            // Cập nhật nội dung mặc định với các số liệu Real-time
             const total = document.getElementById('kpiTotal').textContent;
             const urgent = document.getElementById('kpiUrgent').textContent;
             const overdue = document.getElementById('kpiOverdue').textContent;
@@ -669,28 +657,23 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             closeZaloModal();
             showToast('Đang gửi dữ liệu...', 'info');
             
-            // Gửi dữ liệu về Streamlit qua URL query params
             const encodedMsg = encodeURIComponent(msg);
             window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
         }
 
-        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss) Hoặc lấy giá trị số trực tiếp
-        function calculateTonGioFromColumnI(dateStr) {
+        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss) từ Cột H
+        function calculateTonGioFromColumnH(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
 
-            // Nếu giá trị đã là số giờ cụ thể
             if (typeof dateStr === 'number' && dateStr < 10000) {
                 return Math.max(0, Math.floor(dateStr));
             }
 
             let parsedDate = null;
 
-            // Case 1: Excel Serial Number (dạng số thực như 45200.5)
             if (typeof dateStr === 'number') {
                 parsedDate = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
-            } 
-            // Case 2: Dạng chuỗi String
-            else {
+            } else {
                 const str = String(dateStr).trim();
                 if (!str) return 0;
 
@@ -698,12 +681,10 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     return Math.max(0, Math.floor(Number(str)));
                 }
 
-                // Tách ngày giờ bằng khoảng trắng hoặc 'T'
                 const parts = str.split(/[ T]+/);
-                const datePart = parts[0]; // DD/MM/YYYY hoặc YYYY-MM-DD
+                const datePart = parts[0]; 
                 const timePart = parts[1] || "00:00:00";
 
-                // Trường hợp định dạng DD/MM/YYYY hoặc DD-MM-YYYY (Chuẩn Việt Nam)
                 if (datePart.includes('/') || datePart.includes('-')) {
                     const separator = datePart.includes('/') ? '/' : '-';
                     const dateComponents = datePart.split(separator);
@@ -711,20 +692,16 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     if (dateComponents.length === 3) {
                         let day, month, year;
 
-                        // Nếu phần đầu tiên là Năm (YYYY/MM/DD)
                         if (dateComponents[0].length === 4) {
                             year = parseInt(dateComponents[0], 10);
                             month = parseInt(dateComponents[1], 10) - 1;
                             day = parseInt(dateComponents[2], 10);
-                        } 
-                        // Chuẩn Việt Nam (DD/MM/YYYY)
-                        else {
+                        } else {
                             day = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1; // Tháng trong JS từ 0-11
+                            month = parseInt(dateComponents[1], 10) - 1;
                             year = parseInt(dateComponents[2], 10);
                         }
 
-                        // Tách Giờ : Phút : Giây
                         const timeComponents = timePart.split(':');
                         const hour = parseInt(timeComponents[0], 10) || 0;
                         const min = parseInt(timeComponents[1], 10) || 0;
@@ -734,7 +711,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     }
                 }
 
-                // Dự phòng cho các định dạng khác
                 if (!parsedDate || isNaN(parsedDate.getTime())) {
                     parsedDate = new Date(str);
                 }
@@ -742,7 +718,6 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
 
             if (!parsedDate || isNaN(parsedDate.getTime())) return 0;
 
-            // Tính chênh lệch giờ so với hiện tại
             const now = new Date();
             const diffMs = now - parsedDate;
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -1217,7 +1192,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
-            const colITimeIdx = 8; // Lấy dữ liệu Cột I (Chỉ số mảng bắt đầu từ 0 -> Cột I là 8)
+            const colHTimeIdx = 7; // Cột H (Index 7)
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
@@ -1243,15 +1218,15 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                const rawTimeColI = row[colITimeIdx];
-                const calculatedTonGio = calculateTonGioFromColumnI(rawTimeColI);
+                const rawTimeColH = row[colHTimeIdx];
+                const calculatedTonGio = calculateTonGioFromColumnH(rawTimeColH);
 
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
-                    "Thời gian tạo": rawTimeColI || '',
+                    "Thời gian tạo": rawTimeColH || '',
                     "Tồn giờ": calculatedTonGio,
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
@@ -1331,12 +1306,9 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             applyFilters();
         }
 
-        // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
         window.onload = function() {
-            // Tải dữ liệu ngay lập tức lần đầu
             fetchGoogleSheetData(true);
 
-            // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
             setInterval(function() {
                 fetchGoogleSheetData(false);
             }, 30000);
