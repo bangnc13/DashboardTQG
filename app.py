@@ -446,7 +446,7 @@ html_content = '''<!DOCTYPE html>
                             <i class="fa-solid fa-table-cells text-paleOlive-600 mr-2"></i>
                             BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA
                         </h2>
-                        <p class="text-xs text-paleOlive-800/80 dark:text-paleOlive-300/80">Xem, tìm kiếm và lọc bổ sung dữ liệu tồn ca theo nhu cầu</p>
+                        <p class="text-xs text-paleOlive-800/80 dark:text-paleOlive-300/80">Xem, tìm kiếm và lọc bổ sung dữ liệu tồn ca theo nhu cầu (Tồn giờ tính Realtime tự động cập nhật)</p>
                     </div>
 
                     <div class="flex items-center space-x-2">
@@ -661,13 +661,9 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
         }
 
-        // CÔNG THỨC CHUẨN XÁC: XỬ LÝ ĐỊNH DẠNG DD/MM/YYYY TUYỆT ĐỐI CHO CỘT H (Index 7)
+        // HÀM TÍNH TỒN GIỜ REALTIME = CURRENT_TIME - CỘT H (Index 7)
         function calculateTonGioFromColumnH(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
-
-            if (typeof dateStr === 'number' && dateStr < 10000) {
-                return Math.max(0, Math.floor(dateStr));
-            }
 
             let parsedDate = null;
 
@@ -677,50 +673,53 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                 const str = String(dateStr).trim();
                 if (!str) return 0;
 
-                if (!isNaN(str) && Number(str) < 10000) {
+                if (!isNaN(str) && Number(str) > 10000) {
+                    parsedDate = new Date(Math.round((Number(str) - 25569) * 86400 * 1000));
+                } else if (!isNaN(str) && Number(str) <= 10000) {
                     return Math.max(0, Math.floor(Number(str)));
-                }
+                } else {
+                    const parts = str.split(/[ T]+/);
+                    const datePart = parts[0]; 
+                    const timePart = parts[1] || "00:00:00";
 
-                const parts = str.split(/[ T]+/);
-                const datePart = parts[0]; 
-                const timePart = parts[1] || "00:00:00";
+                    if (datePart.includes('/') || datePart.includes('-')) {
+                        const separator = datePart.includes('/') ? '/' : '-';
+                        const dateComponents = datePart.split(separator);
 
-                if (datePart.includes('/') || datePart.includes('-')) {
-                    const separator = datePart.includes('/') ? '/' : '-';
-                    const dateComponents = datePart.split(separator);
+                        if (dateComponents.length === 3) {
+                            let day, month, year;
 
-                    if (dateComponents.length === 3) {
-                        let year, month, day;
+                            if (dateComponents[0].length === 4) {
+                                year = parseInt(dateComponents[0], 10);
+                                month = parseInt(dateComponents[1], 10) - 1;
+                                day = parseInt(dateComponents[2], 10);
+                            } else {
+                                // Chuẩn DD/MM/YYYY Việt Nam tuyệt đối
+                                day = parseInt(dateComponents[0], 10);
+                                month = parseInt(dateComponents[1], 10) - 1;
+                                year = parseInt(dateComponents[2], 10);
+                            }
 
-                        if (dateComponents[0].length === 4) {
-                            year = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1;
-                            day = parseInt(dateComponents[2], 10);
-                        } else {
-                            // Ép buộc chuẩn DD/MM/YYYY (Việt Nam) tuyệt đối để tránh sai lệch tháng/ngày
-                            day = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1;
-                            year = parseInt(dateComponents[2], 10);
-                        }
+                            if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+                                const timeComponents = timePart.split(':');
+                                const hour = parseInt(timeComponents[0], 10) || 0;
+                                const min = parseInt(timeComponents[1], 10) || 0;
+                                const sec = parseInt(timeComponents[2], 10) || 0;
 
-                        if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
-                            const timeComponents = timePart.split(':');
-                            const hour = parseInt(timeComponents[0], 10) || 0;
-                            const min = parseInt(timeComponents[1], 10) || 0;
-                            const sec = parseInt(timeComponents[2], 10) || 0;
-
-                            parsedDate = new Date(year, month, day, hour, min, sec);
+                                parsedDate = new Date(year, month, day, hour, min, sec);
+                            }
                         }
                     }
-                }
 
-                if (!parsedDate || isNaN(parsedDate.getTime())) {
-                    parsedDate = new Date(str);
+                    if (!parsedDate || isNaN(parsedDate.getTime())) {
+                        parsedDate = new Date(str);
+                    }
                 }
             }
 
             if (!parsedDate || isNaN(parsedDate.getTime())) return 0;
 
+            // Tính thời gian thực (REALTIME) trừ đi giá trị thời gian tại cột H
             const now = new Date();
             const diffMs = now - parsedDate;
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -813,7 +812,11 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             const blockFilter = document.getElementById('filterBlock')?.value || '';
             const chkNonZero = document.getElementById('chkNonZero')?.checked || false;
 
-            return currentDataset.filter(item => {
+            return currentDataset.map(item => {
+                // Tính toán Tồn giờ Realtime liên tục cho từng bản ghi
+                const realtimeTonGio = calculateTonGioFromColumnH(item["RawTimeColH"]);
+                return { ...item, "Tồn giờ": realtimeTonGio };
+            }).filter(item => {
                 if (managerFilter && item["Cột AN"] !== managerFilter) return false;
                 if (techFilter && item["Nhân sự"] !== techFilter) return false;
                 if (blockFilter && item["Block"] !== blockFilter) return false;
@@ -1222,15 +1225,15 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                 const popValue = popRaw.substring(0, 7);
 
                 const rawTimeColH = row[colHTimeIdx];
-                const calculatedTonGio = calculateTonGioFromColumnH(rawTimeColH);
+                const realtimeTonGio = calculateTonGioFromColumnH(rawTimeColH);
 
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
-                    "Thời gian tạo": rawTimeColH || '',
-                    "Tồn giờ": calculatedTonGio,
+                    "RawTimeColH": rawTimeColH, // Lưu giá trị thô để tính Realtime liên tục
+                    "Tồn giờ": realtimeTonGio,
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": nhanSuKey,
@@ -1312,9 +1315,17 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
         window.onload = function() {
             fetchGoogleSheetData(true);
 
+            // Tự động đồng bộ ngầm định kỳ mỗi 30s
             setInterval(function() {
                 fetchGoogleSheetData(false);
             }, 30000);
+
+            // Realtime ticker: Tự động cập nhật lại thời gian tồn giờ liên tục mỗi 60 giây mà không cần reload
+            setInterval(function() {
+                if (currentDataset.length > 0) {
+                    applyFilters();
+                }
+            }, 60000);
         };
     </script>
 </body>
