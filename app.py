@@ -7,7 +7,7 @@ st.set_page_config(
     page_title="TQG-Dashboard Kiểm Soát Ca Tồn & Checklist (CLL)",
     page_icon="📋",
     layout="wide",
-    initial_sidebar_state="collapsed"
+    # initial_sidebar_state="collapsed" # CHÚ Ý: Đã bỏ dòng này để sidebar luôn hiển thị
 )
 
 # Thêm CSS ẩn header/footer mặc định của Streamlit
@@ -1232,7 +1232,7 @@ html_content = '''<!DOCTYPE html>
 # Token cấp quyền từ hệ thống (Cần bảo mật nghiêm ngặt)
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
 # ID của Group Zalo cần gửi
-ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c" 
+ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
 
 def send_zalo_group_message(message):
     """Hàm gửi tin nhắn vào Group Zalo qua API"""
