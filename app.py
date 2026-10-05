@@ -29,7 +29,7 @@ st.markdown('''
 
 # Lấy Group ID và Token Zalo Bot
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
-ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
+ZALO_GROUP_ID = "zgr-9207abe0d78f3ed1679e"
 
 def send_zalo_group_message(message):
     """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API với cơ chế bắt lỗi an toàn"""
