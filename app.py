@@ -11,7 +11,7 @@ ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
 GOOGLE_SHEET_ID = '1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM'
 
 def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
+    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API (Đã xử lý an toàn phản hồi)"""
     url = "https://bot.zaloplatforms.com/api/v1/message"
     headers = {
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
@@ -23,7 +23,17 @@ def send_zalo_group_message(message):
     }
     try:
         response = requests.post(url, json=payload, headers=headers)
-        res_data = response.json()
+        
+        # Kiểm tra nếu nội dung trả về rỗng
+        if not response.text.strip():
+            return False, f"API trả về phản hồi rỗng (Mã lỗi HTTP: {response.status_code})"
+            
+        # Thử parse JSON an toàn
+        try:
+            res_data = response.json()
+        except Exception:
+            return False, f"Phản hồi không hợp lệ (HTTP {response.status_code}): {response.text}"
+            
         if response.status_code == 200 and res_data.get("error") == 0:
             return True, res_data
         else:
@@ -60,7 +70,7 @@ def fetch_kpi_summary_for_bot():
         )
         return report_msg
     except Exception as e:
-        return f"⚠️️ Không thể đọc dữ liệu báo cáo lúc này: {str(e)}"
+        return f"⚠ Không thể đọc dữ liệu báo cáo lúc này: {str(e)}"
 
 # --- KHỞI TẠO FLASK SERVER NHẬN WEBHOOK TỪ ZALO ---
 flask_app = Flask(__name__)
@@ -113,11 +123,11 @@ st.markdown('''
     </style>
 ''', unsafe_allow_html=True)
 
-# Tạo một thanh công cụ trực tiếp bằng Streamlit ở ngay đầu trang để bấm gửi Zalo chắc chắn thành công
+# Thanh công cụ Streamlit chứa nút bấm gửi Zalo trực tiếp
 col_zalo_1, col_zalo_2 = st.columns([6, 1])
 with col_zalo_2:
     if st.button("📤 Gửi ngay qua Zalo", use_container_width=True, type="primary"):
-        default_msg = f"📊 Báo cáo Kiểm soát Ca tồn (CLL) từ Web Dashboard:\n- Cập nhật lúc hệ thống trực tuyến."
+        default_msg = f"📊 Báo cáo Kiểm soát Ca tồn (CLL) từ Web Dashboard trực tuyến!"
         success, res = send_zalo_group_message(default_msg)
         if success:
             st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
