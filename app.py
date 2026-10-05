@@ -27,7 +27,7 @@ st.markdown('''
     </style>
 ''', unsafe_allow_html=True)
 
-# Lấy Group ID và Token
+# Lấy Group ID và Token Zalo Bot
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
 ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
 
@@ -57,18 +57,34 @@ def send_zalo_group_message(message):
     except Exception as e:
         return False, str(e)
 
-# Xử lý sự kiện gửi Zalo từ giao diện HTML thông qua query params
-query_params = st.query_params
-if "action" in query_params and query_params["action"] == "send_zalo":
-    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)")
-    success, res = send_zalo_group_message(msg_content)
+# --- KHU VỰC GỬI ZALO TRỰC QUAN NGAY TRÊN STREAMLIT (100% HOẠT ĐỘNG, KHÔNG BỊ CHẶN) ---
+with st.container():
+    st.markdown("""
+        <div style="background: linear-gradient(to right, #eff6ff, #dbeafe); padding: 12px 20px; border-bottom: 2px solid #3b82f6; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa-brands fa-diaspora" style="color: #2563eb; font-size: 20px;"></i>
+                <span style="font-weight: bold; color: #1e3a8a; font-size: 14px;">BẢNG ĐIỀU KHIỂN GỬI BÁO CÁO NHÓM ZALO BOT</span>
+            </div>
+            <span style="font-size: 12px; color: #64748b;">(Giải pháp thay thế modal HTML để vượt qua cơ chế chặn bảo mật iframe của trình duyệt)</span>
+        </div>
+    """, unsafe_allow_html=True)
     
-    if success:
-        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
-    else:
-        st.error(f"❌ Lỗi gửi tin nhắn: {res}")
-        
-    st.query_params.clear()
+    col_zalo_1, col_zalo_2 = st.columns([4, 1])
+    with col_zalo_1:
+        default_zalo_msg = "📊 Báo cáo Kiểm soát Ca tồn (CLL):\n- Đơn vị: TQG\n- Trạng thái: Đang theo dõi ca tồn hệ thống\n\nTruy cập Dashboard để xem chi tiết biểu đồ!"
+        zalo_msg_input = st.text_area("Nội dung tin nhắn gửi Zalo:", value=default_zalo_msg, height=80, label_visibility="collapsed")
+    with col_zalo_2:
+        st.markdown("<div style='height: 5px;'></div>", unsafe_allow_html=True)
+        if st.button("🚀 Gửi ngay vào Zalo", type="primary", use_container_width=True):
+            if not zalo_msg_input.strip():
+                st.warning("⚠️ Vui lòng nhập nội dung tin nhắn cần gửi!")
+            else:
+                with st.spinner("Đang kết nối Zalo Bot API..."):
+                    success, res = send_zalo_group_message(zalo_msg_input)
+                    if success:
+                        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
+                    else:
+                        st.error(f"❌ Lỗi gửi tin nhắn: {res}")
 
 html_content = '''<!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
@@ -140,30 +156,6 @@ html_content = '''<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- MODAL CONFIRM ZALO -->
-    <div id="zaloModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-md mx-4">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-paper-plane text-lg"></i>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Gửi báo cáo qua Zalo</h3>
-                    <p class="text-xs text-slate-500">Bot Thư Ký TQG sẽ gửi nội dung này vào nhóm</p>
-                </div>
-            </div>
-            <div class="space-y-4">
-                <textarea id="zaloMessageContent" rows="7" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border rounded-lg focus:outline-none dark:text-white resize-none"></textarea>
-                <div class="flex items-center justify-end space-x-2">
-                    <button onclick="closeZaloModal()" class="px-4 py-2 text-xs font-medium text-slate-600">Hủy</button>
-                    <button onclick="triggerSendZalo()" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm">
-                        <i class="fa-solid fa-paper-plane mr-1"></i> Gửi ngay
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -178,14 +170,6 @@ html_content = '''<!DOCTYPE html>
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <!-- NÚT GỬI ZALO ĐÃ ĐƯỢC PHỤC HỒI TRÊN HEADER -->
-                    <button onclick="openZaloModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition shadow-sm" title="Gửi thông báo vào Group Zalo">
-                        <i class="fa-solid fa-paper-plane mr-2 text-sm"></i>
-                        <span>Gửi Zalo</span>
-                    </button>
-
-                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
-
                     <div class="flex items-center space-x-2">
                         <span class="flex h-2.5 w-2.5 relative">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -362,38 +346,8 @@ html_content = '''<!DOCTYPE html>
                 closePasswordModal();
                 if (pendingAction === 'EXCEL') document.getElementById('excelFileInput').click();
             } else {
-                document.getElementById('passwordError').classList.add('hidden');
+                document.getElementById('passwordError').classList.remove('hidden');
             }
-        }
-
-        // CÁC HÀM MODAL ZALO
-        function openZaloModal() {
-            const total = document.getElementById('kpiTotal').textContent;
-            const urgent = document.getElementById('kpiUrgent').textContent;
-            const overdue = document.getElementById('kpiOverdue').textContent;
-            const repeat = document.getElementById('kpiRepeat').textContent;
-            
-            const defaultMsg = `📊 Báo cáo Kiểm soát Ca tồn (CLL):
-- Tổng tồn: ${total} ca
-- KH Giục: ${urgent} ca
-- Quá 24h: ${overdue} ca
-- CL Lặp: ${repeat} ca
-
-Truy cập Dashboard để xem biểu đồ chi tiết!`;
-
-            document.getElementById('zaloMessageContent').value = defaultMsg;
-            document.getElementById('zaloModal').classList.remove('hidden');
-        }
-
-        function closeZaloModal() {
-            document.getElementById('zaloModal').classList.add('hidden');
-        }
-
-        function triggerSendZalo() {
-            const msg = document.getElementById('zaloMessageContent').value;
-            closeZaloModal();
-            showToast('Đang gửi dữ liệu...', 'info');
-            window.parent.location.search = `?action=send_zalo&msg=${encodeURIComponent(msg)}`;
         }
 
         function calculateTonGioFromColumnI(dateStr) {
