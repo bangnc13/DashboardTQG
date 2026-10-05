@@ -658,7 +658,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
         }
 
-        // HÀM TÍNH TỒN GIỜ: XỬ LÝ CHUẨN DD/MM/YYYY (VIỆT NAM) & EXCEL SERIAL NUMBER
+        // HÀM TÍNH TỒN GIỜ: ÉP BUỘC ĐÚNG CHUẨN DD/MM/YYYY (VIỆT NAM) TỪ CỘT H (Index 7)
         function calculateTonGioFromColumnH(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
 
@@ -690,15 +690,15 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                         let day, month, year;
 
                         if (dateComponents[0].length === 4) {
-                            // Định dạng YYYY-MM-DD
+                            // Trường hợp YYYY-MM-DD
                             year = parseInt(dateComponents[0], 10);
                             month = parseInt(dateComponents[1], 10) - 1;
                             day = parseInt(dateComponents[2], 10);
                         } else {
-                            // Chuẩn Việt Nam DD/MM/YYYY (ví dụ: 01/10/2026 -> ngày 1, tháng 10)
-                            day = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1; 
-                            year = parseInt(dateComponents[2], 10);
+                            // Ép buộc chuẩn Việt Nam DD/MM/YYYY: v1 là Ngày, v2 là Tháng
+                            day = parseInt(dateComponents[0], 10);   // Phần 1: Ngày (VD: 01)
+                            month = parseInt(dateComponents[1], 10) - 1; // Phần 2: Tháng (VD: 10 -> Tháng 10)
+                            year = parseInt(dateComponents[2], 10);  // Phần 3: Năm (VD: 2026)
                         }
 
                         const timeComponents = timePart.split(':');
