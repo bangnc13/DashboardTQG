@@ -7,7 +7,7 @@ from flask import Flask, request, jsonify
 
 # --- CẤU HÌNH ZALO BOT & GOOGLE SHEETS ---
 ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
-ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
+ZALO_GROUP_ID = "zgr-9207abe0d78f3ed1679e"
 GOOGLE_SHEET_ID = '1qKW7OcGegD1IXcgV5WYXuzcUzYvpjZw-CqgzpYDLKoM'
 
 # --- HÀM TỰ ĐỘNG ĐỌC DỮ LIỆU TỪ GOOGLE SHEETS ĐỂ TRẢ VỀ CHO BOT ---
