@@ -1,6 +1,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import requests
+import json
 
 # Cấu hình trang rộng tràn màn hình (Wide mode)
 st.set_page_config(
@@ -31,27 +32,44 @@ ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSA
 ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
 
 def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn vào Group Zalo qua API"""
-    url = "https://bot-api.zaloplatforms.com/bot/sendMessage"
+    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
+    url = "https://bot.zaloplatforms.com/api/v1/message"
     headers = {
         "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
         "Content-Type": "application/json"
     }
+    # Cấu trúc payload chuẩn cho Zalo Bot Platform
     payload = {
-        "chat_id": ZALO_GROUP_ID,
-        "text": message
+        "recipient": {
+            "group_id": ZALO_GROUP_ID
+        },
+        "message": {
+            "text": message
+        }
     }
+    
     try:
         response = requests.post(url, json=payload, headers=headers)
-        return response.status_code == 200, response.json()
+        res_data = response.json()
+        # Zalo Bot API thường trả về error: 0 nếu thành công
+        if response.status_code == 200 and res_data.get("error") == 0:
+            return True, res_data
+        else:
+            return False, res_data
     except Exception as e:
         return False, str(e)
 
-# Xử lý sự kiện gửi Zalo (nếu có param trong URL)
+# Xử lý sự kiện gửi Zalo (nếu có param trong URL từ HTML Backend)
 query_params = st.query_params
 if "action" in query_params and query_params["action"] == "send_zalo":
-    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)\nTruy cập Dashboard để xem biểu đồ chi tiết.")
+    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)")
     success, res = send_zalo_group_message(msg_content)
+    
+    if success:
+        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
+    else:
+        st.error(f"❌ Lỗi gửi tin nhắn: {res}")
+        
     # Xoá param để tránh gửi lại khi refresh
     st.query_params.clear()
 
@@ -197,7 +215,7 @@ html_content = '''<!DOCTYPE html>
 
             <div class="space-y-4">
                 <div>
-                    <textarea id="zaloMessageContent" rows="4" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"></textarea>
+                    <textarea id="zaloMessageContent" rows="7" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"></textarea>
                 </div>
 
                 <div class="flex items-center justify-end space-x-2">
