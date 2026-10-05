@@ -661,7 +661,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
         }
 
-        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss) từ Cột H
+        // CÔNG THỨC TÍNH TỒN GIỜ THÔNG MINH (CHỐNG LỖI ĐỊNH DẠNG DD/MM/YYYY vs MM/DD/YYYY) TỪ CỘT H
         function calculateTonGioFromColumnH(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
 
@@ -690,24 +690,52 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     const dateComponents = datePart.split(separator);
 
                     if (dateComponents.length === 3) {
-                        let day, month, year;
+                        let c1 = parseInt(dateComponents[0], 10);
+                        let c2 = parseInt(dateComponents[1], 10);
+                        let c3 = parseInt(dateComponents[2], 10);
+
+                        let year, month, day;
 
                         if (dateComponents[0].length === 4) {
-                            year = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1;
-                            day = parseInt(dateComponents[2], 10);
-                        } else {
-                            day = parseInt(dateComponents[0], 10);
-                            month = parseInt(dateComponents[1], 10) - 1;
-                            year = parseInt(dateComponents[2], 10);
+                            year = c1;
+                            month = c2 - 1;
+                            day = c3;
+                        } else if (dateComponents[2].length === 4) {
+                            year = c3;
+                            if (c1 > 12) {
+                                day = c1;
+                                month = c2 - 1;
+                            } else if (c2 > 12) {
+                                day = c2;
+                                month = c1 - 1;
+                            } else {
+                                // Kiểm tra cả 2 định dạng DD/MM/YYYY và MM/DD/YYYY, chọn ngày hợp lệ ở quá khứ gần nhất
+                                const dateDDMM = new Date(year, c2 - 1, c1);
+                                const dateMMDD = new Date(year, c1 - 1, c2);
+                                
+                                const now = new Date();
+                                const diffDDMM = now - dateDDMM;
+                                const diffMMDD = now - dateMMDD;
+
+                                if (diffDDMM >= 0 && diffMMDD < 0) {
+                                    day = c1; month = c2 - 1;
+                                } else if (diffMMDD >= 0 && diffDDMM < 0) {
+                                    day = c2; month = c1 - 1;
+                                } else {
+                                    day = c1;
+                                    month = c2 - 1;
+                                }
+                            }
                         }
 
-                        const timeComponents = timePart.split(':');
-                        const hour = parseInt(timeComponents[0], 10) || 0;
-                        const min = parseInt(timeComponents[1], 10) || 0;
-                        const sec = parseInt(timeComponents[2], 10) || 0;
+                        if (year && !isNaN(month) && !isNaN(day)) {
+                            const timeComponents = timePart.split(':');
+                            const hour = parseInt(timeComponents[0], 10) || 0;
+                            const min = parseInt(timeComponents[1], 10) || 0;
+                            const sec = parseInt(timeComponents[2], 10) || 0;
 
-                        parsedDate = new Date(year, month, day, hour, min, sec);
+                            parsedDate = new Date(year, month, day, hour, min, sec);
+                        }
                     }
                 }
 
