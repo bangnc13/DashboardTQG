@@ -7,7 +7,7 @@ st.set_page_config(
     page_title="TQG-Dashboard Kiểm Soát Ca Tồn & Checklist (CLL)",
     page_icon="📋",
     layout="wide",
-    # initial_sidebar_state="collapsed" # CHÚ Ý: Đã bỏ dòng này để sidebar luôn hiển thị
+    initial_sidebar_state="collapsed"
 )
 
 # Thêm CSS ẩn header/footer mặc định của Streamlit
@@ -25,6 +25,35 @@ st.markdown('''
         }
     </style>
 ''', unsafe_allow_html=True)
+
+# Lấy Group ID và Token
+ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
+ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
+
+def send_zalo_group_message(message):
+    """Hàm gửi tin nhắn vào Group Zalo qua API"""
+    url = "https://bot-api.zaloplatforms.com/bot/sendMessage"
+    headers = {
+        "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "chat_id": ZALO_GROUP_ID,
+        "text": message
+    }
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        return response.status_code == 200, response.json()
+    except Exception as e:
+        return False, str(e)
+
+# Xử lý sự kiện gửi Zalo (nếu có param trong URL)
+query_params = st.query_params
+if "action" in query_params and query_params["action"] == "send_zalo":
+    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)\nTruy cập Dashboard để xem biểu đồ chi tiết.")
+    success, res = send_zalo_group_message(msg_content)
+    # Xoá param để tránh gửi lại khi refresh
+    st.query_params.clear()
 
 html_content = '''<!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
@@ -153,6 +182,34 @@ html_content = '''<!DOCTYPE html>
         </div>
     </div>
 
+    <!-- MODAL CONFIRM ZALO -->
+    <div id="zaloModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-md mx-4 transform transition-all">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                    <i class="fa-solid fa-paper-plane text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Gửi báo cáo qua Zalo</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Bot Thư Ký TQG sẽ gửi nội dung này vào nhóm</p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <textarea id="zaloMessageContent" rows="4" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"></textarea>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2">
+                    <button onclick="closeZaloModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition">Hủy</button>
+                    <button onclick="triggerSendZalo()" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">
+                        <i class="fa-brands fa-diaspora mr-1"></i> Gửi ngay
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -172,6 +229,14 @@ html_content = '''<!DOCTYPE html>
                 </div>
 
                 <div class="flex items-center space-x-3">
+                    <!-- NÚT GỬI ZALO ĐƯỢC THÊM VÀO ĐÂY -->
+                    <button onclick="openZaloModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition shadow-sm" title="Gửi thông báo vào Group Zalo">
+                        <i class="fa-solid fa-paper-plane mr-2 text-sm"></i>
+                        <span>Gửi Zalo</span>
+                    </button>
+                    
+                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div> <!-- Đường kẻ chia cắt -->
+
                     <!-- NÚT ĐỒNG BỘ CÓ BÁO TRẠNG THÁI REALTIME PING -->
                     <div class="flex items-center space-x-2">
                         <span class="flex h-2.5 w-2.5 relative" title="Chế độ tự động đồng bộ Realtime đang bật">
@@ -555,6 +620,40 @@ html_content = '''<!DOCTYPE html>
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
+        }
+        
+        // MODAL ZALO GIAO TIẾP VỚI STREAMLIT BACKEND
+        function openZaloModal() {
+            // Cập nhật nội dung mặc định với các số liệu Real-time
+            const total = document.getElementById('kpiTotal').textContent;
+            const urgent = document.getElementById('kpiUrgent').textContent;
+            const overdue = document.getElementById('kpiOverdue').textContent;
+            const repeat = document.getElementById('kpiRepeat').textContent;
+            
+            const defaultMsg = `📊 Báo cáo Kiểm soát Ca tồn (CLL):
+- Tổng tồn: ${total} ca
+- KH Giục: ${urgent} ca
+- Quá 24h: ${overdue} ca
+- CL Lặp: ${repeat} ca
+
+Truy cập Dashboard để xem biểu đồ chi tiết!`;
+
+            document.getElementById('zaloMessageContent').value = defaultMsg;
+            document.getElementById('zaloModal').classList.remove('hidden');
+        }
+
+        function closeZaloModal() {
+            document.getElementById('zaloModal').classList.add('hidden');
+        }
+
+        function triggerSendZalo() {
+            const msg = document.getElementById('zaloMessageContent').value;
+            closeZaloModal();
+            showToast('Đang gửi dữ liệu...', 'info');
+            
+            // Gửi dữ liệu về Streamlit qua URL query params
+            const encodedMsg = encodeURIComponent(msg);
+            window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
         }
 
         // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss) Hoặc lấy giá trị số trực tiếp
@@ -1227,53 +1326,6 @@ html_content = '''<!DOCTYPE html>
     </script>
 </body>
 </html>'''
-
-# --- TÍCH HỢP ZALO BOT BÊN TRONG STREAMLIT ---
-# Token cấp quyền từ hệ thống (Cần bảo mật nghiêm ngặt)
-ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
-# ID của Group Zalo cần gửi
-ZALO_GROUP_ID = "zgr-9207abe0d78f3cd1679c"
-
-def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn vào Group Zalo qua API"""
-    url = "https://bot-api.zaloplatforms.com/bot/sendMessage"
-    headers = {
-        "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "chat_id": ZALO_GROUP_ID,
-        "text": message
-    }
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        return response.status_code == 200, response.json()
-    except Exception as e:
-        return False, str(e)
-
-# Giao diện gửi Zalo trên Sidebar của Streamlit
-with st.sidebar:
-    st.header("🤖 Trợ Lý Bot TQG")
-    st.markdown("Đẩy thông tin báo cáo nhanh vào Group Zalo.")
-    
-    # Nội dung mặc định
-    default_msg = """📊 Báo cáo Kiểm soát Ca tồn (CLL):
-- Truy cập Dashboard để xem biểu đồ chi tiết.
-- Các trưởng nhóm chú ý các ca tồn quá 24h!
-🌐 Link Dashboard: [Đính kèm link web của bạn]"""
-    
-    report_content = st.text_area("Nội dung báo cáo:", value=default_msg, height=150)
-    
-    if st.button("🚀 Gửi vào Group Zalo", use_container_width=True):
-        if ZALO_GROUP_ID == "NHAP_GROUP_ID_CUA_BAN_TAI_DAY":
-            st.warning("⚠️ Lỗi: Bạn chưa khai báo ZALO_GROUP_ID trong file app.py!")
-        else:
-            with st.spinner('Đang gửi dữ liệu...'):
-                is_success, response_data = send_zalo_group_message(report_content)
-                if is_success:
-                    st.success("✅ Đã gửi thông báo thành công!")
-                else:
-                    st.error(f"❌ Gửi thất bại: {response_data}")
 
 # Render full screen Dashboard
 components.html(html_content, height=1400, scrolling=True)
