@@ -282,7 +282,7 @@ html_content = """
                     <span id="kpiOverdue" class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</span>
                     <span id="kpiOverduePct" class="text-xs text-purple-700 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-0.5 rounded-full">0%</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca có giá trị âm (-)</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400"Số case quá hẹn L1</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
             </div>
 
