@@ -950,7 +950,7 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            const csvUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:csv&_nc=' + Date.now();
+            const jsonUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:json&_nc=' + Date.now();
             const syncIcon = document.getElementById('syncIcon');
             
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -958,19 +958,21 @@ html_content = """
             try {
                 if (showNotification) showToast('Đang tự động đồng bộ Google Sheets...', 'info');
                 
-                const response = await fetch(csvUrl);
+                const response = await fetch(jsonUrl);
                 if (!response.ok) {
                     throw new Error('Không thể kết nối Google Sheets. Kiểm tra quyền truy cập công khai.');
                 }
                 
-                const csvText = await response.text();
-                const workbook = XLSX.read(csvText, { type: 'string' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                
-                if (processRowsMatrix(rowsMatrix)) {
+                const text = await response.text();
+                const start = text.indexOf('{');
+                const end = text.lastIndexOf('}');
+                if (start === -1 || end === -1) {
+                    throw new Error('Định dạng phản hồi từ Google Sheets không hợp lệ.');
+                }
+                const jsonString = text.substring(start, end + 1);
+                const jsonData = JSON.parse(jsonString);
+
+                if (processGvizJson(jsonData)) {
                     if (showNotification) showToast('Tự động đồng bộ thành công ' + currentDataset.length + ' ca tồn!', 'success');
                 }
             } catch (err) {
@@ -983,6 +985,43 @@ html_content = """
             }
         }
 
+        function processGvizJson(jsonData) {
+            if (!jsonData || !jsonData.table || !jsonData.table.rows) {
+                showToast('Không tìm thấy dữ liệu cấu trúc từ Google Sheets!', 'error');
+                return false;
+            }
+
+            const table = jsonData.table;
+            const gvizCols = table.cols || [];
+            const gvizRows = table.rows || [];
+
+            if (gvizRows.length === 0) {
+                showToast('Không tìm thấy dữ liệu trong sheet!', 'error');
+                return false;
+            }
+
+            const rowsMatrix = [];
+            const headerRow = gvizCols.map(function(c) { return c.label || c.id || ''; });
+            rowsMatrix.push(headerRow);
+
+            gvizRows.forEach(function(rowObj) {
+                const rowCells = rowObj.c || [];
+                rowsMatrix.push(rowCells);
+            });
+
+            return processRowsMatrix(rowsMatrix);
+        }
+
+        function getCellVal(row, idx) {
+            if (!row || idx < 0 || idx >= row.length) return '';
+            const cell = row[idx];
+            if (cell === undefined || cell === null) return '';
+            if (typeof cell === 'object') {
+                return cell.f !== undefined && cell.f !== null && cell.f !== '' ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '');
+            }
+            return cell;
+        }
+
         function processRowsMatrix(rowsMatrix) {
             if (!rowsMatrix || rowsMatrix.length <= 1) {
                 showToast('Không tìm thấy dữ liệu trong sheet!', 'error');
@@ -991,14 +1030,20 @@ html_content = """
 
             let headerRowIdx = 0;
             for (let r = 0; r < Math.min(10, rowsMatrix.length); r++) {
-                const rowStr = rowsMatrix[r].map(function(c) { return String(c).toUpperCase(); }).join(' ');
+                const row = rowsMatrix[r];
+                const rowStr = row.map(function(c, idx) { 
+                    return String(getCellVal(row, idx)).toUpperCase(); 
+                }).join(' ');
                 if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('TỒN GIỜ') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
                     headerRowIdx = r;
                     break;
                 }
             }
 
-            const headers = rowsMatrix[headerRowIdx].map(function(h) { return String(h).trim(); });
+            const headerCells = rowsMatrix[headerRowIdx];
+            const headers = headerCells.map(function(c, idx) { 
+                return String(getCellVal(headerCells, idx)).trim(); 
+            });
 
             function getColIndex(candidateNames, fallbackIndex) {
                 const idx = headers.findIndex(function(h) {
@@ -1035,19 +1080,19 @@ html_content = """
                 const row = rowsMatrix[r];
                 if (!row || row.length === 0) continue;
 
-                const soHD = String(row[colSoHDIdx] || '').trim();
-                const block = String(row[colBlockIdx] || '').trim();
+                const soHD = String(getCellVal(row, colSoHDIdx) || '').trim();
+                const block = String(getCellVal(row, colBlockIdx) || '').trim();
                 
                 if (!soHD && !block) continue;
 
-                const nhanSuKey = String(row[colTechIdx] || '').trim();
-                const quanLyName = managerMapping[nhanSuKey] || String(row[colANIdx] || '').trim();
+                const nhanSuKey = String(getCellVal(row, colTechIdx) || '').trim();
+                const quanLyName = managerMapping[nhanSuKey] || String(getCellVal(row, colANIdx) || '').trim();
 
-                const popRaw = String(row[colPopIdx] || '').trim();
+                const popRaw = String(getCellVal(row, colPopIdx) || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // Lấy và chuẩn hóa giá trị từ Cột J (hỗ trợ số thập phân dấu phẩy/chấm và giá trị âm / dấu -)
-                const rawTonGioJ = row[colTonGioJIdx];
+                // Lấy và chuẩn hóa giá trị từ Cột J (hỗ trợ số thập phân dấu phẩy/chấm và giữ nguyên giá trị âm / dấu -)
+                const rawTonGioJ = getCellVal(row, colTonGioJIdx);
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
                     tonGioVal = rawTonGioJ;
@@ -1064,15 +1109,15 @@ html_content = """
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
-                    "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
+                    "Tên đầy đủ": String(getCellVal(row, colTenKHIdx) || '').trim(),
                     "Tồn giờ": tonGioVal,
-                    "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
-                    "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
+                    "Số lần hẹn": parseInt(getCellVal(row, colHenIdx), 10) || 0,
+                    "CL Lặp": parseInt(getCellVal(row, colCLLapIdx), 10) || 0,
                     "Nhân sự": nhanSuKey,
-                    "KH Giục Tiến Độ": String(row[colUrgentIdx] || '').trim(),
-                    "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
+                    "KH Giục Tiến Độ": String(getCellVal(row, colUrgentIdx) || '').trim(),
+                    "TTCL": String(getCellVal(row, colTtclIdx) || 'Đang XL').trim(),
                     "POP": popValue,
-                    "Kiểm soát": String(row[colControlIdx] || '').trim(),
+                    "Kiểm soát": String(getCellVal(row, colControlIdx) || '').trim(),
                     "Cột AN": quanLyName
                 });
             }
