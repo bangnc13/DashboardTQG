@@ -242,7 +242,7 @@ html_content = """
                     <span id="kpiTotal" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
                     <span id="kpiTotalSub" class="text-xs text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-0.5 rounded-full">Tất cả</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng hợp hợp đồng tồn</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng số hợp đồng tồn</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
             </div>
 
@@ -268,7 +268,7 @@ html_content = """
                     <span id="kpiRepeat" class="text-2xl font-bold text-amber-600 dark:text-amber-400">0</span>
                     <span id="kpiRepeatCases" class="text-xs text-amber-700 bg-amber-50 dark:bg-amber-900/30 dark:text-amber-300 px-2 py-0.5 rounded-full">0 ca</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tổng số ca vụ lặp (Lặp > 0)</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Tổng số ca vụ lặp</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
