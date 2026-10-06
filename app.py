@@ -215,7 +215,7 @@ html_content = """
                 <div>
                     <div class="flex items-center space-x-2">
                         <label for="filterColAN" class="text-sm font-bold text-paleOlive-950 dark:text-paleOlive-100 uppercase tracking-wide">
-                            Lọc Theo Quản Lý Phụ Trách
+                            Lọc Theo trưởng bầy
                         </label>
                         <span id="activeManagerBadge" class="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-paleOlive-200 text-paleOlive-900 dark:bg-paleOlive-800 dark:text-paleOlive-100">
                             Tất cả
