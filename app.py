@@ -242,7 +242,7 @@ html_content = """
                     <span id="kpiTotal" class="text-2xl font-bold text-slate-900 dark:text-white">0</span>
                     <span id="kpiTotalSub" class="text-xs text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 px-2 py-0.5 rounded-full">Tất cả</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng số hợp đồng tồn</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">Tổng hợp hợp đồng tồn</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-blue-500"></div>
             </div>
 
@@ -275,14 +275,14 @@ html_content = """
             <!-- THẺ TỒN GIỜ ÂM (< 0) -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Quá giờ hẹn </span>
+                    <span>Tồn Giờ Âm</span>
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="mt-2 flex items-baseline justify-between">
                     <span id="kpiOverdue" class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</span>
                     <span id="kpiOverduePct" class="text-xs text-purple-700 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-0.5 rounded-full">0%</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Các case vụ quá lịch hẹn</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca có giá trị âm (-)</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
             </div>
 
@@ -434,7 +434,7 @@ html_content = """
                             <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Nhân Sự</th>
                             <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Quản Lý</th>
                             <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">KH Giục Tiến Độ</th>
-                            <th class="py-3 px-3 text-center w-24">Hạn còn lại đến giờ hẹn </th>
+                            <th class="py-3 px-3 text-center w-24">HẠN CÒN LẠI</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 dark:divide-paleOlive-800/40 bg-paleOlive-50/30 dark:bg-paleOlive-950/20">
@@ -680,8 +680,8 @@ html_content = """
             const repeatCases = data.filter(function(d) { return (d["CL Lặp"] || 0) > 0; });
             const totalRepeatCasesCount = repeatCases.length;
             
-            // Đếm số lượng case có giá trị Tồn giờ < 0 (giá trị âm)
-            const negativeCases = data.filter(function(d) { return (d["Tồn giờ"] || 0) < 0; }).length;
+            // Đếm số lượng case có giá trị Hạn còn lại < 0 (giá trị âm)
+            const negativeCases = data.filter(function(d) { return (d["Hạn còn lại"] || 0) < 0; }).length;
             const processingCases = data.filter(function(d) { return d["TTCL"] === 'Đang XL'; }).length;
             const urgentCases = data.filter(function(d) { return d["KH Giục Tiến Độ"] && d["KH Giục Tiến Độ"].toString().trim() !== ''; }).length;
 
@@ -730,7 +730,7 @@ html_content = """
 
             tbody.innerHTML = pageData.map(function(item, idx) {
                 const isRepeat = (item["CL Lặp"] || 0) > 0;
-                const isNegative = (item["Tồn giờ"] || 0) < 0;
+                const isNegative = (item["Hạn còn lại"] || 0) < 0;
                 const urgentVal = item["KH Giục Tiến Độ"] ? item["KH Giục Tiến Độ"].toString().trim() : '';
 
                 const repeatBadge = isRepeat
@@ -742,7 +742,7 @@ html_content = """
                     : '<span class="text-slate-400 font-normal">-</span>';
 
                 const tonGioClass = isNegative ? 'text-rose-600 font-bold dark:text-rose-400' : 'text-slate-600 dark:text-slate-300';
-                const tonGioDisplay = (item["Tồn giờ"] !== undefined && item["Tồn giờ"] !== null && item["Tồn giờ"] !== '') ? item["Tồn giờ"] : 0;
+                const tonGioDisplay = (item["Hạn còn lại"] !== undefined && item["Hạn còn lại"] !== null && item["Hạn còn lại"] !== '') ? item["Hạn còn lại"] : 0;
 
                 return '<tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">' +
                     '<td class="py-2.5 px-3 text-center text-slate-500 font-medium">' + (startIdx + idx + 1) + '</td>' +
@@ -994,7 +994,7 @@ html_content = """
             let headerRowIdx = 0;
             for (let r = 0; r < Math.min(10, rowsMatrix.length); r++) {
                 const rowStr = rowsMatrix[r].map(function(c) { return String(c).toUpperCase(); }).join(' ');
-                if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('TỒN GIỜ') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
+                if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('HẠN CÒN LẠI') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
                     headerRowIdx = r;
                     break;
                 }
@@ -1020,6 +1020,7 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
+            // Lấy giá trị trực tiếp chuẩn xác từ Cột J (Index 9) - Hạn còn lại
             const colTonGioJIdx = 9; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
@@ -1047,17 +1048,18 @@ html_content = """
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
+                // Xử lý chuẩn xác giá trị từ Cột J (Hạn còn lại): hỗ trợ số thập phân dấu phẩy (vd: -181,6)
                 const rawTonGioJ = row[colTonGioJIdx];
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
                     tonGioVal = rawTonGioJ;
                 } else if (rawTonGioJ !== undefined && rawTonGioJ !== null && rawTonGioJ !== '') {
                     let strVal = String(rawTonGioJ).trim();
-                    strVal = strVal.replace(',', '.');
-                    const cleaned = strVal.replace(/[^0-9.-]/g, '');
-                    tonGioVal = cleaned !== '' ? parseFloat(cleaned) : rawTonGioJ;
+                    strVal = strVal.replace(',', '.'); // Đổi dấu phẩy thành dấu chấm thập phân
+                    const cleaned = strVal.replace(/[^0-9.-]/g, ''); // Giữ lại số, dấu chấm và dấu trừ (-)
+                    tonGioVal = cleaned !== '' ? parseFloat(cleaned) : 0;
                 } else {
-                    tonGioVal = rawTonGioJ;
+                    tonGioVal = 0;
                 }
 
                 parsedRecords.push({
@@ -1065,7 +1067,7 @@ html_content = """
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
-                    "Tồn giờ": tonGioVal,
+                    "Hạn còn lại": tonGioVal,
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": nhanSuKey,
