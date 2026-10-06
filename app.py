@@ -747,7 +747,6 @@ html_content = """
 
                 const tonGioClass = isOverdue ? 'text-purple-600 font-bold dark:text-purple-400' : 'text-slate-600 dark:text-slate-300';
                 
-                // Hiển thị giá trị tồn giờ (giữ nguyên số thập phân hoặc giá trị âm)
                 const tonGioDisplay = (item["Tồn giờ"] !== undefined && item["Tồn giờ"] !== null && item["Tồn giờ"] !== '') ? item["Tồn giờ"] : 0;
 
                 return `
@@ -960,7 +959,7 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            const jsonUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json&_nc=${Date.now()}`;
+            const jsonUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:json&_nc=' + Date.now();
             const syncIcon = document.getElementById('syncIcon');
             
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -977,7 +976,8 @@ html_content = """
                 const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\([\s\S]*?\);?/);
                 let jsonData;
                 if (jsonMatch) {
-                    let cleanStr = jsonMatch[0].replace(/google\.visualization\.Query\.setResponse\(/, '');                     cleanStr = cleanStr.replace(/\);\s*$/, '');
+                    let cleanStr = jsonMatch[0].replace('google.visualization.Query.setResponse(', '');
+                    cleanStr = cleanStr.replace(/\);\s*$/, '');
                     jsonData = JSON.parse(cleanStr);
                 } else {
                     const start = text.indexOf('{');
@@ -986,7 +986,7 @@ html_content = """
                 }
 
                 if (processGvizJson(jsonData)) {
-                    if (showNotification) showToast(`Tự động đồng bộ thành công ${currentDataset.length} ca tồn!`, 'success');
+                    if (showNotification) showToast('Tự động đồng bộ thành công ' + currentDataset.length + ' ca tồn!', 'success');
                 }
             } catch (err) {
                 console.error('Google Sheets Fetch Error:', err);
@@ -1014,12 +1014,12 @@ html_content = """
             }
 
             const rowsMatrix = [];
-            const headerRow = gvizCols.map(c => c.label || c.id || '');
+            const headerRow = gvizCols.map(function(c) { return c.label || c.id || ''; });
             rowsMatrix.push(headerRow);
 
-            gvizRows.forEach(rowObj => {
+            gvizRows.forEach(function(rowObj) {
                 const rowCells = rowObj.c || [];
-                const rowValues = rowCells.map(cell => {
+                const rowValues = rowCells.map(function(cell) {
                     if (!cell) return '';
                     return cell.v !== undefined && cell.v !== null ? cell.v : (cell.f !== undefined ? cell.f : '');
                 });
@@ -1037,24 +1037,24 @@ html_content = """
 
             let headerRowIdx = 0;
             for (let r = 0; r < Math.min(10, rowsMatrix.length); r++) {
-                const rowStr = rowsMatrix[r].map(c => String(c).toUpperCase()).join(' ');
-                if (rowStr.includes('SỐ HĐ') || rowStr.includes('TỒN GIỜ') || rowStr.includes('BLOCK')) {
+                const rowStr = rowsMatrix[r].map(function(c) { return String(c).toUpperCase(); }).join(' ');
+                if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('TỒN GIỜ') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
                     headerRowIdx = r;
                     break;
                 }
             }
 
-            const headers = rowsMatrix[headerRowIdx].map(h => String(h).trim());
+            const headers = rowsMatrix[headerRowIdx].map(function(h) { return String(h).trim(); });
 
             function getColIndex(candidateNames, fallbackIndex) {
-                const idx = headers.findIndex(h => {
+                const idx = headers.findIndex(function(h) {
                     const cleanH = String(h).trim().toLowerCase();
-                    return candidateNames.some(name => {
+                    return candidateNames.some(function(name) {
                         const cleanName = name.toLowerCase().trim();
                         if (cleanName === 'an' || cleanName === 'cột an') {
                             return cleanH === 'an' || cleanH === 'cột an' || cleanH === 'cot an';
                         }
-                        return cleanH.includes(cleanName);
+                        return cleanH.indexOf(cleanName) !== -1;
                     });
                 });
                 return idx !== -1 ? idx : fallbackIndex;
@@ -1064,7 +1064,6 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            // Lấy giá trị trực tiếp chuẩn xác từ Cột J (Index 9)
             const colTonGioJIdx = 9; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
@@ -1092,7 +1091,6 @@ html_content = """
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // Lấy giá trị trực tiếp từ Cột J, hỗ trợ số thập phân và giá trị âm / dấu -
                 const rawTonGioJ = row[colTonGioJIdx];
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
@@ -1125,3 +1123,82 @@ html_content = """
 
             if (parsedRecords.length > 0) {
                 currentDataset = parsedRecords;
+                
+                try {
+                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentDataset));
+                } catch (e) {
+                    console.error('Không thể lưu vào localStorage:', e);
+                }
+
+                populateFilterOptions();
+                renderDashboard();
+                return true;
+            } else {
+                showToast('Không tìm thấy bản ghi hợp lệ nào!', 'error');
+                return false;
+            }
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    
+                    const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                    if (processRowsMatrix(rowsMatrix)) {
+                        showToast('Nạp thành công ' + currentDataset.length + ' ca tồn từ File Excel!', 'success');
+                    }
+                } catch (err) {
+                    showToast('Lỗi khi xử lý file Excel: ' + err.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
+        function exportDataCSV() {
+            const dataToExport = getFilteredData();
+            if (!dataToExport.length) {
+                showToast('Không có dữ liệu để xuất!', 'error');
+                return;
+            }
+
+            const ws = XLSX.utils.json_to_sheet(dataToExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Kiểm Soát Ca Tồn");
+            XLSX.writeFile(wb, "Bao_Cao_Kiem_Soat_Ca_Ton.xlsx");
+            showToast('Đã xuất file Excel báo cáo!', 'success');
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const filtered = getFilteredData();
+            renderCharts(filtered);
+        }
+
+        function renderDashboard() {
+            populateFilterOptions();
+            applyFilters();
+        }
+
+        window.onload = function() {
+            fetchGoogleSheetData(true);
+
+            setInterval(function() {
+                fetchGoogleSheetData(false);
+            }, 30000);
+        };
+    </script>
+</body>
+</html>
+"""
+
+# Render full screen Dashboard
+components.html(html_content, height=1400, scrolling=True)
