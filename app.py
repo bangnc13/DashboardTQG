@@ -221,7 +221,7 @@ html_content = """
                             Tất cả
                         </span>
                     </div>
-                    <p class="text-xs text-slate-600 dark:text-slate-400">Chọn Quản lý để cập nhật lại toàn bộ các ô chỉ số KPI, Biểu đồ phân tích và Bảng dữ liệu phía dưới</p>
+                    <p class="text-xs text-slate-600 dark:text-slate-400"></p>
                 </div>
             </div>
 
