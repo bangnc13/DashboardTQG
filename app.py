@@ -36,7 +36,7 @@ html_content = """
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- SheetJS (xlsx) for processing Excel files -->
+    <!-- SheetJS (xlsx) for processing Excel & CSV files -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- FontAwesome icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -469,12 +469,10 @@ html_content = """
         const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
         const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
         
-        // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
         let currentPage = 1;
-        let pendingAction = null; // Lưu loại thao tác cần xác thực (EXCEL)
+        let pendingAction = null;
 
-        // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
             "TQGTI.GIANGVH2": "ANHHV15",
             "TQGTI.THANHNV41": "ANHHV15",
@@ -520,7 +518,6 @@ html_content = """
         let chartTopPop = null;
         let chartTopTech = null;
 
-        // BẢO MẬT: Mở Modal Password
         function openPasswordModal(actionType = 'EXCEL') {
             pendingAction = actionType;
             document.getElementById('importPasswordInput').value = '';
@@ -533,24 +530,21 @@ html_content = """
             if (descEl) descEl.textContent = 'Vui lòng nhập mật khẩu để import File Excel';
 
             document.getElementById('passwordModal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('importPasswordInput').focus(), 100);
+            setTimeout(function() { document.getElementById('importPasswordInput').focus(); }, 100);
         }
 
-        // BẢO MẬT: Đóng Modal Password
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
             pendingAction = null;
         }
 
-        // BẢO MẬT: Kiểm tra Password
         function verifyPassword() {
             const inputPwd = document.getElementById('importPasswordInput').value;
             if (inputPwd === DEFAULT_PASSWORD) {
                 const action = pendingAction;
                 closePasswordModal();
-                
                 if (action === 'EXCEL') {
-                    document.getElementById('excelFileInput').click(); // Mở chọn file
+                    document.getElementById('excelFileInput').click();
                 }
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
@@ -571,13 +565,13 @@ html_content = """
                 error: 'fa-circle-exclamation',
                 info: 'fa-circle-info'
             };
-            toast.className = `flex items-center space-x-2 px-4 py-3 rounded-xl shadow-lg text-xs font-medium animate-toast ${bgColors[type] || bgColors.info} pointer-events-auto`;
-            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-sm"></i><span>${message}</span>`;
+            toast.className = 'flex items-center space-x-2 px-4 py-3 rounded-xl shadow-lg text-xs font-medium animate-toast ' + (bgColors[type] || bgColors.info) + ' pointer-events-auto';
+            toast.innerHTML = '<i class="fa-solid ' + (icons[type] || icons.info) + ' text-sm"></i><span>' + message + '</span>';
             container.appendChild(toast);
-            setTimeout(() => {
+            setTimeout(function() {
                 toast.style.opacity = '0';
                 toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
+                setTimeout(function() { toast.remove(); }, 300);
             }, 3000);
         }
 
@@ -592,20 +586,20 @@ html_content = """
             const currentTech = techSelect.value;
             const currentBlock = blockSelect.value;
 
-            const managers = [...new Set(currentDataset.map(d => d["Cột AN"]).filter(Boolean))].sort();
-            const techs = [...new Set(currentDataset.map(d => d["Nhân sự"]).filter(Boolean))].sort();
-            const blocks = [...new Set(currentDataset.map(d => d["Block"]).filter(Boolean))].sort();
+            const managers = [...new Set(currentDataset.map(function(d) { return d["Cột AN"]; }).filter(Boolean))].sort();
+            const techs = [...new Set(currentDataset.map(function(d) { return d["Nhân sự"]; }).filter(Boolean))].sort();
+            const blocks = [...new Set(currentDataset.map(function(d) { return d["Block"]; }).filter(Boolean))].sort();
 
             colANSelect.innerHTML = '<option value="">-- Tất cả Quản lý --</option>' + 
-                managers.map(m => `<option value="${m}">${m}</option>`).join('');
+                managers.map(function(m) { return '<option value="' + m + '">' + m + '</option>'; }).join('');
             colANSelect.value = currentAN;
 
             techSelect.innerHTML = '<option value="">Tất cả Nhân sự</option>' + 
-                techs.map(t => `<option value="${t}">${t}</option>`).join('');
+                techs.map(function(t) { return '<option value="' + t + '">' + t + '</option>'; }).join('');
             techSelect.value = currentTech;
 
             blockSelect.innerHTML = '<option value="">Tất cả Block</option>' + 
-                blocks.map(b => `<option value="${b}">${b}</option>`).join('');
+                blocks.map(function(b) { return '<option value="' + b + '">' + b + '</option>'; }).join('');
             blockSelect.value = currentBlock;
         }
 
@@ -642,7 +636,7 @@ html_content = """
             const blockFilter = document.getElementById('filterBlock')?.value || '';
             const chkNonZero = document.getElementById('chkNonZero')?.checked || false;
 
-            return currentDataset.filter(item => {
+            return currentDataset.filter(function(item) {
                 if (managerFilter && item["Cột AN"] !== managerFilter) return false;
                 if (techFilter && item["Nhân sự"] !== techFilter) return false;
                 if (blockFilter && item["Block"] !== blockFilter) return false;
@@ -682,12 +676,12 @@ html_content = """
 
         function updateKPIs(data) {
             const total = data.length;
-            const repeatCases = data.filter(d => (d["CL Lặp"] || 0) > 0);
+            const repeatCases = data.filter(function(d) { return (d["CL Lặp"] || 0) > 0; });
             const totalRepeatCasesCount = repeatCases.length;
             
-            const overdueCases = data.filter(d => (d["Tồn giờ"] || 0) >= 24).length;
-            const processingCases = data.filter(d => d["TTCL"] === 'Đang XL').length;
-            const urgentCases = data.filter(d => d["KH Giục Tiến Độ"] && d["KH Giục Tiến Độ"].toString().trim() !== '').length;
+            const overdueCases = data.filter(function(d) { return (d["Tồn giờ"] || 0) >= 24; }).length;
+            const processingCases = data.filter(function(d) { return d["TTCL"] === 'Đang XL'; }).length;
+            const urgentCases = data.filter(function(d) { return d["KH Giục Tiến Độ"] && d["KH Giục Tiến Độ"].toString().trim() !== ''; }).length;
 
             document.getElementById('kpiTotal').textContent = total;
             document.getElementById('kpiUrgent').textContent = urgentCases;
@@ -726,42 +720,39 @@ html_content = """
             if (!tbody) return;
 
             if (total === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>`;
+                tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>';
                 return;
             }
 
             const pageData = data.slice(startIdx, endIdx);
 
-            tbody.innerHTML = pageData.map((item, idx) => {
+            tbody.innerHTML = pageData.map(function(item, idx) {
                 const isRepeat = (item["CL Lặp"] || 0) > 0;
                 const isOverdue = (item["Tồn giờ"] || 0) >= 24;
                 const urgentVal = item["KH Giục Tiến Độ"] ? item["KH Giục Tiến Độ"].toString().trim() : '';
 
                 const repeatBadge = isRepeat
-                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200">${item["CL Lặp"]}</span>`
-                    : `<span class="text-slate-400">0</span>`;
+                    ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200">' + item["CL Lặp"] + '</span>'
+                    : '<span class="text-slate-400">0</span>';
 
                 const urgentBadge = urgentVal
-                    ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-300 dark:border-rose-700"><i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i>${urgentVal}</span>`
-                    : `<span class="text-slate-400 font-normal">-</span>`;
+                    ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-300 dark:border-rose-700"><i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i>' + urgentVal + '</span>'
+                    : '<span class="text-slate-400 font-normal">-</span>';
 
                 const tonGioClass = isOverdue ? 'text-purple-600 font-bold dark:text-purple-400' : 'text-slate-600 dark:text-slate-300';
-                
                 const tonGioDisplay = (item["Tồn giờ"] !== undefined && item["Tồn giờ"] !== null && item["Tồn giờ"] !== '') ? item["Tồn giờ"] : 0;
 
-                return `
-                    <tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">
-                        <td class="py-2.5 px-3 text-center text-slate-500 font-medium">${startIdx + idx + 1}</td>
-                        <td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400">${item["Số HĐ"] || '-'}</td>
-                        <td class="py-2.5 px-3 text-slate-800 dark:text-slate-200 font-medium">${item["Block"] || '-'}</td>
-                        <td class="py-2.5 px-3 text-center text-slate-700 dark:text-slate-300">${item["Số lần hẹn"] || 0}</td>
-                        <td class="py-2.5 px-3 text-center col-highlight font-semibold">${repeatBadge}</td>
-                        <td class="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">${item["Nhân sự"] || '-'}</td>
-                        <td class="py-2.5 px-3 font-medium text-paleOlive-900 dark:text-paleOlive-200 col-highlight">${item["Cột AN"] || '-'}</td>
-                        <td class="py-2.5 px-3 font-medium text-rose-600 dark:text-rose-400">${urgentBadge}</td>
-                        <td class="py-2.5 px-3 text-center ${tonGioClass}">${tonGioDisplay}h</td>
-                    </tr>
-                `;
+                return '<tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">' +
+                    '<td class="py-2.5 px-3 text-center text-slate-500 font-medium">' + (startIdx + idx + 1) + '</td>' +
+                    '<td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400">' + (item["Số HĐ"] || '-') + '</td>' +
+                    '<td class="py-2.5 px-3 text-slate-800 dark:text-slate-200 font-medium">' + (item["Block"] || '-') + '</td>' +
+                    '<td class="py-2.5 px-3 text-center text-slate-700 dark:text-slate-300">' + (item["Số lần hẹn"] || 0) + '</td>' +
+                    '<td class="py-2.5 px-3 text-center col-highlight font-semibold">' + repeatBadge + '</td>' +
+                    '<td class="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">' + (item["Nhân sự"] || '-') + '</td>' +
+                    '<td class="py-2.5 px-3 font-medium text-paleOlive-900 dark:text-paleOlive-200 col-highlight">' + (item["Cột AN"] || '-') + '</td>' +
+                    '<td class="py-2.5 px-3 font-medium text-rose-600 dark:text-rose-400">' + urgentBadge + '</td>' +
+                    '<td class="py-2.5 px-3 text-center ' + tonGioClass + '">' + tonGioDisplay + 'h</td>' +
+                '</tr>';
             }).join('');
         }
 
@@ -776,16 +767,16 @@ html_content = """
 
             let html = '';
 
-            html += `<button onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>`;
+            html += '<button onclick="goToPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + ' class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">' +
+                '<i class="fa-solid fa-chevron-left"></i>' +
+            '</button>';
 
             let startPage = Math.max(1, currentPage - 2);
             let endPage = Math.min(totalPages, currentPage + 2);
 
             if (startPage > 1) {
-                html += `<button onclick="goToPage(1)" class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">1</button>`;
-                if (startPage > 2) html += `<span class="px-1 text-slate-400">...</span>`;
+                html += '<button onclick="goToPage(1)" class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">1</button>';
+                if (startPage > 2) html += '<span class="px-1 text-slate-400">...</span>';
             }
 
             for (let p = startPage; p <= endPage; p++) {
@@ -794,17 +785,17 @@ html_content = """
                     ? 'bg-paleOlive-600 text-white font-bold border-paleOlive-600' 
                     : 'bg-white dark:bg-slate-800 border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700';
 
-                html += `<button onclick="goToPage(${p})" class="px-2.5 py-1 rounded-md border ${activeClass} transition">${p}</button>`;
+                html += '<button onclick="goToPage(' + p + ')" class="px-2.5 py-1 rounded-md border ' + activeClass + ' transition">' + p + '</button>';
             }
 
             if (endPage < totalPages) {
-                if (endPage < totalPages - 1) html += `<span class="px-1 text-slate-400">...</span>`;
-                html += `<button onclick="goToPage(${totalPages})" class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">${totalPages}</button>`;
+                if (endPage < totalPages - 1) html += '<span class="px-1 text-slate-400">...</span>';
+                html += '<button onclick="goToPage(' + totalPages + ')" class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">' + totalPages + '</button>';
             }
 
-            html += `<button onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>`;
+            html += '<button onclick="goToPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + ' class="px-2.5 py-1 rounded-md bg-white dark:bg-slate-800 border border-paleOlive-300 dark:border-paleOlive-700 text-paleOlive-950 dark:text-paleOlive-100 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-paleOlive-100 dark:hover:bg-slate-700 transition">' +
+                '<i class="fa-solid fa-chevron-right"></i>' +
+            '</button>';
 
             container.innerHTML = html;
         }
@@ -814,8 +805,8 @@ html_content = """
             const textColor = isDark ? '#94a3b8' : '#475569';
             const gridColor = isDark ? 'rgba(148, 163, 184, 0.1)' : 'rgba(203, 213, 225, 0.4)';
 
-            const hasRepeat = data.filter(d => (d["CL Lặp"] || 0) > 0).length;
-            const noRepeat = data.filter(d => (d["CL Lặp"] || 0) === 0).length;
+            const hasRepeat = data.filter(function(d) { return (d["CL Lặp"] || 0) > 0; }).length;
+            const noRepeat = data.filter(function(d) { return (d["CL Lặp"] || 0) === 0; }).length;
 
             if (chartRepeatPriority) chartRepeatPriority.destroy();
             const ctx1 = document.getElementById('chartRepeatPriority')?.getContext('2d');
@@ -850,7 +841,7 @@ html_content = """
                                         const value = context.raw || 0;
                                         const total = hasRepeat + noRepeat;
                                         const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                                        return ` ${label}: ${value} ca (${percentage}%)`;
+                                        return ' ' + label + ': ' + value + ' ca (' + percentage + '%)';
                                     }
                                 }
                             }
@@ -860,10 +851,10 @@ html_content = """
             }
 
             const blockMap = {};
-            data.forEach(d => {
+            data.forEach(function(d) {
                 if (d["Block"]) blockMap[d["Block"]] = (blockMap[d["Block"]] || 0) + 1;
             });
-            const sortedBlocks = Object.entries(blockMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            const sortedBlocks = Object.entries(blockMap).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
 
             if (chartTopBlock) chartTopBlock.destroy();
             const ctx2 = document.getElementById('chartTopBlock')?.getContext('2d');
@@ -871,10 +862,10 @@ html_content = """
                 chartTopBlock = new Chart(ctx2, {
                     type: 'bar',
                     data: {
-                        labels: sortedBlocks.map(b => b[0]),
+                        labels: sortedBlocks.map(function(b) { return b[0]; }),
                         datasets: [{
                             label: 'Số ca tồn',
-                            data: sortedBlocks.map(b => b[1]),
+                            data: sortedBlocks.map(function(b) { return b[1]; }),
                             backgroundColor: '#0284c7',
                             borderRadius: 6
                         }]
@@ -893,10 +884,10 @@ html_content = """
             }
 
             const popMap = {};
-            data.forEach(d => {
+            data.forEach(function(d) {
                 if (d["POP"]) popMap[d["POP"]] = (popMap[d["POP"]] || 0) + 1;
             });
-            const sortedPops = Object.entries(popMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            const sortedPops = Object.entries(popMap).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
 
             if (chartTopPop) chartTopPop.destroy();
             const ctx3 = document.getElementById('chartTopPop')?.getContext('2d');
@@ -904,10 +895,10 @@ html_content = """
                 chartTopPop = new Chart(ctx3, {
                     type: 'bar',
                     data: {
-                        labels: sortedPops.map(p => p[0]),
+                        labels: sortedPops.map(function(p) { return p[0]; }),
                         datasets: [{
                             label: 'Số ca tồn',
-                            data: sortedPops.map(p => p[1]),
+                            data: sortedPops.map(function(p) { return p[1]; }),
                             backgroundColor: '#10b981',
                             borderRadius: 6
                         }]
@@ -925,10 +916,10 @@ html_content = """
             }
 
             const techMap = {};
-            data.forEach(d => {
+            data.forEach(function(d) {
                 if (d["Nhân sự"]) techMap[d["Nhân sự"]] = (techMap[d["Nhân sự"]] || 0) + 1;
             });
-            const sortedTechs = Object.entries(techMap).sort((a, b) => b[1] - a[1]).slice(0, 8);
+            const sortedTechs = Object.entries(techMap).sort(function(a, b) { return b[1] - a[1]; }).slice(0, 8);
 
             if (chartTopTech) chartTopTech.destroy();
             const ctx4 = document.getElementById('chartTopTech')?.getContext('2d');
@@ -936,10 +927,10 @@ html_content = """
                 chartTopTech = new Chart(ctx4, {
                     type: 'bar',
                     data: {
-                        labels: sortedTechs.map(t => t[0]),
+                        labels: sortedTechs.map(function(t) { return t[0]; }),
                         datasets: [{
                             label: 'Số ca tồn',
-                            data: sortedTechs.map(t => t[1]),
+                            data: sortedTechs.map(function(t) { return t[1]; }),
                             backgroundColor: '#8b5cf6',
                             borderRadius: 6
                         }]
@@ -959,7 +950,7 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            const jsonUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:json&_nc=' + Date.now();
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:csv&_nc=' + Date.now();
             const syncIcon = document.getElementById('syncIcon');
             
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -967,25 +958,19 @@ html_content = """
             try {
                 if (showNotification) showToast('Đang tự động đồng bộ Google Sheets...', 'info');
                 
-                const response = await fetch(jsonUrl);
+                const response = await fetch(csvUrl);
                 if (!response.ok) {
                     throw new Error('Không thể kết nối Google Sheets. Kiểm tra quyền truy cập công khai.');
                 }
                 
-                const text = await response.text();
-                const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\([\s\S]*?\);?/);
-                let jsonData;
-                if (jsonMatch) {
-                    let cleanStr = jsonMatch[0].replace('google.visualization.Query.setResponse(', '');
-                    cleanStr = cleanStr.replace(/\);\s*$/, '');
-                    jsonData = JSON.parse(cleanStr);
-                } else {
-                    const start = text.indexOf('{');
-                    const end = text.lastIndexOf('}');
-                    jsonData = JSON.parse(text.substring(start, end + 1));
-                }
-
-                if (processGvizJson(jsonData)) {
+                const csvText = await response.text();
+                const workbook = XLSX.read(csvText, { type: 'string' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                
+                if (processRowsMatrix(rowsMatrix)) {
                     if (showNotification) showToast('Tự động đồng bộ thành công ' + currentDataset.length + ' ca tồn!', 'success');
                 }
             } catch (err) {
@@ -996,37 +981,6 @@ html_content = """
             } finally {
                 if (syncIcon) syncIcon.classList.remove('fa-spin');
             }
-        }
-
-        function processGvizJson(jsonData) {
-            if (!jsonData || !jsonData.table || !jsonData.table.rows) {
-                showToast('Không tìm thấy dữ liệu cấu trúc từ Google Sheets!', 'error');
-                return false;
-            }
-
-            const table = jsonData.table;
-            const gvizCols = table.cols || [];
-            const gvizRows = table.rows || [];
-
-            if (gvizRows.length === 0) {
-                showToast('Không tìm thấy dữ liệu trong sheet!', 'error');
-                return false;
-            }
-
-            const rowsMatrix = [];
-            const headerRow = gvizCols.map(function(c) { return c.label || c.id || ''; });
-            rowsMatrix.push(headerRow);
-
-            gvizRows.forEach(function(rowObj) {
-                const rowCells = rowObj.c || [];
-                const rowValues = rowCells.map(function(cell) {
-                    if (!cell) return '';
-                    return cell.v !== undefined && cell.v !== null ? cell.v : (cell.f !== undefined ? cell.f : '');
-                });
-                rowsMatrix.push(rowValues);
-            });
-
-            return processRowsMatrix(rowsMatrix);
         }
 
         function processRowsMatrix(rowsMatrix) {
@@ -1064,6 +1018,7 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
+            // Lấy giá trị trực tiếp chuẩn xác từ Cột J (Index 9)
             const colTonGioJIdx = 9; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
@@ -1091,6 +1046,7 @@ html_content = """
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
+                // Lấy và chuẩn hóa giá trị từ Cột J (hỗ trợ số thập phân dấu phẩy/chấm và giá trị âm / dấu -)
                 const rawTonGioJ = row[colTonGioJIdx];
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
