@@ -272,16 +272,17 @@ html_content = """
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
+            <!-- THẺ TỒN GIỜ ÂM (< 0) -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Tồn Giờ ≥ 24H</span>
+                    <span>Quá giờ hẹn </span>
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="mt-2 flex items-baseline justify-between">
                     <span id="kpiOverdue" class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</span>
                     <span id="kpiOverduePct" class="text-xs text-purple-700 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-0.5 rounded-full">0%</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca quá hạn 1 ngày</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca có giá trị âm (-)</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
             </div>
 
@@ -433,7 +434,7 @@ html_content = """
                             <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Nhân Sự</th>
                             <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Quản Lý</th>
                             <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">KH Giục Tiến Độ</th>
-                            <th class="py-3 px-3 text-center w-24">Tồn Giờ</th>
+                            <th class="py-3 px-3 text-center w-24">Hạn còn lại đến giờ hẹn </th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 dark:divide-paleOlive-800/40 bg-paleOlive-50/30 dark:bg-paleOlive-950/20">
@@ -679,7 +680,8 @@ html_content = """
             const repeatCases = data.filter(function(d) { return (d["CL Lặp"] || 0) > 0; });
             const totalRepeatCasesCount = repeatCases.length;
             
-            const overdueCases = data.filter(function(d) { return (d["Tồn giờ"] || 0) >= 24; }).length;
+            // Đếm số lượng case có giá trị Tồn giờ < 0 (giá trị âm)
+            const negativeCases = data.filter(function(d) { return (d["Tồn giờ"] || 0) < 0; }).length;
             const processingCases = data.filter(function(d) { return d["TTCL"] === 'Đang XL'; }).length;
             const urgentCases = data.filter(function(d) { return d["KH Giục Tiến Độ"] && d["KH Giục Tiến Độ"].toString().trim() !== ''; }).length;
 
@@ -688,8 +690,8 @@ html_content = """
             document.getElementById('kpiUrgentPct').textContent = total ? Math.round((urgentCases / total) * 100) + '%' : '0%';
             document.getElementById('kpiRepeat').textContent = totalRepeatCasesCount;
             document.getElementById('kpiRepeatCases').textContent = totalRepeatCasesCount + ' ca';
-            document.getElementById('kpiOverdue').textContent = overdueCases;
-            document.getElementById('kpiOverduePct').textContent = total ? Math.round((overdueCases / total) * 100) + '%' : '0%';
+            document.getElementById('kpiOverdue').textContent = negativeCases;
+            document.getElementById('kpiOverduePct').textContent = total ? Math.round((negativeCases / total) * 100) + '%' : '0%';
             document.getElementById('kpiProcessing').textContent = processingCases;
             document.getElementById('kpiProcessingPct').textContent = total ? Math.round((processingCases / total) * 100) + '%' : '0%';
         }
@@ -728,7 +730,7 @@ html_content = """
 
             tbody.innerHTML = pageData.map(function(item, idx) {
                 const isRepeat = (item["CL Lặp"] || 0) > 0;
-                const isOverdue = (item["Tồn giờ"] || 0) >= 24;
+                const isNegative = (item["Tồn giờ"] || 0) < 0;
                 const urgentVal = item["KH Giục Tiến Độ"] ? item["KH Giục Tiến Độ"].toString().trim() : '';
 
                 const repeatBadge = isRepeat
@@ -739,7 +741,7 @@ html_content = """
                     ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-300 dark:border-rose-700"><i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i>' + urgentVal + '</span>'
                     : '<span class="text-slate-400 font-normal">-</span>';
 
-                const tonGioClass = isOverdue ? 'text-purple-600 font-bold dark:text-purple-400' : 'text-slate-600 dark:text-slate-300';
+                const tonGioClass = isNegative ? 'text-rose-600 font-bold dark:text-rose-400' : 'text-slate-600 dark:text-slate-300';
                 const tonGioDisplay = (item["Tồn giờ"] !== undefined && item["Tồn giờ"] !== null && item["Tồn giờ"] !== '') ? item["Tồn giờ"] : 0;
 
                 return '<tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">' +
@@ -950,7 +952,7 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            const jsonUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:json&_nc=' + Date.now();
+            const csvUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:csv&_nc=' + Date.now();
             const syncIcon = document.getElementById('syncIcon');
             
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -958,21 +960,19 @@ html_content = """
             try {
                 if (showNotification) showToast('Đang tự động đồng bộ Google Sheets...', 'info');
                 
-                const response = await fetch(jsonUrl);
+                const response = await fetch(csvUrl);
                 if (!response.ok) {
                     throw new Error('Không thể kết nối Google Sheets. Kiểm tra quyền truy cập công khai.');
                 }
                 
-                const text = await response.text();
-                const start = text.indexOf('{');
-                const end = text.lastIndexOf('}');
-                if (start === -1 || end === -1) {
-                    throw new Error('Định dạng phản hồi từ Google Sheets không hợp lệ.');
-                }
-                const jsonString = text.substring(start, end + 1);
-                const jsonData = JSON.parse(jsonString);
-
-                if (processGvizJson(jsonData)) {
+                const csvText = await response.text();
+                const workbook = XLSX.read(csvText, { type: 'string' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                
+                const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                
+                if (processRowsMatrix(rowsMatrix)) {
                     if (showNotification) showToast('Tự động đồng bộ thành công ' + currentDataset.length + ' ca tồn!', 'success');
                 }
             } catch (err) {
@@ -985,43 +985,6 @@ html_content = """
             }
         }
 
-        function processGvizJson(jsonData) {
-            if (!jsonData || !jsonData.table || !jsonData.table.rows) {
-                showToast('Không tìm thấy dữ liệu cấu trúc từ Google Sheets!', 'error');
-                return false;
-            }
-
-            const table = jsonData.table;
-            const gvizCols = table.cols || [];
-            const gvizRows = table.rows || [];
-
-            if (gvizRows.length === 0) {
-                showToast('Không tìm thấy dữ liệu trong sheet!', 'error');
-                return false;
-            }
-
-            const rowsMatrix = [];
-            const headerRow = gvizCols.map(function(c) { return c.label || c.id || ''; });
-            rowsMatrix.push(headerRow);
-
-            gvizRows.forEach(function(rowObj) {
-                const rowCells = rowObj.c || [];
-                rowsMatrix.push(rowCells);
-            });
-
-            return processRowsMatrix(rowsMatrix);
-        }
-
-        function getCellVal(row, idx) {
-            if (!row || idx < 0 || idx >= row.length) return '';
-            const cell = row[idx];
-            if (cell === undefined || cell === null) return '';
-            if (typeof cell === 'object') {
-                return cell.f !== undefined && cell.f !== null && cell.f !== '' ? cell.f : (cell.v !== undefined && cell.v !== null ? cell.v : '');
-            }
-            return cell;
-        }
-
         function processRowsMatrix(rowsMatrix) {
             if (!rowsMatrix || rowsMatrix.length <= 1) {
                 showToast('Không tìm thấy dữ liệu trong sheet!', 'error');
@@ -1030,20 +993,14 @@ html_content = """
 
             let headerRowIdx = 0;
             for (let r = 0; r < Math.min(10, rowsMatrix.length); r++) {
-                const row = rowsMatrix[r];
-                const rowStr = row.map(function(c, idx) { 
-                    return String(getCellVal(row, idx)).toUpperCase(); 
-                }).join(' ');
+                const rowStr = rowsMatrix[r].map(function(c) { return String(c).toUpperCase(); }).join(' ');
                 if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('TỒN GIỜ') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
                     headerRowIdx = r;
                     break;
                 }
             }
 
-            const headerCells = rowsMatrix[headerRowIdx];
-            const headers = headerCells.map(function(c, idx) { 
-                return String(getCellVal(headerCells, idx)).trim(); 
-            });
+            const headers = rowsMatrix[headerRowIdx].map(function(h) { return String(h).trim(); });
 
             function getColIndex(candidateNames, fallbackIndex) {
                 const idx = headers.findIndex(function(h) {
@@ -1063,7 +1020,6 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            // Lấy giá trị trực tiếp chuẩn xác từ Cột J (Index 9)
             const colTonGioJIdx = 9; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
@@ -1080,19 +1036,18 @@ html_content = """
                 const row = rowsMatrix[r];
                 if (!row || row.length === 0) continue;
 
-                const soHD = String(getCellVal(row, colSoHDIdx) || '').trim();
-                const block = String(getCellVal(row, colBlockIdx) || '').trim();
+                const soHD = String(row[colSoHDIdx] || '').trim();
+                const block = String(row[colBlockIdx] || '').trim();
                 
                 if (!soHD && !block) continue;
 
-                const nhanSuKey = String(getCellVal(row, colTechIdx) || '').trim();
-                const quanLyName = managerMapping[nhanSuKey] || String(getCellVal(row, colANIdx) || '').trim();
+                const nhanSuKey = String(row[colTechIdx] || '').trim();
+                const quanLyName = managerMapping[nhanSuKey] || String(row[colANIdx] || '').trim();
 
-                const popRaw = String(getCellVal(row, colPopIdx) || '').trim();
+                const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // Lấy và chuẩn hóa giá trị từ Cột J (hỗ trợ số thập phân dấu phẩy/chấm và giữ nguyên giá trị âm / dấu -)
-                const rawTonGioJ = getCellVal(row, colTonGioJIdx);
+                const rawTonGioJ = row[colTonGioJIdx];
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
                     tonGioVal = rawTonGioJ;
@@ -1109,15 +1064,15 @@ html_content = """
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
-                    "Tên đầy đủ": String(getCellVal(row, colTenKHIdx) || '').trim(),
+                    "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
                     "Tồn giờ": tonGioVal,
-                    "Số lần hẹn": parseInt(getCellVal(row, colHenIdx), 10) || 0,
-                    "CL Lặp": parseInt(getCellVal(row, colCLLapIdx), 10) || 0,
+                    "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
+                    "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
                     "Nhân sự": nhanSuKey,
-                    "KH Giục Tiến Độ": String(getCellVal(row, colUrgentIdx) || '').trim(),
-                    "TTCL": String(getCellVal(row, colTtclIdx) || 'Đang XL').trim(),
+                    "KH Giục Tiến Độ": String(row[colUrgentIdx] || '').trim(),
+                    "TTCL": String(row[colTtclIdx] || 'Đang XL').trim(),
                     "POP": popValue,
-                    "Kiểm soát": String(getCellVal(row, colControlIdx) || '').trim(),
+                    "Kiểm soát": String(row[colControlIdx] || '').trim(),
                     "Cột AN": quanLyName
                 });
             }
