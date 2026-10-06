@@ -272,16 +272,17 @@ html_content = """
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
+            <!-- THẺ TỒN GIỜ ÂM (< 0) -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Tồn Giờ ≥ 24H</span>
+                    <span>Tồn Giờ Âm</span>
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="mt-2 flex items-baseline justify-between">
                     <span id="kpiOverdue" class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</span>
                     <span id="kpiOverduePct" class="text-xs text-purple-700 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-0.5 rounded-full">0%</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca quá hạn 1 ngày</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca có giá trị âm (-)</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
             </div>
 
@@ -433,7 +434,7 @@ html_content = """
                             <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Nhân Sự</th>
                             <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Quản Lý</th>
                             <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">KH Giục Tiến Độ</th>
-                            <th class="py-3 px-3 text-center w-24">Tồn Giờ</th>
+                            <th class="py-3 px-3 text-center w-24">HẠN CÒN LẠI</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 dark:divide-paleOlive-800/40 bg-paleOlive-50/30 dark:bg-paleOlive-950/20">
@@ -679,7 +680,7 @@ html_content = """
             const repeatCases = data.filter(function(d) { return (d["CL Lặp"] || 0) > 0; });
             const totalRepeatCasesCount = repeatCases.length;
             
-            const overdueCases = data.filter(function(d) { return (d["Tồn giờ"] || 0) >= 24; }).length;
+            const negativeCases = data.filter(function(d) { return (d["Hạn còn lại"] || 0) < 0; }).length;
             const processingCases = data.filter(function(d) { return d["TTCL"] === 'Đang XL'; }).length;
             const urgentCases = data.filter(function(d) { return d["KH Giục Tiến Độ"] && d["KH Giục Tiến Độ"].toString().trim() !== ''; }).length;
 
@@ -688,8 +689,8 @@ html_content = """
             document.getElementById('kpiUrgentPct').textContent = total ? Math.round((urgentCases / total) * 100) + '%' : '0%';
             document.getElementById('kpiRepeat').textContent = totalRepeatCasesCount;
             document.getElementById('kpiRepeatCases').textContent = totalRepeatCasesCount + ' ca';
-            document.getElementById('kpiOverdue').textContent = overdueCases;
-            document.getElementById('kpiOverduePct').textContent = total ? Math.round((overdueCases / total) * 100) + '%' : '0%';
+            document.getElementById('kpiOverdue').textContent = negativeCases;
+            document.getElementById('kpiOverduePct').textContent = total ? Math.round((negativeCases / total) * 100) + '%' : '0%';
             document.getElementById('kpiProcessing').textContent = processingCases;
             document.getElementById('kpiProcessingPct').textContent = total ? Math.round((processingCases / total) * 100) + '%' : '0%';
         }
@@ -728,7 +729,7 @@ html_content = """
 
             tbody.innerHTML = pageData.map(function(item, idx) {
                 const isRepeat = (item["CL Lặp"] || 0) > 0;
-                const isOverdue = (item["Tồn giờ"] || 0) >= 24;
+                const isNegative = (item["Hạn còn lại"] || 0) < 0;
                 const urgentVal = item["KH Giục Tiến Độ"] ? item["KH Giục Tiến Độ"].toString().trim() : '';
 
                 const repeatBadge = isRepeat
@@ -739,8 +740,8 @@ html_content = """
                     ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-300 dark:border-rose-700"><i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i>' + urgentVal + '</span>'
                     : '<span class="text-slate-400 font-normal">-</span>';
 
-                const tonGioClass = isOverdue ? 'text-purple-600 font-bold dark:text-purple-400' : 'text-slate-600 dark:text-slate-300';
-                const tonGioDisplay = (item["Tồn giờ"] !== undefined && item["Tồn giờ"] !== null && item["Tồn giờ"] !== '') ? item["Tồn giờ"] : 0;
+                const tonGioClass = isNegative ? 'text-rose-600 font-bold dark:text-rose-400' : 'text-slate-600 dark:text-slate-300';
+                const tonGioDisplay = (item["Hạn còn lại"] !== undefined && item["Hạn còn lại"] !== null && item["Hạn còn lại"] !== '') ? item["Hạn còn lại"] : 0;
 
                 return '<tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">' +
                     '<td class="py-2.5 px-3 text-center text-slate-500 font-medium">' + (startIdx + idx + 1) + '</td>' +
@@ -964,12 +965,12 @@ html_content = """
                 }
                 
                 const text = await response.text();
-                const start = text.indexOf('{');
-                const end = text.lastIndexOf('}');
-                if (start === -1 || end === -1) {
+                const openParen = text.indexOf('(');
+                const closeParen = text.lastIndexOf(')');
+                if (openParen === -1 || closeParen === -1) {
                     throw new Error('Định dạng phản hồi từ Google Sheets không hợp lệ.');
                 }
-                const jsonString = text.substring(start, end + 1);
+                const jsonString = text.substring(openParen + 1, closeParen);
                 const jsonData = JSON.parse(jsonString);
 
                 if (processGvizJson(jsonData)) {
@@ -1034,7 +1035,7 @@ html_content = """
                 const rowStr = row.map(function(c, idx) { 
                     return String(getCellVal(row, idx)).toUpperCase(); 
                 }).join(' ');
-                if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('TỒN GIỜ') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
+                if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('HẠN CÒN LẠI') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
                     headerRowIdx = r;
                     break;
                 }
@@ -1063,8 +1064,7 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            // Lấy giá trị trực tiếp chuẩn xác từ Cột J (Index 9)
-            const colTonGioJIdx = 9; 
+            const colTonGioJIdx = 9; // Cột J (Index 9) - Hạn còn lại
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
@@ -1091,7 +1091,7 @@ html_content = """
                 const popRaw = String(getCellVal(row, colPopIdx) || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // Lấy và chuẩn hóa giá trị từ Cột J (hỗ trợ số thập phân dấu phẩy/chấm và giữ nguyên giá trị âm / dấu -)
+                // Xử lý chuẩn xác giá trị từ Cột J (Hạn còn lại): đổi dấu phẩy thành dấu chấm để parseFloat nhận diện chính xác phần thập phân
                 const rawTonGioJ = getCellVal(row, colTonGioJIdx);
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
@@ -1100,9 +1100,9 @@ html_content = """
                     let strVal = String(rawTonGioJ).trim();
                     strVal = strVal.replace(',', '.');
                     const cleaned = strVal.replace(/[^0-9.-]/g, '');
-                    tonGioVal = cleaned !== '' ? parseFloat(cleaned) : rawTonGioJ;
+                    tonGioVal = cleaned !== '' ? parseFloat(cleaned) : 0;
                 } else {
-                    tonGioVal = rawTonGioJ;
+                    tonGioVal = 0;
                 }
 
                 parsedRecords.push({
@@ -1110,7 +1110,7 @@ html_content = """
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(getCellVal(row, colTenKHIdx) || '').trim(),
-                    "Tồn giờ": tonGioVal,
+                    "Hạn còn lại": tonGioVal,
                     "Số lần hẹn": parseInt(getCellVal(row, colHenIdx), 10) || 0,
                     "CL Lặp": parseInt(getCellVal(row, colCLLapIdx), 10) || 0,
                     "Nhân sự": nhanSuKey,
