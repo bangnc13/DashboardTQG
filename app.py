@@ -275,7 +275,7 @@ html_content = """
             <!-- THẺ TỒN GIỜ ÂM (< 0) -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Số case sai hẹn L1</span>
+                    <span>Số case quá hẹn L1</span>
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="mt-2 flex items-baseline justify-between">
