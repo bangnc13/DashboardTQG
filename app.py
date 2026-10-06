@@ -747,8 +747,8 @@ html_content = """
 
                 const tonGioClass = isOverdue ? 'text-purple-600 font-bold dark:text-purple-400' : 'text-slate-600 dark:text-slate-300';
                 
-                // Hiển thị giá trị tồn giờ (giữ định dạng số thập phân nếu có)
-                const tonGioDisplay = typeof item["Tồn giờ"] === 'number' ? (Number.isInteger(item["Tồn giờ"]) ? item["Tồn giờ"] : item["Tồn giờ"].toFixed(1)) : (item["Tồn giờ"] ?? 0);
+                // Hiển thị giá trị tồn giờ (giữ nguyên số thập phân hoặc giá trị âm)
+                const tonGioDisplay = (item["Tồn giờ"] !== undefined && item["Tồn giờ"] !== null && item["Tồn giờ"] !== '') ? item["Tồn giờ"] : 0;
 
                 return `
                     <tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">
@@ -960,7 +960,7 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            const csvUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:csv&_nc=${Date.now()}`;
+            const jsonUrl = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json&_nc=${Date.now()}`;
             const syncIcon = document.getElementById('syncIcon');
             
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -968,19 +968,24 @@ html_content = """
             try {
                 if (showNotification) showToast('Đang tự động đồng bộ Google Sheets...', 'info');
                 
-                const response = await fetch(csvUrl);
+                const response = await fetch(jsonUrl);
                 if (!response.ok) {
                     throw new Error('Không thể kết nối Google Sheets. Kiểm tra quyền truy cập công khai.');
                 }
                 
-                const csvText = await response.text();
-                const workbook = XLSX.read(csvText, { type: 'string' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                
-                const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                
-                if (processRowsMatrix(rowsMatrix)) {
+                const text = await response.text();
+                const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\([\s\S]*?\);?/);
+                let jsonData;
+                if (jsonMatch) {
+                    let cleanStr = jsonMatch[0].replace(/google\.visualization\.Query\.setResponse\(/, '');                     cleanStr = cleanStr.replace(/\);\s*$/, '');
+                    jsonData = JSON.parse(cleanStr);
+                } else {
+                    const start = text.indexOf('{');
+                    const end = text.lastIndexOf('}');
+                    jsonData = JSON.parse(text.substring(start, end + 1));
+                }
+
+                if (processGvizJson(jsonData)) {
                     if (showNotification) showToast(`Tự động đồng bộ thành công ${currentDataset.length} ca tồn!`, 'success');
                 }
             } catch (err) {
@@ -991,6 +996,37 @@ html_content = """
             } finally {
                 if (syncIcon) syncIcon.classList.remove('fa-spin');
             }
+        }
+
+        function processGvizJson(jsonData) {
+            if (!jsonData || !jsonData.table || !jsonData.table.rows) {
+                showToast('Không tìm thấy dữ liệu cấu trúc từ Google Sheets!', 'error');
+                return false;
+            }
+
+            const table = jsonData.table;
+            const gvizCols = table.cols || [];
+            const gvizRows = table.rows || [];
+
+            if (gvizRows.length === 0) {
+                showToast('Không tìm thấy dữ liệu trong sheet!', 'error');
+                return false;
+            }
+
+            const rowsMatrix = [];
+            const headerRow = gvizCols.map(c => c.label || c.id || '');
+            rowsMatrix.push(headerRow);
+
+            gvizRows.forEach(rowObj => {
+                const rowCells = rowObj.c || [];
+                const rowValues = rowCells.map(cell => {
+                    if (!cell) return '';
+                    return cell.v !== undefined && cell.v !== null ? cell.v : (cell.f !== undefined ? cell.f : '');
+                });
+                rowsMatrix.push(rowValues);
+            });
+
+            return processRowsMatrix(rowsMatrix);
         }
 
         function processRowsMatrix(rowsMatrix) {
@@ -1028,7 +1064,7 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            // Lấy giá trị trực tiếp từ Cột J (Index 9)
+            // Lấy giá trị trực tiếp chuẩn xác từ Cột J (Index 9)
             const colTonGioJIdx = 9; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
@@ -1056,16 +1092,18 @@ html_content = """
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // Lấy và chuẩn hóa giá trị từ Cột J (hỗ trợ số thập phân có dấu phẩy/chấm và giá trị âm / có dấu -)
+                // Lấy giá trị trực tiếp từ Cột J, hỗ trợ số thập phân và giá trị âm / dấu -
                 const rawTonGioJ = row[colTonGioJIdx];
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
                     tonGioVal = rawTonGioJ;
-                } else if (rawTonGioJ !== undefined && rawTonGioJ !== null) {
+                } else if (rawTonGioJ !== undefined && rawTonGioJ !== null && rawTonGioJ !== '') {
                     let strVal = String(rawTonGioJ).trim();
-                    strVal = strVal.replace(',', '.'); // Đổi dấu phẩy thành dấu chấm thập phân
-                    const cleaned = strVal.replace(/[^0-9.-]/g, ''); // Giữ lại số, dấu chấm và dấu trừ (-)
-                    tonGioVal = parseFloat(cleaned) || 0;
+                    strVal = strVal.replace(',', '.');
+                    const cleaned = strVal.replace(/[^0-9.-]/g, '');
+                    tonGioVal = cleaned !== '' ? parseFloat(cleaned) : rawTonGioJ;
+                } else {
+                    tonGioVal = rawTonGioJ;
                 }
 
                 parsedRecords.push({
@@ -1087,85 +1125,3 @@ html_content = """
 
             if (parsedRecords.length > 0) {
                 currentDataset = parsedRecords;
-                
-                try {
-                    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(currentDataset));
-                } catch (e) {
-                    console.error('Không thể lưu vào localStorage:', e);
-                }
-
-                populateFilterOptions();
-                renderDashboard();
-                return true;
-            } else {
-                showToast('Không tìm thấy bản ghi hợp lệ nào!', 'error');
-                return false;
-            }
-        }
-
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    
-                    const rowsMatrix = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                    if (processRowsMatrix(rowsMatrix)) {
-                        showToast(`Nạp thành công ${currentDataset.length} ca tồn từ File Excel!`, 'success');
-                    }
-                } catch (err) {
-                    showToast('Lỗi khi xử lý file Excel: ' + err.message, 'error');
-                }
-            };
-            reader.readAsArrayBuffer(file);
-            event.target.value = '';
-        }
-
-        function exportDataCSV() {
-            const dataToExport = getFilteredData();
-            if (!dataToExport.length) {
-                showToast('Không có dữ liệu để xuất!', 'error');
-                return;
-            }
-
-            const ws = XLSX.utils.json_to_sheet(dataToExport);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Kiểm Soát Ca Tồn");
-            XLSX.writeFile(wb, "Bao_Cao_Kiem_Soat_Ca_Ton.xlsx");
-            showToast('Đã xuất file Excel báo cáo!', 'success');
-        }
-
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const filtered = getFilteredData();
-            renderCharts(filtered);
-        }
-
-        function renderDashboard() {
-            populateFilterOptions();
-            applyFilters();
-        }
-
-        // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
-        window.onload = function() {
-            // Tải dữ liệu ngay lập tức lần đầu
-            fetchGoogleSheetData(true);
-
-            // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
-            setInterval(function() {
-                fetchGoogleSheetData(false);
-            }, 30000);
-        };
-    </script>
-</body>
-</html>
-"""
-
-# Render full screen Dashboard
-components.html(html_content, height=1400, scrolling=True)
