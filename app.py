@@ -308,7 +308,7 @@ html_content = """
                             <i class="fa-solid fa-chart-pie text-amber-500 mr-2"></i>
                             1. Thống Kê Checklist Lặp
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Tỷ lệ ca tồn có Checklist lặp so với không lặp</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400"></p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -353,7 +353,7 @@ html_content = """
                             <i class="fa-solid fa-user-gear text-purple-500 mr-2"></i>
                             4. Top KTV Tồn Ca nhiều nhất
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Xếp hạng nhân sự có số tồn case vụ cao nhất</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400"></p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -370,7 +370,7 @@ html_content = """
                             <i class="fa-solid fa-table-cells text-paleOlive-600 mr-2"></i>
                             BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA
                         </h2>
-                        <p class="text-xs text-paleOlive-800/80 dark:text-paleOlive-300/80">Xem, tìm kiếm và lọc bổ sung dữ liệu tồn ca theo nhu cầu</p>
+                        <p class="text-xs text-paleOlive-800/80 dark:text-paleOlive-300/80"></p>
                     </div>
 
                     <div class="flex items-center space-x-2">
