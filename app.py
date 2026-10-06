@@ -274,7 +274,7 @@ html_content = """
 
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Hạn còn lại </span>
+                    <span>Tồn Giờ ≥ 24H</span>
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="mt-2 flex items-baseline justify-between">
@@ -746,6 +746,9 @@ html_content = """
                     : `<span class="text-slate-400 font-normal">-</span>`;
 
                 const tonGioClass = isOverdue ? 'text-purple-600 font-bold dark:text-purple-400' : 'text-slate-600 dark:text-slate-300';
+                
+                // Hiển thị giá trị tồn giờ (giữ định dạng số thập phân nếu có)
+                const tonGioDisplay = typeof item["Tồn giờ"] === 'number' ? (Number.isInteger(item["Tồn giờ"]) ? item["Tồn giờ"] : item["Tồn giờ"].toFixed(1)) : (item["Tồn giờ"] ?? 0);
 
                 return `
                     <tr class="hover:bg-paleOlive-100/50 dark:hover:bg-paleOlive-900/30 transition border-b border-paleOlive-200/50 dark:border-paleOlive-800/30">
@@ -757,7 +760,7 @@ html_content = """
                         <td class="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">${item["Nhân sự"] || '-'}</td>
                         <td class="py-2.5 px-3 font-medium text-paleOlive-900 dark:text-paleOlive-200 col-highlight">${item["Cột AN"] || '-'}</td>
                         <td class="py-2.5 px-3 font-medium text-rose-600 dark:text-rose-400">${urgentBadge}</td>
-                        <td class="py-2.5 px-3 text-center ${tonGioClass}">${item["Tồn giờ"] ?? 0}h</td>
+                        <td class="py-2.5 px-3 text-center ${tonGioClass}">${tonGioDisplay}h</td>
                     </tr>
                 `;
             }).join('');
@@ -1025,7 +1028,7 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            // Lấy giá trị trực tiếp từ Cột J (Index 9) cho Tồn Giờ
+            // Lấy giá trị trực tiếp từ Cột J (Index 9)
             const colTonGioJIdx = 9; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
@@ -1053,14 +1056,16 @@ html_content = """
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // Lấy và chuẩn hóa giá trị từ Cột J
+                // Lấy và chuẩn hóa giá trị từ Cột J (hỗ trợ số thập phân có dấu phẩy/chấm và giá trị âm / có dấu -)
                 const rawTonGioJ = row[colTonGioJIdx];
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
-                    tonGioVal = Math.max(0, Math.floor(rawTonGioJ));
-                } else if (typeof rawTonGioJ === 'string') {
-                    const cleaned = rawTonGioJ.replace(/[^0-9.-]/g, '');
-                    tonGioVal = parseInt(cleaned, 10) || 0;
+                    tonGioVal = rawTonGioJ;
+                } else if (rawTonGioJ !== undefined && rawTonGioJ !== null) {
+                    let strVal = String(rawTonGioJ).trim();
+                    strVal = strVal.replace(',', '.'); // Đổi dấu phẩy thành dấu chấm thập phân
+                    const cleaned = strVal.replace(/[^0-9.-]/g, ''); // Giữ lại số, dấu chấm và dấu trừ (-)
+                    tonGioVal = parseFloat(cleaned) || 0;
                 }
 
                 parsedRecords.push({
