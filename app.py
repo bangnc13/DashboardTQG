@@ -1,7 +1,5 @@
 import streamlit as st
 import streamlit.components.v1 as components
-import requests
-import json
 
 # Cấu hình trang rộng tràn màn hình (Wide mode)
 st.set_page_config(
@@ -12,7 +10,7 @@ st.set_page_config(
 )
 
 # Thêm CSS ẩn header/footer mặc định của Streamlit
-st.markdown('''
+st.markdown("""
     <style>
         #MainMenu {visibility: hidden;}
         footer {visibility: hidden;}
@@ -25,51 +23,10 @@ st.markdown('''
             max-width: 100% !important;
         }
     </style>
-''', unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
-# Lấy Group ID và Token
-ZALO_BOT_TOKEN = "3613571325008693860:BsVltrcHugOoOMZsOvVZywwbfdjueukaFtofsLetSAYUUevPgFQaQsUDOprWWesx"
-ZALO_GROUP_ID = "zgr-9207abe0d78f3ed1679e"
-
-def send_zalo_group_message(message):
-    """Hàm gửi tin nhắn vào Group Zalo qua Zalo Bot Platform API"""
-    url = "https://bot.zaloplatforms.com/api/v1/message"
-    headers = {
-        "Authorization": f"Bearer {ZALO_BOT_TOKEN}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "recipient": {
-            "group_id": ZALO_GROUP_ID
-        },
-        "message": {
-            "text": message
-        }
-    }
-    
-    try:
-        response = requests.post(url, json=payload, headers=headers)
-        res_data = response.json()
-        if response.status_code == 200 and res_data.get("error") == 0:
-            return True, res_data
-        else:
-            return False, res_data
-    except Exception as e:
-        return False, str(e)
-
-query_params = st.query_params
-if "action" in query_params and query_params["action"] == "send_zalo":
-    msg_content = query_params.get("msg", "📊 Báo cáo Kiểm soát Ca tồn (CLL)")
-    success, res = send_zalo_group_message(msg_content)
-    
-    if success:
-        st.success("✅ Đã gửi báo cáo thành công vào Group Zalo!")
-    else:
-        st.error(f"❌ Lỗi gửi tin nhắn: {res}")
-        
-    st.query_params.clear()
-
-html_content = '''<!DOCTYPE html>
+html_content = """
+<!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
@@ -196,34 +153,6 @@ html_content = '''<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- MODAL CONFIRM ZALO -->
-    <div id="zaloModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-700 p-6 w-full max-w-md mx-4 transform transition-all">
-            <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
-                    <i class="fa-solid fa-paper-plane text-lg"></i>
-                </div>
-                <div>
-                    <h3 class="text-base font-bold text-slate-900 dark:text-white">Gửi báo cáo qua Zalo</h3>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Bot Thư Ký TQG sẽ gửi nội dung này vào nhóm</p>
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <div>
-                    <textarea id="zaloMessageContent" rows="7" class="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white resize-none"></textarea>
-                </div>
-
-                <div class="flex items-center justify-end space-x-2">
-                    <button onclick="closeZaloModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700 rounded-lg transition">Hủy</button>
-                    <button onclick="triggerSendZalo()" class="px-4 py-2 text-xs font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm">
-                        <i class="fa-brands fa-diaspora mr-1"></i> Gửi ngay
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -243,13 +172,7 @@ html_content = '''<!DOCTYPE html>
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <button onclick="openZaloModal()" class="inline-flex items-center px-3 py-2 text-xs font-bold rounded-lg text-white bg-blue-500 hover:bg-blue-600 transition shadow-sm" title="Gửi thông báo vào Group Zalo">
-                        <i class="fa-solid fa-paper-plane mr-2 text-sm"></i>
-                        <span>Gửi Zalo</span>
-                    </button>
-                    
-                    <div class="w-px h-6 bg-slate-200 dark:bg-slate-700 mx-1"></div>
-
+                    <!-- NÚT ĐỒNG BỘ CÓ BÁO TRẠNG THÁI REALTIME PING -->
                     <div class="flex items-center space-x-2">
                         <span class="flex h-2.5 w-2.5 relative" title="Chế độ tự động đồng bộ Realtime đang bật">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -261,6 +184,7 @@ html_content = '''<!DOCTYPE html>
                         </button>
                     </div>
 
+                    <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
                     <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
                         <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
                         <span>File Excel</span>
@@ -443,7 +367,7 @@ html_content = '''<!DOCTYPE html>
                     <div>
                         <h2 class="text-base font-bold text-paleOlive-950 dark:text-paleOlive-100 flex items-center">
                             <i class="fa-solid fa-table-cells text-paleOlive-600 mr-2"></i>
-                            BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA (Tồn giờ tính Realtime từ Cột H chuẩn DD/MM/YYYY)
+                            BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA
                         </h2>
                         <p class="text-xs text-paleOlive-800/80 dark:text-paleOlive-300/80">Xem, tìm kiếm và lọc bổ sung dữ liệu tồn ca theo nhu cầu</p>
                     </div>
@@ -524,6 +448,7 @@ html_content = '''<!DOCTYPE html>
                 </div>
                 
                 <div id="paginationControls" class="flex items-center space-x-1">
+                    <!-- JS sẽ tự động vẽ nút phân trang ở đây -->
                 </div>
 
                 <div class="italic">
@@ -541,13 +466,15 @@ html_content = '''<!DOCTYPE html>
     </footer>
 
     <script>
-        const DEFAULT_PASSWORD = "1900"; 
-        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; 
+        const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
+        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
         
+        // BẢN BIẾN PHÂN TRANG
         const PAGE_SIZE = 10;
         let currentPage = 1;
-        let pendingAction = null; 
+        let pendingAction = null; // Lưu loại thao tác cần xác thực (EXCEL)
 
+        // Bảng tra cứu VLOOKUP Tên Quản lý từ file data.xlsx
         const managerMapping = {
             "TQGTI.GIANGVH2": "ANHHV15",
             "TQGTI.THANHNV41": "ANHHV15",
@@ -593,6 +520,7 @@ html_content = '''<!DOCTYPE html>
         let chartTopPop = null;
         let chartTopTech = null;
 
+        // BẢO MẬT: Mở Modal Password
         function openPasswordModal(actionType = 'EXCEL') {
             pendingAction = actionType;
             document.getElementById('importPasswordInput').value = '';
@@ -608,11 +536,13 @@ html_content = '''<!DOCTYPE html>
             setTimeout(() => document.getElementById('importPasswordInput').focus(), 100);
         }
 
+        // BẢO MẬT: Đóng Modal Password
         function closePasswordModal() {
             document.getElementById('passwordModal').classList.add('hidden');
             pendingAction = null;
         }
 
+        // BẢO MẬT: Kiểm tra Password
         function verifyPassword() {
             const inputPwd = document.getElementById('importPasswordInput').value;
             if (inputPwd === DEFAULT_PASSWORD) {
@@ -620,57 +550,30 @@ html_content = '''<!DOCTYPE html>
                 closePasswordModal();
                 
                 if (action === 'EXCEL') {
-                    document.getElementById('excelFileInput').click();
+                    document.getElementById('excelFileInput').click(); // Mở chọn file
                 }
             } else {
                 document.getElementById('passwordError').classList.remove('hidden');
             }
         }
-        
-        function openZaloModal() {
-            const total = document.getElementById('kpiTotal').textContent;
-            const urgent = document.getElementById('kpiUrgent').textContent;
-            const overdue = document.getElementById('kpiOverdue').textContent;
-            const repeat = document.getElementById('kpiRepeat').textContent;
-            
-            const defaultMsg = `📊 Báo cáo Kiểm soát Ca tồn (CLL):
-- Tổng tồn: ${total} ca
-- KH Giục: ${urgent} ca
-- Quá 24h: ${overdue} ca
-- CL Lặp: ${repeat} ca
 
-Truy cập Dashboard để xem biểu đồ chi tiết!`;
-
-            document.getElementById('zaloMessageContent').value = defaultMsg;
-            document.getElementById('zaloModal').classList.remove('hidden');
-        }
-
-        function closeZaloModal() {
-            document.getElementById('zaloModal').classList.add('hidden');
-        }
-
-        function triggerSendZalo() {
-            const msg = document.getElementById('zaloMessageContent').value;
-            closeZaloModal();
-            showToast('Đang gửi dữ liệu...', 'info');
-            
-            const encodedMsg = encodeURIComponent(msg);
-            window.parent.location.search = `?action=send_zalo&msg=${encodedMsg}`;
-        }
-
-        // HÀM TÍNH TỒN GIỜ: ÉP BUỘC ĐÚNG CHUẨN DD/MM/YYYY (VIỆT NAM) TỪ CỘT H (Index 7)
-        function calculateTonGioFromColumnH(dateStr) {
+        // CÔNG THỨC TÍNH TỒN GIỜ CHUẨN ĐỊNH DẠNG VIỆT NAM (DD/MM/YYYY HH:mm:ss) Hoặc lấy giá trị số trực tiếp
+        function calculateTonGioFromColumnI(dateStr) {
             if (!dateStr && dateStr !== 0) return 0;
 
+            // Nếu giá trị đã là số giờ cụ thể
             if (typeof dateStr === 'number' && dateStr < 10000) {
                 return Math.max(0, Math.floor(dateStr));
             }
 
             let parsedDate = null;
 
+            // Case 1: Excel Serial Number (dạng số thực như 45200.5)
             if (typeof dateStr === 'number') {
                 parsedDate = new Date(Math.round((dateStr - 25569) * 86400 * 1000));
-            } else {
+            } 
+            // Case 2: Dạng chuỗi String
+            else {
                 const str = String(dateStr).trim();
                 if (!str) return 0;
 
@@ -678,10 +581,12 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     return Math.max(0, Math.floor(Number(str)));
                 }
 
+                // Tách ngày giờ bằng khoảng trắng hoặc 'T'
                 const parts = str.split(/[ T]+/);
-                const datePart = parts[0]; 
+                const datePart = parts[0]; // DD/MM/YYYY hoặc YYYY-MM-DD
                 const timePart = parts[1] || "00:00:00";
 
+                // Trường hợp định dạng DD/MM/YYYY hoặc DD-MM-YYYY (Chuẩn Việt Nam)
                 if (datePart.includes('/') || datePart.includes('-')) {
                     const separator = datePart.includes('/') ? '/' : '-';
                     const dateComponents = datePart.split(separator);
@@ -689,18 +594,20 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     if (dateComponents.length === 3) {
                         let day, month, year;
 
+                        // Nếu phần đầu tiên là Năm (YYYY/MM/DD)
                         if (dateComponents[0].length === 4) {
-                            // Trường hợp YYYY-MM-DD
                             year = parseInt(dateComponents[0], 10);
                             month = parseInt(dateComponents[1], 10) - 1;
                             day = parseInt(dateComponents[2], 10);
-                        } else {
-                            // Ép buộc chuẩn Việt Nam DD/MM/YYYY: v1 là Ngày, v2 là Tháng
-                            day = parseInt(dateComponents[0], 10);   // Phần 1: Ngày (VD: 01)
-                            month = parseInt(dateComponents[1], 10) - 1; // Phần 2: Tháng (VD: 10 -> Tháng 10)
-                            year = parseInt(dateComponents[2], 10);  // Phần 3: Năm (VD: 2026)
+                        } 
+                        // Chuẩn Việt Nam (DD/MM/YYYY)
+                        else {
+                            day = parseInt(dateComponents[0], 10);
+                            month = parseInt(dateComponents[1], 10) - 1; // Tháng trong JS từ 0-11
+                            year = parseInt(dateComponents[2], 10);
                         }
 
+                        // Tách Giờ : Phút : Giây
                         const timeComponents = timePart.split(':');
                         const hour = parseInt(timeComponents[0], 10) || 0;
                         const min = parseInt(timeComponents[1], 10) || 0;
@@ -710,6 +617,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                     }
                 }
 
+                // Dự phòng cho các định dạng khác
                 if (!parsedDate || isNaN(parsedDate.getTime())) {
                     parsedDate = new Date(str);
                 }
@@ -717,6 +625,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
 
             if (!parsedDate || isNaN(parsedDate.getTime())) return 0;
 
+            // Tính chênh lệch giờ so với hiện tại
             const now = new Date();
             const diffMs = now - parsedDate;
             const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -1191,10 +1100,7 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
-            
-            // Cột H (Index 7)
-            const colHTimeIdx = 7; 
-
+            const colITimeIdx = 8; // Lấy dữ liệu Cột I (Chỉ số mảng bắt đầu từ 0 -> Cột I là 8)
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
             const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
@@ -1220,15 +1126,15 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
                 const popRaw = String(row[colPopIdx] || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                const rawTimeColH = row[colHTimeIdx];
-                const calculatedTonGio = calculateTonGioFromColumnH(rawTimeColH);
+                const rawTimeColI = row[colITimeIdx];
+                const calculatedTonGio = calculateTonGioFromColumnI(rawTimeColI);
 
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(row[colTenKHIdx] || '').trim(),
-                    "Thời gian tạo": rawTimeColH || '',
+                    "Thời gian tạo": rawTimeColI || '',
                     "Tồn giờ": calculatedTonGio,
                     "Số lần hẹn": parseInt(row[colHenIdx], 10) || 0,
                     "CL Lặp": parseInt(row[colCLLapIdx], 10) || 0,
@@ -1308,16 +1214,20 @@ Truy cập Dashboard để xem biểu đồ chi tiết!`;
             applyFilters();
         }
 
+        // TỰ ĐỘNG MỞ KHÓA TẢI DỮ LIỆU TỪ GOOGLE SHEETS VÀ THIẾT LẬP AUTO-REFRESH REALTIME
         window.onload = function() {
+            // Tải dữ liệu ngay lập tức lần đầu
             fetchGoogleSheetData(true);
 
+            // Thiết lập chạy định kỳ ngầm tự động cập nhật mỗi 30 giây (30000 ms)
             setInterval(function() {
                 fetchGoogleSheetData(false);
             }, 30000);
         };
     </script>
 </body>
-</html>'''
+</html>
+"""
 
 # Render full screen Dashboard
 components.html(html_content, height=1400, scrolling=True)
