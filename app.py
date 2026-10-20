@@ -154,7 +154,7 @@ html_content = """
     </div>
 
     <header class="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 sticky top-0 z-30 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-paleOlive-600 to-paleOlive-400 flex items-center justify-center text-white font-bold shadow-md shadow-paleOlive-200 dark:shadow-none">
@@ -162,7 +162,7 @@ html_content = """
                     </div>
                     <div>
                         <div class="flex items-center space-x-2">
-                            <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">DASHBOARD KIỂM SOÁT CA TỒN & CHECKLIST</h1>
+                            <h1 class="text-lg font-bold text-slate-900 dark:text-white leading-tight">CHECKLIST</h1>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-paleOlive-100 text-paleOlive-900 border border-paleOlive-300 dark:bg-paleOlive-900/40 dark:text-paleOlive-200">
                                 Báo Cáo Kiểm Soát
                             </span>
@@ -172,7 +172,6 @@ html_content = """
                 </div>
 
                 <div class="flex items-center space-x-3">
-                    <!-- NÚT ĐỒNG BỘ CÓ BÁO TRẠNG THÁI REALTIME PING -->
                     <div class="flex items-center space-x-2">
                         <span class="flex h-2.5 w-2.5 relative" title="Chế độ tự động đồng bộ Realtime đang bật">
                             <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -184,7 +183,6 @@ html_content = """
                         </button>
                     </div>
 
-                    <!-- NÚT MỞ MODAL MẬT KHẨU FILE EXCEL -->
                     <button onclick="openPasswordModal('EXCEL')" class="inline-flex items-center px-3 py-2 text-xs font-medium rounded-lg text-slate-700 bg-slate-100 hover:bg-slate-200 dark:text-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 transition shadow-sm" title="Upload file offline nếu cần">
                         <i class="fa-solid fa-file-excel text-emerald-600 dark:text-emerald-400 mr-2 text-sm"></i>
                         <span>File Excel</span>
@@ -204,7 +202,7 @@ html_content = """
         </div>
     </header>
 
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+    <main class="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
 
         <!-- BỘ LỌC QUẢN LÝ TẬP TRUNG -->
         <div class="bg-gradient-to-r from-paleOlive-100/90 via-paleOlive-50 to-white dark:from-paleOlive-950/60 dark:via-slate-800 dark:to-slate-800 p-4 rounded-xl border-2 border-paleOlive-400 dark:border-paleOlive-600 shadow-md flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
@@ -215,7 +213,7 @@ html_content = """
                 <div>
                     <div class="flex items-center space-x-2">
                         <label for="filterColAN" class="text-sm font-bold text-paleOlive-950 dark:text-paleOlive-100 uppercase tracking-wide">
-                            Lọc Theo trưởng bầy
+                            Lọc Theo trưởng bẫy
                         </label>
                         <span id="activeManagerBadge" class="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-paleOlive-200 text-paleOlive-900 dark:bg-paleOlive-800 dark:text-paleOlive-100">
                             Tất cả
@@ -272,17 +270,16 @@ html_content = """
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-amber-500"></div>
             </div>
 
-            <!-- THẺ TỒN GIỜ ÂM (< 0) -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden">
                 <div class="text-xs font-medium text-purple-600 dark:text-purple-400 uppercase tracking-wider flex items-center justify-between">
-                    <span>Số case quá hẹn L1</span>
+                    <span>Số case quá hạn L1</span>
                     <i class="fa-solid fa-clock"></i>
                 </div>
                 <div class="mt-2 flex items-baseline justify-between">
                     <span id="kpiOverdue" class="text-2xl font-bold text-purple-600 dark:text-purple-400">0</span>
                     <span id="kpiOverduePct" class="text-xs text-purple-700 bg-purple-50 dark:bg-purple-900/30 dark:text-purple-300 px-2 py-0.5 rounded-full">0%</span>
                 </div>
-                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca vụ quá hẹn L1</div>
+                <div class="mt-2 text-xs text-slate-500 dark:text-slate-400">Ca vụ quá hạn L1</div>
                 <div class="absolute bottom-0 left-0 right-0 h-1 bg-purple-500"></div>
             </div>
 
@@ -308,7 +305,6 @@ html_content = """
                             <i class="fa-solid fa-chart-pie text-amber-500 mr-2"></i>
                             1. Thống Kê Checklist Lặp
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400"></p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -323,7 +319,6 @@ html_content = """
                             <i class="fa-solid fa-chart-bar text-blue-500 mr-2"></i>
                             2. Top Block Tồn Ca Nhiều Nhất
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400"></p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -338,7 +333,6 @@ html_content = """
                             <i class="fa-solid fa-network-wired text-emerald-500 mr-2"></i>
                             3. Tồn theo POP
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400"> </p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -353,7 +347,6 @@ html_content = """
                             <i class="fa-solid fa-user-gear text-purple-500 mr-2"></i>
                             4. Top KTV Tồn Ca nhiều nhất
                         </h2>
-                        <p class="text-xs text-slate-500 dark:text-slate-400"></p>
                     </div>
                 </div>
                 <div class="relative flex-1 min-h-[260px]">
@@ -370,7 +363,6 @@ html_content = """
                             <i class="fa-solid fa-table-cells text-paleOlive-600 mr-2"></i>
                             BẢNG KIỂM SOÁT DỮ LIỆU TỒN CA
                         </h2>
-                        <p class="text-xs text-paleOlive-800/80 dark:text-paleOlive-300/80"></p>
                     </div>
 
                     <div class="flex items-center space-x-2">
@@ -407,10 +399,11 @@ html_content = """
 
                     <div>
                         <select id="filterRepeat" onchange="applyFilters()" class="w-full py-1.5 px-3 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
-                            <option value="">Tất cả CL Lặp</option>
+                            <option value="">Tất cả</option>
+                            <option value=">0">Tất cả CL Lặp</option>
                             <option value="1">Lặp 1 lần</option>
                             <option value="2">Lặp 2 lần</option>
-                            <option value="3">Lặp ≥ 3 lần</option>
+                            <option value="3">Lặp >= 3 lần</option>
                         </select>
                     </div>
 
@@ -427,14 +420,30 @@ html_content = """
                     <thead>
                         <tr class="bg-paleOlive-100 dark:bg-paleOlive-900/60 text-paleOlive-900 dark:text-paleOlive-200 font-bold border-b border-paleOlive-300 dark:border-paleOlive-700 uppercase tracking-wider">
                             <th class="py-3 px-3 w-12 text-center border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">STT</th>
-                            <th class="py-3 px-3 w-32 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Số HĐ</th>
-                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Block</th>
-                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Lần Hẹn</th>
-                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">CL Lặp</th>
-                            <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Nhân Sự</th>
-                            <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">Quản Lý</th>
-                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50">KH Giục Tiến Độ</th>
-                            <th class="py-3 px-3 text-center w-24">HẠN CÒN LẠI</th>
+                            <th class="py-3 px-3 w-32 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Số HĐ')">
+                                <div class="flex items-center justify-between">Số HĐ <i id="sortIcon-SốHĐ" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Block')">
+                                <div class="flex items-center justify-between">Block <i id="sortIcon-Block" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Số lần hẹn')">
+                                <div class="flex items-center justify-center">Lần Hẹn <i id="sortIcon-Sốlầnhẹn" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('CL Lặp')">
+                                <div class="flex items-center justify-center">CL Lặp <i id="sortIcon-CLLặp" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Nhân sự')">
+                                <div class="flex items-center justify-between">Nhân Sự <i id="sortIcon-Nhânsự" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Cột AN')">
+                                <div class="flex items-center justify-between">Quản Lý <i id="sortIcon-CộtAN" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('KH Giục Tiến Độ')">
+                                <div class="flex items-center justify-between">KH Giục <i id="sortIcon-KHGiụcTiếnĐộ" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <th class="py-3 px-3 text-center w-24 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Hạn còn lại')">
+                                <div class="flex items-center justify-center">HẠN <i id="sortIcon-Hạncònlại" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="divide-y divide-paleOlive-200/60 dark:divide-paleOlive-800/40 bg-paleOlive-50/30 dark:bg-paleOlive-950/20">
@@ -449,7 +458,6 @@ html_content = """
                 </div>
                 
                 <div id="paginationControls" class="flex items-center space-x-1">
-                    <!-- JS sẽ tự động vẽ nút phân trang ở đây -->
                 </div>
 
                 <div class="italic">
@@ -461,18 +469,35 @@ html_content = """
     </main>
 
     <footer class="bg-white dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700 mt-8 py-4">
-        <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 dark:text-slate-400">
-            Dashboard Kiểm Soát Ca Tồn & Checklist &bull; BangNC13-TQG
+        <div class="w-full mx-auto px-4 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-4">
+            <div>
+                Dashboard Kiểm Soát Ca Tồn & Checklist &bull; BangNC13-TQG
+            </div>
+            <!-- BỘ ĐẾM TRUY CẬP ĐÃ CHÈN VÀO ĐÂY -->
+            <div class="flex items-center space-x-2">
+                <span class="text-[11px] font-medium text-slate-400">Lượt truy cập:</span>
+                <div id="sfccsxhel73g4gmx1qslsmdpq8b28qbgrn1" class="inline-block"></div>
+                <script type="text/javascript" src="https://counter6.optistats.ovh/private/counter.js?c=csxhel73g4gmx1qslsmdpq8b28qbgrn1&down=async" async></script>
+                <noscript>
+                    <a href="https://www.freecounterstat.com" title="website counter">
+                        <img src="https://counter6.optistats.ovh/private/freecounterstat.php?c=csxhel73g4gmx1qslsmdpq8b28qbgrn1" border="0" title="website counter" alt="website counter">
+                    </a>
+                </noscript>
+            </div>
         </div>
     </footer>
 
     <script>
-        const DEFAULT_PASSWORD = "1900"; // Mật khẩu mặc định
-        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; // Key lưu vết vào localStorage
+        const DEFAULT_PASSWORD = "1900"; 
+        const LOCAL_STORAGE_KEY = "TQG_DASHBOARD_DATASET"; 
         
-        const PAGE_SIZE = 10;
+        const PAGE_SIZE = 20;
         let currentPage = 1;
         let pendingAction = null;
+        
+        // Trạng thái cho tính năng sắp xếp
+        let currentSortColumn = '';
+        let currentSortAsc = true;
 
         const managerMapping = {
             "TQGTI.GIANGVH2": "ANHHV15",
@@ -518,6 +543,32 @@ html_content = """
         let chartTopBlock = null;
         let chartTopPop = null;
         let chartTopTech = null;
+
+        function handleSort(column) {
+            if (currentSortColumn === column) {
+                currentSortAsc = !currentSortAsc; // Đảo chiều nếu bấm lại
+            } else {
+                currentSortColumn = column;
+                currentSortAsc = true; // Mặc định sắp xếp A-Z / Tăng dần
+            }
+            updateSortIcons();
+            applyFilters();
+        }
+
+        function updateSortIcons() {
+            const columns = ['Số HĐ', 'Block', 'Số lần hẹn', 'CL Lặp', 'Nhân sự', 'Cột AN', 'KH Giục Tiến Độ', 'Hạn còn lại'];
+            columns.forEach(function(col) {
+                const id = 'sortIcon-' + col.replace(/\s+/g, '');
+                const el = document.getElementById(id);
+                if (el) {
+                    if (currentSortColumn === col) {
+                        el.className = currentSortAsc ? 'fa-solid fa-sort-up ml-1 text-paleOlive-600 dark:text-paleOlive-400' : 'fa-solid fa-sort-down ml-1 text-paleOlive-600 dark:text-paleOlive-400';
+                    } else {
+                        el.className = 'fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100';
+                    }
+                }
+            });
+        }
 
         function openPasswordModal(actionType = 'EXCEL') {
             pendingAction = actionType;
@@ -637,7 +688,7 @@ html_content = """
             const blockFilter = document.getElementById('filterBlock')?.value || '';
             const chkNonZero = document.getElementById('chkNonZero')?.checked || false;
 
-            return currentDataset.filter(function(item) {
+            let filteredData = currentDataset.filter(function(item) {
                 if (managerFilter && item["Cột AN"] !== managerFilter) return false;
                 if (techFilter && item["Nhân sự"] !== techFilter) return false;
                 if (blockFilter && item["Block"] !== blockFilter) return false;
@@ -650,7 +701,9 @@ html_content = """
                     if (urgentFilter === 'NO' && hasUrgent) return false;
                 }
 
+                // Cập nhật phần lọc CL Lặp tại đây
                 if (repeatFilter) {
+                    if (repeatFilter === '>0' && item["CL Lặp"] <= 0) return false;
                     if (repeatFilter === '1' && item["CL Lặp"] !== 1) return false;
                     if (repeatFilter === '2' && item["CL Lặp"] !== 2) return false;
                     if (repeatFilter === '3' && item["CL Lặp"] < 3) return false;
@@ -665,6 +718,31 @@ html_content = """
 
                 return true;
             });
+
+            // Thực hiện sắp xếp dữ liệu (nếu có cột được chọn)
+            if (currentSortColumn) {
+                filteredData.sort(function(a, b) {
+                    let valA = a[currentSortColumn];
+                    let valB = b[currentSortColumn];
+                    
+                    if (valA === undefined || valA === null) valA = '';
+                    if (valB === undefined || valB === null) valB = '';
+                    
+                    if (currentSortColumn === 'Hạn còn lại' || currentSortColumn === 'Số lần hẹn' || currentSortColumn === 'CL Lặp') {
+                        valA = parseFloat(valA) || 0;
+                        valB = parseFloat(valB) || 0;
+                        return currentSortAsc ? (valA - valB) : (valB - valA);
+                    } else {
+                        valA = String(valA).toLowerCase();
+                        valB = String(valB).toLowerCase();
+                        if (valA < valB) return currentSortAsc ? -1 : 1;
+                        if (valA > valB) return currentSortAsc ? 1 : -1;
+                        return 0;
+                    }
+                });
+            }
+
+            return filteredData;
         }
 
         function applyFilters() {
@@ -1064,7 +1142,7 @@ html_content = """
             const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            const colTonGioJIdx = 9; // Cột J (Index 9) - Hạn còn lại
+            const colTonGioJIdx = 9; 
 
             const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
             const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
@@ -1091,7 +1169,6 @@ html_content = """
                 const popRaw = String(getCellVal(row, colPopIdx) || '').trim();
                 const popValue = popRaw.substring(0, 7);
 
-                // Xử lý chuẩn xác giá trị từ Cột J (Hạn còn lại): đổi dấu phẩy thành dấu chấm để parseFloat nhận diện chính xác phần thập phân
                 const rawTonGioJ = getCellVal(row, colTonGioJIdx);
                 let tonGioVal = 0;
                 if (typeof rawTonGioJ === 'number') {
@@ -1199,7 +1276,3 @@ html_content = """
     </script>
 </body>
 </html>
-"""
-
-# Render full screen Dashboard
-components.html(html_content, height=1400, scrolling=True)
