@@ -701,7 +701,6 @@ html_content = """
                     if (urgentFilter === 'NO' && hasUrgent) return false;
                 }
 
-                // Cập nhật phần lọc CL Lặp tại đây
                 if (repeatFilter) {
                     if (repeatFilter === '>0' && item["CL Lặp"] <= 0) return false;
                     if (repeatFilter === '1' && item["CL Lặp"] !== 1) return false;
@@ -719,7 +718,6 @@ html_content = """
                 return true;
             });
 
-            // Thực hiện sắp xếp dữ liệu (nếu có cột được chọn)
             if (currentSortColumn) {
                 filteredData.sort(function(a, b) {
                     let valA = a[currentSortColumn];
@@ -1276,3 +1274,6 @@ html_content = """
     </script>
 </body>
 </html>
+"""  # <--- BỔ SUNG DẤU ĐÓNG NÀY ĐỂ FIX LỖI
+
+components.html(html_content, height=1200, scrolling=True)
