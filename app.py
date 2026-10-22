@@ -213,7 +213,7 @@ html_content = """
                 <div>
                     <div class="flex items-center space-x-2">
                         <label for="filterColAN" class="text-sm font-bold text-paleOlive-950 dark:text-paleOlive-100 uppercase tracking-wide">
-                            Lọc Theo trưởng bẫy
+                            Lọc Theo Trưởng Bầy
                         </label>
                         <span id="activeManagerBadge" class="text-[11px] px-2 py-0.5 rounded-full font-semibold bg-paleOlive-200 text-paleOlive-900 dark:bg-paleOlive-800 dark:text-paleOlive-100">
                             Tất cả
@@ -380,7 +380,7 @@ html_content = """
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
                     <div class="relative sm:col-span-2 lg:col-span-1">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, KH..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
+                        <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Tìm Số HĐ, KH, Lịch hẹn..." class="w-full pl-8 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-paleOlive-300 dark:border-paleOlive-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-paleOlive-500 dark:text-white">
                     </div>
 
                     <div>
@@ -423,8 +423,22 @@ html_content = """
                             <th class="py-3 px-3 w-32 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Số HĐ')">
                                 <div class="flex items-center justify-between">Số HĐ <i id="sortIcon-SốHĐ" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
                             </th>
-                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Block')">
+                            <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Block')">
                                 <div class="flex items-center justify-between">Block <i id="sortIcon-Block" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
+                            </th>
+                            <!-- CỘT MỚI: NGÀY HẸN (CỘT K) -->
+                            <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Ngày hẹn')">
+                                <div class="flex items-center justify-between">
+                                    <span><i class="fa-regular fa-calendar-check mr-1 text-emerald-600 dark:text-emerald-400"></i>Ngày Hẹn</span>
+                                    <i id="sortIcon-Ngàyhẹn" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i>
+                                </div>
+                            </th>
+                            <!-- CỘT MỚI: LỊCH HẸN (CỘT M) -->
+                            <th class="py-3 px-3 min-w-[120px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Lịch hẹn')">
+                                <div class="flex items-center justify-between">
+                                    <span><i class="fa-regular fa-clock mr-1 text-blue-600 dark:text-blue-400"></i>Lịch Hẹn</span>
+                                    <i id="sortIcon-Lịchhẹn" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i>
+                                </div>
                             </th>
                             <th class="py-3 px-3 text-center w-24 border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Số lần hẹn')">
                                 <div class="flex items-center justify-center">Lần Hẹn <i id="sortIcon-Sốlầnhẹn" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
@@ -435,7 +449,7 @@ html_content = """
                             <th class="py-3 px-3 min-w-[130px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Nhân sự')">
                                 <div class="flex items-center justify-between">Nhân Sự <i id="sortIcon-Nhânsự" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
                             </th>
-                            <th class="py-3 px-3 min-w-[150px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Cột AN')">
+                            <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('Cột AN')">
                                 <div class="flex items-center justify-between">Quản Lý <i id="sortIcon-CộtAN" class="fa-solid fa-sort ml-1 text-slate-400 opacity-50 group-hover:opacity-100"></i></div>
                             </th>
                             <th class="py-3 px-3 min-w-[140px] border-r border-paleOlive-200/80 dark:border-paleOlive-800/50 cursor-pointer hover:bg-paleOlive-200 dark:hover:bg-paleOlive-800 transition group" onclick="handleSort('KH Giục Tiến Độ')">
@@ -556,7 +570,7 @@ html_content = """
         }
 
         function updateSortIcons() {
-            const columns = ['Số HĐ', 'Block', 'Số lần hẹn', 'CL Lặp', 'Nhân sự', 'Cột AN', 'KH Giục Tiến Độ', 'Hạn còn lại'];
+            const columns = ['Số HĐ', 'Block', 'Lịch hẹn', 'Ngày hẹn', 'Số lần hẹn', 'CL Lặp', 'Nhân sự', 'Cột AN', 'KH Giục Tiến Độ', 'Hạn còn lại'];
             columns.forEach(function(col) {
                 const id = 'sortIcon-' + col.replace(/\s+/g, '');
                 const el = document.getElementById(id);
@@ -701,6 +715,7 @@ html_content = """
                     if (urgentFilter === 'NO' && hasUrgent) return false;
                 }
 
+                // Cập nhật phần lọc CL Lặp tại đây
                 if (repeatFilter) {
                     if (repeatFilter === '>0' && item["CL Lặp"] <= 0) return false;
                     if (repeatFilter === '1' && item["CL Lặp"] !== 1) return false;
@@ -712,12 +727,15 @@ html_content = """
                     const matchSoHD = item["Số HĐ"]?.toLowerCase().includes(searchFilter);
                     const matchName = item["Tên đầy đủ"]?.toLowerCase().includes(searchFilter);
                     const matchUrgent = item["KH Giục Tiến Độ"]?.toLowerCase().includes(searchFilter);
-                    if (!matchSoHD && !matchName && !matchUrgent) return false;
+                    const matchLichHen = item["Lịch hẹn"]?.toLowerCase().includes(searchFilter);
+                    const matchNgayHen = item["Ngày hẹn"]?.toLowerCase().includes(searchFilter);
+                    if (!matchSoHD && !matchName && !matchUrgent && !matchLichHen && !matchNgayHen) return false;
                 }
 
                 return true;
             });
 
+            // Thực hiện sắp xếp dữ liệu (nếu có cột được chọn)
             if (currentSortColumn) {
                 filteredData.sort(function(a, b) {
                     let valA = a[currentSortColumn];
@@ -797,7 +815,7 @@ html_content = """
             if (!tbody) return;
 
             if (total === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="11" class="py-8 text-center text-slate-400 italic">Không tìm thấy ca tồn nào phù hợp với bộ lọc</td></tr>';
                 return;
             }
 
@@ -807,6 +825,8 @@ html_content = """
                 const isRepeat = (item["CL Lặp"] || 0) > 0;
                 const isNegative = (item["Hạn còn lại"] || 0) < 0;
                 const urgentVal = item["KH Giục Tiến Độ"] ? item["KH Giục Tiến Độ"].toString().trim() : '';
+                const ngayHenVal = item["Ngày hẹn"] ? item["Ngày hẹn"].toString().trim() : '';
+                const lichHenVal = item["Lịch hẹn"] ? item["Lịch hẹn"].toString().trim() : '';
 
                 const repeatBadge = isRepeat
                     ? '<span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 dark:bg-amber-900/60 dark:text-amber-200">' + item["CL Lặp"] + '</span>'
@@ -816,6 +836,14 @@ html_content = """
                     ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-200 border border-rose-300 dark:border-rose-700"><i class="fa-solid fa-triangle-exclamation mr-1 text-[10px]"></i>' + urgentVal + '</span>'
                     : '<span class="text-slate-400 font-normal">-</span>';
 
+                const ngayHenDisplay = ngayHenVal
+                    ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">' + ngayHenVal + '</span>'
+                    : '<span class="text-slate-400">-</span>';
+
+                const lichHenDisplay = lichHenVal
+                    ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border border-blue-200 dark:border-blue-800">' + lichHenVal + '</span>'
+                    : '<span class="text-slate-400">-</span>';
+
                 const tonGioClass = isNegative ? 'text-rose-600 font-bold dark:text-rose-400' : 'text-slate-600 dark:text-slate-300';
                 const tonGioDisplay = (item["Hạn còn lại"] !== undefined && item["Hạn còn lại"] !== null && item["Hạn còn lại"] !== '') ? item["Hạn còn lại"] : 0;
 
@@ -823,6 +851,8 @@ html_content = """
                     '<td class="py-2.5 px-3 text-center text-slate-500 font-medium">' + (startIdx + idx + 1) + '</td>' +
                     '<td class="py-2.5 px-3 font-semibold text-blue-600 dark:text-blue-400">' + (item["Số HĐ"] || '-') + '</td>' +
                     '<td class="py-2.5 px-3 text-slate-800 dark:text-slate-200 font-medium">' + (item["Block"] || '-') + '</td>' +
+                    '<td class="py-2.5 px-3 text-slate-700 dark:text-slate-300">' + ngayHenDisplay + '</td>' +
+                    '<td class="py-2.5 px-3 text-slate-700 dark:text-slate-300">' + lichHenDisplay + '</td>' +
                     '<td class="py-2.5 px-3 text-center text-slate-700 dark:text-slate-300">' + (item["Số lần hẹn"] || 0) + '</td>' +
                     '<td class="py-2.5 px-3 text-center col-highlight font-semibold">' + repeatBadge + '</td>' +
                     '<td class="py-2.5 px-3 font-medium text-slate-700 dark:text-slate-300">' + (item["Nhân sự"] || '-') + '</td>' +
@@ -1027,7 +1057,7 @@ html_content = """
         }
 
         async function fetchGoogleSheetData(showNotification = true) {
-            const jsonUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:json&_nc=' + Date.now();
+            const jsonUrl = 'https://docs.google.com/spreadsheets/d/' + GOOGLE_SHEET_ID + '/gviz/tq?tqx=out:json&gid=0&_nc=' + Date.now();
             const syncIcon = document.getElementById('syncIcon');
             
             if (syncIcon) syncIcon.classList.add('fa-spin');
@@ -1111,7 +1141,7 @@ html_content = """
                 const rowStr = row.map(function(c, idx) { 
                     return String(getCellVal(row, idx)).toUpperCase(); 
                 }).join(' ');
-                if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('HẠN CÒN LẠI') !== -1 || rowStr.indexOf('BLOCK') !== -1) {
+                if (rowStr.indexOf('SỐ HĐ') !== -1 || rowStr.indexOf('HẠN CÒN LẠI') !== -1 || rowStr.indexOf('BLOCK') !== -1 || rowStr.indexOf('S H') !== -1) {
                     headerRowIdx = r;
                     break;
                 }
@@ -1128,7 +1158,7 @@ html_content = """
                     return candidateNames.some(function(name) {
                         const cleanName = name.toLowerCase().trim();
                         if (cleanName === 'an' || cleanName === 'cột an') {
-                            return cleanH === 'an' || cleanH === 'cột an' || cleanH === 'cot an';
+                            return cleanH === 'an' || cleanH === 'cột an' || cleanH === 'cot an' || cleanH === 'ct an';
                         }
                         return cleanH.indexOf(cleanName) !== -1;
                     });
@@ -1137,15 +1167,19 @@ html_content = """
             }
 
             const colBlockIdx = getColIndex(['Block', 'Mã Block'], 4);
-            const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD'], 5);
+            const colSoHDIdx = getColIndex(['Số HĐ', 'So HD', 'Mã HĐ', 'Số HD', 'S H'], 5);
             const colTenKHIdx = getColIndex(['Tên đầy đủ', 'Khách hàng', 'Tên KH'], 6);
             
-            const colTonGioJIdx = 9; 
+            const colTonGioJIdx = 9; // Cột J (index 9)
 
-            const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn'], 14);
-            const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp'], 15);
-            const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý'], 18);
-            const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục'], 21);
+            // Cột K (index 10) -> Ngày hẹn & Cột M (index 12) -> Lịch hẹn
+            const colNgayHenKIdx = 10; 
+            const colLichHenMIdx = 12;
+
+            const colHenIdx = getColIndex(['Số lần hẹn', 'Số lần hò', 'Lần hẹn', 'S ln hn'], 14);
+            const colCLLapIdx = getColIndex(['CL Lặp', 'CL Lap', 'Lặp', 'CL Lp'], 15);
+            const colTechIdx = getColIndex(['Nhân sự', 'KTV', 'Nhân sự xử lý', 'Nhân s'], 18);
+            const colUrgentIdx = getColIndex(['KH Giục Tiến Độ', 'Giục tiến độ', 'Giục TĐ', 'Giục', 'KH Gic Tin'], 21);
             const colPopIdx = 20; 
             const colControlIdx = getColIndex(['Kiểm soát', 'Đánh giá'], 38);
             const colANIdx = getColIndex(['cột an', 'an', 'quản lý', 'leader', 'giám sát'], 39);
@@ -1180,11 +1214,17 @@ html_content = """
                     tonGioVal = 0;
                 }
 
+                // Lấy dữ liệu Ngày hẹn (Cột K - index 10) và Lịch hẹn (Cột M - index 12)
+                const ngayHenVal = String(getCellVal(row, colNgayHenKIdx) || '').trim();
+                const lichHenVal = String(getCellVal(row, colLichHenMIdx) || '').trim();
+
                 parsedRecords.push({
                     "STT": parsedRecords.length + 1,
                     "Block": block,
                     "Số HĐ": soHD,
                     "Tên đầy đủ": String(getCellVal(row, colTenKHIdx) || '').trim(),
+                    "Ngày hẹn": ngayHenVal,
+                    "Lịch hẹn": lichHenVal,
                     "Hạn còn lại": tonGioVal,
                     "Số lần hẹn": parseInt(getCellVal(row, colHenIdx), 10) || 0,
                     "CL Lặp": parseInt(getCellVal(row, colCLLapIdx), 10) || 0,
